@@ -1,11 +1,13 @@
-function varargout = phz_writetable(PHZS,features,varargin)
+function varargout = phz_writetable(PHZ,varargin)
 %PHZ_WRITETABLE  Write grouping variables and features to a table.
 % 
-% D = PHZ_WRITETABLE(PHZS,FEATURES) writes calculates features and writes
+% D = PHZ_WRITETABLE(PHZS) writes calculates features and writes
 %   the results to a table D including grouping variables. Each row in the
 %   table represents on trial. If the 'keepVars' parameter is used 
 %   (described below), then each row represents a unique combination of the
-%   values in the grouping variables specified in 'keepVars'.
+%   values in the grouping variables specified in 'keepVars'. A feature or
+%   set of feature(s) must be specified using parameter/value pairs as a
+%   string or cell array of strings, respectively.
 % 
 %   Processing options: These parameter names will call the function with 
 %     the same name, using the specified value as input. See the help of 
@@ -22,15 +24,12 @@ function varargout = phz_writetable(PHZS,features,varargin)
 % PHZ_WRITETABLE(PHZS,FEATURES,...,'filename',FILENAME) saves the table as
 %   a .mat or a .csv file depending on the file extension of FILENAME.
 % 
-% See also PHZ_SUBSET, PHZ_RECT, PHZ_BLC, PHZ_REJ, PHZ_REGION, PHZ_FEATURE,
-%   PHZ_SUMMARY
-% 
 % Written by Gabriel A. Nespoli 2016-03-07. Revised 2016-03-21.
 
 if nargout == 0 && nargin == 0, help phz_writetable, return, end
 
 % gather raw data
-if ~(isstruct(PHZS) && phzUtil_isphzs(PHZS))
+if ~(isstruct(PHZ) && phzUtil_isphzs(PHZ))
     error('Problem with PHZS input.')
 end
 % if isempty(PHZS),                               PHZS = phz_gather;
@@ -41,10 +40,13 @@ end
 
 % defaults
 subset = {};
-rect = '';
+rect = [];
+transform = [];
 blc = [];
 rej = [];
+normtype = [];
 region = '';
+feature = '';
 keepVars = {'all'};
 
 filename = {};
@@ -57,9 +59,12 @@ for i = 1:2:length(varargin)
     switch lower(varargin{i})
         case 'subset',                  subset = varargin{i+1};
         case {'rect','rectify'},        rect = varargin{i+1};
+        case 'transform',               transform = varargin{i+1};
         case {'blc','baselinecorrect'}, blc = varargin{i+1};
         case {'rej','reject'},          rej = varargin{i+1};
+        case {'norm','normtype'},       normtype = varargin{i+1};
         case 'region',                  region = varargin{i+1};
+        case {'feature','features'},    feature = varargin{i+1};
         case {'summary','keepvars'},    keepVars = varargin{i+1};
             
         case {'save','filename'},       filename = addToCell(filename,varargin{i+1});
@@ -70,20 +75,22 @@ for i = 1:2:length(varargin)
 end
 
 % verify input
-if ~iscell(features), features = {features}; end
+if ~iscell(feature), feature = {feature}; end
 
 % data preprocessing
-PHZS = phz_check(PHZS);
-PHZS = phz_subset(PHZS,subset);
-PHZS = phz_rect(PHZS,rect,verbose);
-PHZS = phz_blc(PHZS,blc,verbose);
-PHZS = phz_rej(PHZS,rej,verbose);
-PHZS = phz_region(PHZS,region,verbose);
+PHZ = phz_check(PHZ);
+PHZ = phz_subset(PHZ,subset);
+PHZ = phz_rect(PHZ,rect,verbose);
+PHZ = phz_transform(PHZ,transform,verbose);
+PHZ = phz_blc(PHZ,blc,verbose);
+PHZ = phz_rej(PHZ,rej,verbose);
+PHZ = phz_norm(PHZ,normtype);
+PHZ = phz_region(PHZ,region,verbose);
 
 disp('Calculating features...')
-for i = 1:length(features)
+for i = 1:length(feature)
     
-    [s,featureTitle] = phz_feature(PHZS,features{i},'summary',keepVars,'verbose',verbose);
+    [s,featureTitle] = phz_feature(PHZ,feature{i},'summary',keepVars,'verbose',verbose);
     % (run phz_summary through phz_feature because fft feature needs to average
     %  over the summaryType by participant before doing the fft)
     
@@ -101,16 +108,16 @@ for i = 1:length(features)
         d = table(s.(addVars{1}),'VariableNames',addVars(1));
         d.Properties.VariableUnits = {''};
         d.Properties.VariableDescriptions = {''};
-        d.Properties.Description = [PHZS.study,' ',upper(PHZS.datatype),' data'];
+        d.Properties.Description = [PHZ.study,' ',upper(PHZ.datatype),' data'];
         
-        d.Properties.UserData.study = PHZS.study;
-        d.Properties.UserData.datatype = PHZS.datatype;
-        if ischar(PHZS.region), d.Properties.UserData.region = PHZS.region;
+        d.Properties.UserData.study = PHZ.study;
+        d.Properties.UserData.datatype = PHZ.datatype;
+        if ischar(PHZ.region), d.Properties.UserData.region = PHZ.region;
         else d.Properties.UserData.region = 'epoch';
         end
-        d.Properties.UserData.files = PHZS.files;
-        d.Properties.UserData.misc = PHZS.misc;
-        d.Properties.UserData.history = PHZS.history;
+        d.Properties.UserData.files = PHZ.files;
+        d.Properties.UserData.misc = PHZ.misc;
+        d.Properties.UserData.history = PHZ.history;
         
         for j = 1:length(addVars) - 1
             d.(addVars{j+1}) = s.(addVars{j+1});

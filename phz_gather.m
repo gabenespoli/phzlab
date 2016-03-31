@@ -120,7 +120,7 @@ for i = 1:length(files)
     
     % do user-defined preprocessing
     PHZ = phz_subset(PHZ,subset);
-    PHZ = phz_rect(PHZ,rect,verbose);
+%     PHZ = phz_rect(PHZ,rect,verbose);
     PHZ = phz_blc(PHZ,blc,verbose);
     PHZ = phz_rej(PHZ,rej,verbose);
     PHZ = phz_region(PHZ,region,verbose);

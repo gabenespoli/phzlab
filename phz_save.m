@@ -6,18 +6,18 @@ function PHZ = phz_save(PHZ,varargin)
 % 
 % See also PHZ_LOAD, PHZ_CHECK.
 %
-% Written by Gabriel A. Nespoli 2016-03-04.
+% Written by Gabriel A. Nespoli 2016-03-04. Revised 2016-03-25.
 
 if nargout == 0 && nargin == 0, help phz_save, return, end
 
 if nargin == 1
-    [filename,pathname] = uiputfile({'*.mat';'*.*'});
+    [filename,pathname] = uiputfile({'*.phz';'*.*'});
     filename = fullfile(pathname,filename);
 end
 
 if nargin > 1
     [pathname,filename,ext] = fileparts(varargin{1});
-    if isempty(ext), ext = '.mat'; end
+    if isempty(ext), ext = '.phz'; end
     filename = fullfile(pathname,[filename,ext]);
 end
 
@@ -25,6 +25,8 @@ if nargin > 2
     verbose = varargin{2};
 else verbose = true;
 end
+
+PHZ.misc.filename = filename;
 
 PHZ = phzUtil_history(PHZ,['Saved to ''',filename,'''.'],verbose);
 

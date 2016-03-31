@@ -10,7 +10,6 @@ function phz_plot(PHZ,varargin)
 %     each function for a more detailed explanation of what they do and 
 %     how to use them.
 %   'subset'    = Only plot a subset of the data in PHZ.
-%   'rect'      = Full- or half-wave rectification of PHZ.data.
 %   'blc'       = Subtract the mean of a baseline region from PHZ.data.
 %   'rej'       = Reject trials with values above a threshold.
 %   'region'    = Restrict feature extraction or plotting to a region.
@@ -49,23 +48,23 @@ function phz_plot(PHZ,varargin)
 %       and 'region_spec' specify the colour of the corresponding value in
 %       '*_order'.
 %
-% See also PHZ_SUBSET, PHZ_RECT, PHZ_BLC, PHZ_REJ, PHZ_REGION, PHZ_FEATURE,
-%   PHZ_SUMMARY
-%
-% Written by Gabriel A. Nespoli 2016-02-16. Revised 2016-03-22.
+% Written by Gabriel A. Nespoli 2016-02-16. Revised 2016-03-31.
 
 if nargout == 0 && nargin == 0, help phz_plot, return, end
 
 % defaults
 subset = {};
-rect = '';
-blc = [];
+rect = [];
+win = [];
+transform = [];
 rej = [];
+blc = [];
+normtype = [];
 region = '';
 feature = '';
 keepVars = {'none'};
 
-do_smoothing = false;
+do_plotsmooth = false;
 dispn = 'none'; % '(empty)','none','participant','trials','both'
 legendLoc = 'nw';
 linewidth = 2;
@@ -91,23 +90,26 @@ verbose = true;
 % user-defined
 for i = 1:2:length(varargin)
     switch lower(varargin{i})
-        case 'subset',                                  subset = varargin{i+1};
-        case {'rect','rectify'},                        rect = varargin{i+1};
-        case {'blc','baselinecorrect'},                 blc = varargin{i+1};
-        case {'rej','reject'},                          rej = varargin{i+1};
-        case 'region',                                  region = varargin{i+1};
-        case 'feature',                                 feature = varargin{i+1};
-        case {'summary','keepvars'},                    keepVars = varargin{i+1};
+        case 'subset',                  subset = varargin{i+1};
+        case {'rect','rectify'},        rect = varargin{i+1};
+        case 'smooth',                  win = varargin{i+1};
+        case 'transform',               transform = varargin{i+1};
+        case {'rej','reject'},          rej = varargin{i+1};
+        case {'blc','baselinecorrect'}, blc = varargin{i+1};            
+        case {'norm','normtype'},       normtype = varargin{i+1};
+        case 'region',                  region = varargin{i+1};
+        case 'feature',                 feature = varargin{i+1};
+        case {'summary','keepvars'},    keepVars = varargin{i+1};
             
-        case {'smooth','smoothing'},                    do_smoothing = varargin{i+1};
-        case {'dispn','n'},                             dispn = varargin{i+1};    
-        case {'legend','legendloc'},                    legendLoc = varargin{i+1};            
-        case {'linewidth','lineweight'},                linewidth = varargin{i+1};
-        case 'fontsize',                                fontsize = varargin{i+1};
+        case {'plotsmooth'},            do_plotsmooth = varargin{i+1};
+        case {'dispn','n'},             dispn = varargin{i+1};    
+        case {'legend','legendloc'},    legendLoc = varargin{i+1};            
+        case {'linewidth','lineweight'},linewidth = varargin{i+1};
+        case 'fontsize',                fontsize = varargin{i+1};
             
-        case {'yl','ylim'},                             yl = varargin{i+1};
-        case {'xl','xlim'},                             xl = varargin{i+1};
-        case 'sameyl',                                  sameyl = varargin{i+1};
+        case {'yl','ylim'},             yl = varargin{i+1};
+        case {'xl','xlim'},             xl = varargin{i+1};
+        case 'sameyl',                  sameyl = varargin{i+1};
             
         case {'participant_order','participantorder'},  spec.participant_order = varargin{i+1};
         case {'participant_spec','participantspec'},    spec.participant_spec = varargin{i+1};
@@ -133,8 +135,13 @@ if length(cellstr(keepVars)) > 2, error('Cannot plot more than 2 summary types.'
 PHZ = phz_check(PHZ);
 PHZ = phz_subset(PHZ,subset);
 PHZ = phz_rect(PHZ,rect,verbose);
-PHZ = phz_blc(PHZ,blc,verbose);
-PHZ = phz_rej(PHZ,rej,verbose);
+PHZ = phz_smooth(PHZ,win,verbose);
+PHZ = phz_transform(PHZ,transform,verbose);
+
+% PHZ = phz_rej(PHZ,rej,verbose);
+% PHZ = phz_blc(PHZ,blc,verbose);
+PHZ = phz_norm(PHZ,normtype);
+
 if ~isempty(feature) && ~strcmp(feature,'time'), PHZ = phz_region(PHZ,region,verbose); end
 [PHZ,featureTitle] = phz_feature(PHZ,feature,'summary',keepVars,'verbose',verbose);
 % (run phz_summary through phz_feature because fft feature needs to average
@@ -142,11 +149,10 @@ if ~isempty(feature) && ~strcmp(feature,'time'), PHZ = phz_region(PHZ,region,ver
 
 % prepare to plot
 [spec,lineOrder,lineLabels,lineSpec,plotOrder,plotLabels] = getLabelsAndSpec(PHZ,spec,dispn);
-% linePlotTypes = {'','time','fft','itfft','itpc'};
 [rows,cols,pos,ytitleLoc,xtitleLoc] = getPlotDims(plotLabels);
 if isempty(yl), yl = nan(length(plotLabels),2); do_yl = true; else do_yl = false; end
-if isempty(xl), xl = nan(size(yl));    do_xl = true; else do_xl = false; end
-ytitle = getytitle(PHZ,feature,legendLoc,do_smoothing,featureTitle);
+if isempty(xl), xl = nan(size(yl));             do_xl = true; else do_xl = false; end
+ytitle = getytitle(PHZ,feature,legendLoc,do_plotsmooth,featureTitle);
 
 % loop plots and plot lines/bars
 % ------------------------------
@@ -182,7 +188,6 @@ for j = 1:length(plotOrder)
         
 %         lineLabel = lineOrder{i};
         
-%         if ismember(feature,linePlotTypes)
         if size(PHZ.data,2) > 1
             
             % line plots of time-series or fft data
@@ -190,7 +195,7 @@ for j = 1:length(plotOrder)
             elseif ismember('freqs',fieldnames(PHZ)), x = PHZ.freqs;
             end
             
-            if do_smoothing % x-axis limits become shorter with smoothing
+            if do_plotsmooth % x-axis limits become shorter with smoothing
                 [y,ind] = phzUtil_smooth(y);
                 x = x(ind);
             end
@@ -256,7 +261,6 @@ if do_yl
     if sameyl, yl = [-(max(abs(yl))) (max(abs(yl)))]; end
 end
 
-% if do_xl && ismember(feature,linePlotTypes)
 if do_xl && size(PHZ.data,2) > 1
     xl = [x(1) x(end)];
 end
@@ -268,7 +272,6 @@ for j = 1:length(plotLabels)
     
     % set y- and x-axis ranges
     ylim(yl)
-%     if ismember(feature,linePlotTypes)
     if size(PHZ.data,2) > 1
         xlim(xl)
     end
@@ -300,7 +303,6 @@ for j = 1:length(plotLabels)
     end
     
     % add legend
-%     if ismember(feature,linePlotTypes) && ~isempty(legendLoc)
     if size(PHZ.data,2) > 1 && ~isempty(legendLoc)
         legend('-DynamicLegend','Location',legendLoc)
     end

@@ -6,12 +6,13 @@ function PHZ = phz_load(varargin)
 % 
 % See also PHZ_SAVE, PHZ_CHECK.
 %
-% Written by Gabriel A. Nespoli 2016-03-07. Revised 2016-03-23.
+% Written by Gabriel A. Nespoli 2016-03-07. Revised 2016-03-25.
 
 if nargout == 0 && nargin == 0, help phz_load, return, end
 
+% get filename if none given
 if nargin == 0
-    [filename,pathname] = uigetfile('.mat','Select a PHZ file to load...');
+    [filename,pathname] = uigetfile({'.phz';'.mat'},'Select a PHZ file to load...');
     if filename == 0, return, end
     filename = fullfile(pathname,filename);
 else
@@ -19,11 +20,13 @@ else
     filename = fullfile(pathname,[filename,ext]);
 end
 
+% parse input
 if nargin > 1, verbose = varargin{2}; else verbose = false; end
 
 if ~exist(filename,'file'), error('File doesn''t exist.'), end
 
-S = load(filename);
+% load file
+S = load(filename,'-mat');
 name = fieldnames(S);
 
 i = 1;

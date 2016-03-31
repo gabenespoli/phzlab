@@ -1,10 +1,45 @@
-function PHZ = phz_create
+function PHZ = phz_create(filetype,files,varargin)
 %PHZ_CREATE  Create a new PHZ structure.
 % 
-% PHZ = PHZ_CREATE creates a blank PHZ structure with fields that are to be
-%   filled manually by the user. Ideally, all epoched datafiles are
-%   readable into MATLAB so that this can be scripted. A recommended
-%   workflow for this process is described in the help for phz_create_loop.
+% PHZ = PHZ_CREATE(FILETYPE,FILES) creates a PHZ structure from the data in FILES.
+%   FILES can be a string with a filename, a cell array of strings of
+%   filenames, or a folder of files. Only .mat files are recognized.
+%   Leaving FILES empty ('') opens a prompt to select a file or file(s) 
+%   from which to create PHZ files. The 'participant', 'group', and 
+%   'session' fields of the PHZ structure are filled using the first three 
+%   items in the filename that are delimited by a hyphen ('-').
+%   'filetype'    = The type of data file being loaded. Note that this file
+%                   must have been "saved as" a MATLAB (or .mat) file.
+%                   Default is 'acq' for a BIOPAC AcqKnowledge file.
+% 
+% PHZ = PHZ_CREATE(FILES,'Param1','Value1') specifies the following:
+%   'channel'     = If the data file contains multiple channels, you must
+%                   specify which channel to extract. CHANNEL can be a
+%                   number or a string. If it is a string, there must be a
+%                   labels (or similar) variable in the data file indexing
+%                   the channels in the data variable.
+%   'delimiter'   = Specifies the delimiter in the filename for separating
+%                   'participant, 'group', and 'session' information.
+% X 'namestr'     = Specifies the file naming convention. NAMESTR must
+%                   contain at least one of 'participant', 'group', and
+%                   'session', and each must be separated by a delimiter.
+%                   Other options are 'study' and 'datatype'. The default 
+%                   NAMESTR is 'participant-group-session'.
+%   'study'       = Fills the 'study' field of the PHZ structure.
+%   'datatype'    = Fills the 'datatype' field of the PHZ structure.
+%   'savefolder'  = The folder where the new PHZ file should be saved.
+%                   SAVEFOLDER must be specified if multiple PHZ files are
+%                   being created. Specify the empty string ('') to use the
+%                   same folder as where the data files are saved. Default
+%                   is not to save the new PHZ structure. Files are saved
+%                   using the phz_save function, the file will have the 
+%                   '.phz' extension, and should be loaded using the
+%                   phz_load function.
+% 
+% X  = This functionality isn't working yet.
+% 
+% PHZ = PHZ_CREATE('blank') creates a blank PHZ structure with fields that
+%   are to be filled manually by the user.
 % 
 %   study           = 'string'
 %   datatype        = 'string', type of data in PHZ.data.
@@ -36,11 +71,131 @@ function PHZ = phz_create
 %                     plot.m function for more detail on line types.
 %   misc            = Any type, available for user data.
 %
-% Written by Gabe Nespoli 2016-01-27. Revised 2016-03-22.
+% Written by Gabe Nespoli 2016-01-27. Revised 2016-03-25.
 
-if nargout == 0 && nargin == 0, help phz_create, return, end
+if nargout == 0 && nargin == 0, help phz_create, return
+elseif nargout == 0 && nargin > 0, error('Assign an output argument.')
+end
+if isempty(filetype), error('Specify a file type.'), end
 
-% create empty PHZ structure
+% defaults
+study = '';
+% participant = '';
+% group = '';
+% session = '';
+
+channel = 1;
+delimiter = '-';
+
+% filetype = 'acq';
+savefolder = 0;
+verbose = true;
+
+folder = '';
+
+% get data file names
+if isdir(files) % load all files from folder
+    folder = files;
+    files = what(folder);
+    files = files.mat;
+    
+% elseif ischar(files) && strcmp(files,'blank')
+%     PHZ = getBlankPHZ(verbose);
+%     return
+    
+elseif ischar(files) && exist(files,'file') % load file from filename
+    files = {files};
+    
+elseif isempty(files) % prompt to select file(s)
+    [files,folder] = uigetfile('.mat','Select data file(s)...','MultiSelect','on');
+    if isnumeric(files) && files == 0, return, end
+    if ischar(files), files = {files}; end
+    
+elseif ~iscell(files)  % (load many files from cell array of filenames)
+    error('Problem with FILES input.')
+    
+end
+
+% user-defined
+for i = 1:2:length(varargin)
+    switch lower(varargin{i})
+        case 'study',                   study = varargin{i+1};
+%         case 'participant',             participant = varargin{i+1};
+%         case 'group',                   group = varargin{i+1};
+%         case 'session',                 session = varargin{i+1};
+
+        case 'channel',                 channel = varargin{i+1};
+        case 'delimiter',               delimiter = varargin{i+1};
+        
+%         case 'filetype',                filetype = varargin{i+1};
+        case {'save','filename'},       savefolder = varargin{i+1};
+        case 'verbose',                 verbose = varargin{i+1};
+    end
+end
+
+if nargin == 0, PHZ = getBlankPHZ(verbose); return, end
+
+% check things before starting
+if ~ischar(savefolder) && length(files) > 1
+    error('When creating more than one PHZ file, specify a folder where they should be saved.')
+end
+
+% loop files
+if verbose, disp(' '), disp('Creating PHZ file(s) from data file(s)...'), end
+w = waitbar(0,'Creating PHZ file(s) from data file(s)...');
+for i = 1:length(files)
+    fileProgress = [num2str(i),'/',num2str(length(files)),': ',files{i}];
+    waitbar((i-1)/length(files),w,['Creating PHZ file from data file ',fileProgress]);
+    
+    % load data
+    if verbose, disp(['Loading data from file ',fileProgress]), end
+    PHZ = getBlankPHZ(verbose); % get new blank PHZ structure
+    PHZ.study = study;
+    PHZ.misc.datafile = fullfile(folder,files{i});
+    s = load(PHZ.misc.datafile,'-mat');
+    
+    
+    % get grouping vars from filename ('participant-group-session.mat')
+    [~,name] = fileparts(files{i});
+    name = regexp(name,delimiter,'split');
+    PHZ.participant = name{1};
+    if length(name) > 1, PHZ.group = name{2}; end
+    if length(name) > 2, PHZ.session = name{3}; end
+    
+    % get data
+    switch lower(filetype)
+        case 'acq'
+            if ischar(channel), channel = find(strcmp(cellstr(s.labels),channel)); end
+            if isempty(channel), error('Specify a valid channel.'), end
+            PHZ.datatype = deblank(s.labels(channel,:));
+            
+            PHZ.units = deblank(s.units(channel,:));
+            switch s.isi_units
+                case 'ms', PHZ.srate = s.isi * 1000;
+                case 's',  PHZ.srate = s.isi;
+            end
+            
+            PHZ.data = transpose(s.data(:,channel));
+            PHZ.times = (s.start_sample:1:length(PHZ.data)) / PHZ.srate;
+            
+        otherwise, error('Unknown file type.')
+    end
+    
+    % save PHZ file
+    if ischar(savefolder)
+        [pathstr,name] = fileparts(PHZ.misc.datafile);
+        if isempty(savefolder), savefolder = pathstr; end
+        PHZ = phz_save(PHZ,fullfile(savefolder,[name,'.phz']));
+    else PHZ = phz_check(PHZ);
+    end
+     
+end
+close(w)
+
+end
+
+function PHZ = getBlankPHZ(verbose)
+
 PHZ.study = '';
 PHZ.datatype = ''; % i.e. 'scl', 'zyg', 'ffr', etc.
 
@@ -91,6 +246,6 @@ PHZ.misc = [];
 PHZ.history = {};
 
 % add creation date to FFR.history
-PHZ = phzUtil_history(PHZ,'PHZ structure created.');
+PHZ = phzUtil_history(PHZ,'PHZ structure created.',verbose);
 
 end

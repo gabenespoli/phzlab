@@ -77,7 +77,7 @@ if isempty(threshold) || threshold == 0
     
     % newThresh == 0, oldThresh == 0 (do nothing and return)
     if ~ismember('rej',fieldnames(PHZ))
-        if verbose, disp('Threshold is already set to [].'), end
+%         if verbose, disp('Threshold is already set to [].'), end
         returnFlag = 1;
         return
         
@@ -87,24 +87,14 @@ if isempty(threshold) || threshold == 0
         return
     end
     
-    % newThresh == val, oldThresh == same val (do nothing and return)
+    % newThresh == val
 elseif ismember('rej',fieldnames(PHZ))
-    if threshold == PHZ.rej.threshold
-        if verbose
-            disp(['Trials have already been rejected at a threshold of ',...
-            num2str(threshold),' ',PHZ.units,'.'])
-        end
-        returnFlag = 1;
-        return
-        
-        % newThresh == val, oldThresh == different val (reset and continue)
-    else PHZ = phz_unreject(PHZ,verbose);
-        PHZ = getRejStructure(PHZ);
-    end
+    PHZ = phz_unreject(PHZ,verbose);
+    PHZ = getRejStructure(PHZ);
     
     % (otherwise newThresh == val, oldThresh == 0, no prep needed, continue)
 else PHZ = getRejStructure(PHZ);
-
+    
 end
 
 % do actual finding of trials to reject
@@ -126,6 +116,12 @@ switch lower(rejType)
             end
         end
 end
+
+if length(PHZ.rej.locs) == size(PHZ.data,1)
+    disp('This threshold would reject all trials. Aborting...')
+    error(' ')
+end
+
 end
 
 function PHZ = phz_unreject(PHZ,verbose)

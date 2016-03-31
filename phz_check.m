@@ -1,19 +1,16 @@
 function PHZ = phz_check(PHZ,varargin)
 % PHZ_CHECK  Verify the integrity of a PHZ or PHZS structure.
 % 
-% Written by Gabriel A. Nespoli 2016-02-08. Revised 2016-03-22.
+% USAGE:
+%   PHZ = phz_check(PHZ)
+% 
+% Written by Gabriel A. Nespoli 2016-02-08. Revised 2016-03-29.
 
 if nargout == 0 && nargin == 0, help phz_check, end
 
 if nargin > 1, verbose = varargin{1};
 else           verbose = true;
 end
-
-% if verbose, 
-%     if phzUtil_isphzs(PHZ), disp('Checking PHZS file...')
-%     else            disp('Checking PHZ file...')    
-%     end
-% end
 
 % get name of input variable for accurate feedback
 name = inputname(1);
@@ -150,7 +147,8 @@ for i = {'participant','group','session','trials'}
     % _order
     if ~isempty(PHZ.(i{1}))
         
-        if ~ismember(PHZ.(i{1}),{'<collapsed>'})
+        if ~ismember(PHZ.(i{1}),{'<collapsed>'}) 
+%             || isundefined(PHZ.(i{1}))
             
             % if there is stuff that needs an order
             if length(PHZ.spec.([i{1},'_order'])) ~= length(unique(cellstr(PHZ.(i{1}))))
@@ -202,7 +200,8 @@ for i = {'participant','group','session','trials'}
     % _spec
     if ~isempty(PHZ.spec.([i{1},'_order']))
         
-        if ~ismember(PHZ.(i{1}),{'<collapsed>'})
+        if ~ismember(PHZ.(i{1}),{'<collapsed>'}) 
+%             || isundefined(PHZ.(i{1}))
             
             % if there is an order, make sure spec is same length
             if length(PHZ.spec.([i{1},'_order'])) ~= length(PHZ.spec.([i{1},'_spec']))
@@ -366,6 +365,7 @@ mainOrder = {'study'
     'rej'
     'blc'
     'rect'
+    'norm'
     
     'resp'
     'spec'

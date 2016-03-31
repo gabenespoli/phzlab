@@ -14,13 +14,7 @@ function PHZ = phz_blc(PHZ,region,varargin)
 %     PHZ.blc.values = The value of the mean of the baseline region for
 %                    each trial.
 % 
-%   Note: Baseline-correction is always done before threshold rejection 
-%     (i.e., phz_rej). If trials have already been rejected, phz_blc will 
-%     first unreject all trials, perform baseline-correction, then
-%     re-reject trials at the same threshold. This will likely result in 
-%     a different number of trials being rejected.
-% 
-% Written by Gabriel A. Nespoli 2016-02-16. Revised 2016-03-22.
+% Written by Gabriel A. Nespoli 2016-02-16. Revised 2016-03-31.
 
 if nargout == 0 && nargin == 0, help phz_blc, return, end
 
@@ -33,16 +27,24 @@ if nargin > 2, verbose = varargin{1}; else verbose = true; end
 % if new baseline-subtraction is requested, do it
 if do_blc || do_restore
     
-    % if things are rejected, un-reject first
-    if ismember('rej',fieldnames(PHZ))
-        threshold = PHZ.rej.threshold;
-        if ~isempty(threshold), PHZ = phz_rej(PHZ,[],verbose); end
-    else threshold = [];
-    end
+%     % if things are rejected, un-reject first
+%     if ismember('rej',fieldnames(PHZ))
+%         threshold = PHZ.rej.threshold;
+%         if ~isempty(threshold), PHZ = phz_rej(PHZ,[],verbose); end
+%     else threshold = [];
+%     end
     
     % restore previously-subtracted baseline
     if do_restore
-        PHZ.data = PHZ.data + repmat(PHZ.blc.values,1,size(PHZ.data,2));
+        
+        if ismember('rej',fieldnames(PHZ))
+            PHZ.data     = PHZ.data     + repmat(PHZ.blc.values(PHZ.rej.data_locs),1,size(PHZ.data,2));
+            PHZ.rej.data = PHZ.rej.data + repmat(PHZ.blc.values(PHZ.rej.locs),1,size(PHZ.rej.data,2));
+        else
+            PHZ.data = PHZ.data + repmat(PHZ.blc.values,1,size(PHZ.data,2));
+        end
+        
+        
         PHZ = rmfield(PHZ,'blc');
         PHZ = phzUtil_history(PHZ,'Added back previously removed baseline.',verbose);
     end
@@ -54,8 +56,17 @@ if do_blc || do_restore
         
         % get and subtract baseline
         PHZb = phz_region(PHZ,region,0);
-        PHZ.blc.values = mean(PHZb.data,2);
-        PHZ.data = PHZ.data - repmat(PHZ.blc.values,[1 size(PHZ.data,2)]);
+        
+        if ismember('rej',fieldnames(PHZ))
+            PHZ.blc.values = nan(length(PHZ.rej.locs) + length(PHZ.rej.data_locs),1);
+            PHZ.blc.values(PHZ.rej.locs)      = mean(PHZb.rej.data,2);
+            PHZ.blc.values(PHZ.rej.data_locs) = mean(PHZb.data,2);
+        else
+            PHZ.blc.values = mean(PHZb.data,2);
+            PHZ.data = PHZ.data - repmat(PHZ.blc.values,[1 size(PHZ.data,2)]);
+        end
+        
+        
         
         if ischar(region), region = PHZ.region.(region); end
         PHZ.blc.region = region;
@@ -65,10 +76,10 @@ if do_blc || do_restore
             phzUtil_num2strRegion(region),' from data.'],verbose);
     end
     
-    % if things were rejected, re-reject
-    if ~isempty(threshold)
-        PHZ = phz_rej(PHZ,threshold,verbose);
-    end
+%     % if things were rejected, re-reject
+%     if ~isempty(threshold)
+%         PHZ = phz_rej(PHZ,threshold,verbose);
+%     end
 end
 end
 
@@ -81,7 +92,7 @@ if all(isempty(region))
         % newBL == 0, oldBL == 0 (do nothing and return)
         do_blc = false;
         do_restore = false;
-        if verbose, disp('Baseline is already set to [].'), end
+%         if verbose, disp('Baseline is already set to [].'), end
         return
         
     else % newBL == 0, oldBL == val

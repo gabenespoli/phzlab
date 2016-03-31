@@ -157,7 +157,6 @@ switch lower(feature)
         % convert from indices to times if feature is latency
         switch feature
             case {'maxi','mini','latency','maxlatency','minlatency','slopelatency'}
-                PHZ.data = PHZ.data + locs(1) - 1;
                 PHZ.data = PHZ.times(PHZ.data)';
                 PHZ.units = 's';
             case {'auc','area'}
