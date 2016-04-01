@@ -1,24 +1,23 @@
 function PHZ = phz_filter(PHZ,cutoff,varargin)
 %PHZ_FILTER  Apply a Butterworth or smoothing filter to the data.
 %
-% USAGE:
-%   PHZ = phz_filter(PHZ,CUTOFF)
-%   PHZ = phz_filter(PHZ,'smooth')
-%   PHZ = phz_filter(PHZ,...,'Param1','Value1',etc.)
+% usage:    PHZ = phz_filter(PHZ,CUTOFF)
+%           PHZ = phz_filter(PHZ,CUTOFF,'Param1','Value1',etc.)
 %
-% INPUTS:
-%   PHZ         = PHZLAB data structure.
-%   CUTOFF      = Cutoff frequencies for filtering in Hertz, in the form
-%                 [locut hicut notch]. Default is a Butterworth filter.
-%                 Enter 'smooth' for a sliding window average.
-%   'ord'       = Filter order. Default 3.
-%   'verbose'   = Print history in command window. Default true.
+% inputs:   PHZ       = PHZLAB data structure.
+%           CUTOFF    = Cutoff frequencies for filtering in Hertz, in the
+%                       form [locut hicut notch]. Default is a Butterworth
+%                       filter.
+%           'ord'     = Filter order. Default 3.
+%           'verbose' = Print history in command window. Default true.
+% 
+% outputs:  PHZ.data  = The filtered data.
 %
-% EXAMPLES:
-%   phz_filter(PHZ,1)           >> 1 Hz high pass Butterworth filter
-%   phz_filter(PHZ,[0 10])      >> 10 Hz low pass Butterworth filter
-%   phz_filter(PHZ,[1 10])      >> 1-10 Hz band pass Butterworth filter
-%   phz_filter(PHZ,[0 0 60])    >> 59-61 Hz band stop Butterworth filter
+% examples:
+%   PHZ = phz_filter(PHZ,1)        >> 1 Hz high pass Butterworth filter
+%   PHZ = phz_filter(PHZ,[0 10])   >> 10 Hz low pass Butterworth filter
+%   PHZ = phz_filter(PHZ,[1 10])   >> 1-10 Hz band pass Butterworth filter
+%   PHZ = phz_filter(PHZ,[0 0 60]) >> 59-61 Hz band stop Butterworth filter
 %
 % Written by Gabriel A. Nespoli 2014-03-18. Revised 2016-03-31.
 
