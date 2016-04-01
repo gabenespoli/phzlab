@@ -43,8 +43,8 @@ elseif strcmp(normtype,'all') || length(PHZ.(normtype)) == 1
     PHZ.data = (PHZ.data - mean(PHZ.data(:))) / std(PHZ.data(:));
     
 else
-    for i = 1:length(PHZ.spec.([normtype,'_order']))
-        ind = PHZ.(normtype) == PHZ.spec.([normtype,'_order']){i};
+    for i = 1:length(PHZ.(normtype))
+        ind = PHZ.tags.(normtype) == PHZ.(normtype)(i);
         data = PHZ.data(ind,:);
         PHZ.data(ind,:) = (data - mean(data(:))) / std(data(:));
     end
