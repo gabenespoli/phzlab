@@ -20,7 +20,7 @@ PHZ = orderPHZfields(PHZ);
 % verify data types
 % -----------------
 
-% basic
+%% basic
 if ~isstruct(PHZ), error([name,' variable should be a structure.']), end
 PHZ.study       = verifyChar(PHZ.study,[name,'.study'],verbose);
 PHZ.datatype    = verifyChar(PHZ.datatype,[name,'.datatype'],verbose);
@@ -29,19 +29,81 @@ PHZ.srate       = verifyNumeric(PHZ.srate,[name,'.srate'],verbose);
 checkSingleNumber(PHZ.srate,[name,'.srate']);
 PHZ.data        = verifyNumeric(PHZ.data,[name,'.data'],verbose);
 
-% participant, group, session, trials
-PHZ.participant = verifyCategorical(PHZ.participant,[name,'.partcipant'],verbose);
-PHZ.group       = verifyCategorical(PHZ.group,[name,'.group'],verbose);
-PHZ.session     = verifyCategorical(PHZ.session,[name,'.session'],verbose);
-PHZ.trials      = verifyCategorical(PHZ.trials,[name,'.trials'],verbose);
+%% participant, group, session, trials
+if ~isstruct(PHZ.tags), error([name,'.tags should be a structure.']), end
+if ~isstruct(PHZ.spec), error([name,'.spec should be a structure.']), end
 
-PHZ.participant = checkAndFixColumn(PHZ.participant,[name,'.partcipant'],nargout,verbose);
-PHZ.group       = checkAndFixColumn(PHZ.group,[name,'.group'],nargout,verbose);
-PHZ.session     = checkAndFixColumn(PHZ.session,[name,'.session'],nargout,verbose);
-PHZ.trials      = checkAndFixColumn(PHZ.trials,[name,'.trials'],nargout,verbose);
+for i = {'participant','group','session','trials'}, field = i{1};
+    
+    % grouping vars
+    if length(PHZ.(field)) ~= length(unique(PHZ.(field))), error([name,'.',field,' cannot contain repeated values.']), end
+    PHZ.(field) = verifyCategorical(PHZ.(field),[name,'.',field],verbose);
+    PHZ.(field) = checkAndFixRow(PHZ.(field),[name,'.',field],nargout,verbose);
+    
+    % tags
+    PHZ.tags.(field) = verifyCategorical(PHZ.tags.(field),[name,'.tags.',field],verbose);
+    PHZ.tags.(field) = checkAndFixColumn(PHZ.tags.(field),[name,'.tags.',field],nargout,verbose);
+    
+    if ~isempty(PHZ.tags.(field)) && length(PHZ.tags.(field)) ~= size(PHZ.data,1), error([name,'.tags.',field,' has an incorrect number of elements.']), end
+    if isempty(PHZ.tags.(field)) && length(PHZ.(field)) == 1, PHZ.tags.(field) = repmat(PHZ.(field),size(PHZ.data,1)); end
+    if ~isempty(PHZ.tags.(field)) && isempty(PHZ.(field))
+        PHZ.(field) = unique(PHZ.tags.(field));
+        
+        % if numeric, order numerically
+        if ~any(isnan(str2double(PHZ.(field))))
+            PHZ.(field) = str2double(PHZ.(field));
+            PHZ.(field) = sort(PHZ.(field));
+            PHZ.(field) = cellstr(num2str(PHZ.(field)));
+            PHZ.(field) = strrep(PHZ.(field),' ','');
+        end
+    end
+    
+    % make ordinal
+    if ~isempty(PHZ.(field))
+        PHZ.(field) = categorical(PHZ.(field),'Ordinal',true);
+        PHZ.tags.(field) = categorical(PHZ.tags.(field),cellstr(PHZ.(field)),'Ordinal',true);
+    end
+    
+    % verify spec
+    resetSpec = [];
+    if ~isempty(PHZ.(field))
+        
+        if ~ismember(PHZ.tags.(field),{'<collapsed>'})
+            %             || isundefined(PHZ.(i{1}))
+            
+            % if there is an order, make sure spec is same length
+            if length(PHZ.(field)) ~= length(PHZ.spec.(field))
+                resetSpec = true;
+                if noutargs == 0, warning([name,'.spec.',field,' has an incorrect number of items.'])
+                elseif verbose, disp([name,'.spec.',field,' had an incorrect number of items and was reset to the default order.'])
+                end
+            end
+        else PHZ.spec.(field) = {};
+        end
+        
+        % else _order is empty, make sure spec is empty
+    elseif ~isempty(PHZ.spec.(field))
+        PHZ.spec.(field) = {};
+        disp([name,'.spec.',field,' was emptied (set to {})'])
+        
+    end
+    
+    if resetSpec
+        for j = 1:length(PHZ.(field))
+            PHZ.spec.(field){j} = '';
+        end
+    end
+    
+    
+    
+end
 
 
-% times / freqs
+
+
+
+
+%% times / freqs
 if all(ismember({'times','freqs'},fieldnames(PHZ))), error('Cannot have both TIMES and FREQS fields.'), end
 if ismember('times',fieldnames(PHZ))
     PHZ.times       = verifyNumeric(PHZ.times,[name,'.times'],verbose);
@@ -58,7 +120,7 @@ elseif ismember('freqs',fieldnames(PHZ))
     PHZ.freqs       = checkAndFixRow(PHZ.freqs,[name,'.freqs'],nargout,verbose);
 end
 
-% region
+%% region
 if isstruct(PHZ.region)
     rname = fieldnames(PHZ.region);
     for i = 1:length(rname)
@@ -70,10 +132,14 @@ elseif isnumeric(PHZ.region)
     PHZ.region = checkAndFix1x2(PHZ.region,[name,'.region'],nargout,verbose);
 end
 
-% resp
+PHZ.tags.region = verifyCell(PHZ.tags.region,[name,'.tags.region'],verbose);
+PHZ.tags.region = checkAndFixRow(PHZ.tags.region,[name,'.tags.region'],nargout,verbose);
+if length(PHZ.tags.region) ~= 5, error('There should be 5 region names in PHZ.tags.region.'), end
+
+%% resp
 if ~isstruct(PHZ.resp), error([name,'.resp should be a structure.']), end
 
-% blc
+%% blc
 if ismember('blc',fieldnames(PHZ))
     if ~isstruct(PHZ.blc), error([name,'.blc should be a structure.']), end
     PHZ.blc.region = verifyNumeric(PHZ.blc.region,[name,'.blc.region'],verbose);
@@ -87,7 +153,7 @@ if ismember('blc',fieldnames(PHZ))
     end
 end
 
-% rej
+%% rej
 if ismember('rej',fieldnames(PHZ))
     if ~isstruct(PHZ.rej), error([name,'.rej should be a structure.']), end
     PHZ.rej.threshold   = verifyNumeric(PHZ.rej.threshold, [name,'.rej.threshold'],verbose);
@@ -114,124 +180,16 @@ if ismember('rej',fieldnames(PHZ))
     end
 end
 
-% spec
-if ~isstruct(PHZ.spec), error([name,'.spec should be a structure.']), end
-for i = {'participant','group','session','trials','region'}
-    PHZ.spec.([i{1},'_order']) = verifyCell(PHZ.spec.([i{1},'_order']),    [name,'.spec.',i{1},'_order'],verbose);
-    PHZ.spec.([i{1},'_spec'])  = verifyCell(PHZ.spec.([i{1},'_spec']),     [name,'.spec.',i{1},'_spec'],verbose); 
-end
-PHZ = verifySpecAndOrder(PHZ,name,nargout,verbose);
-for i = {'participant','group','session','trials','region'}
-    PHZ.spec.([i{1},'_order']) = checkAndFixRow(PHZ.spec.([i{1},'_order']),[name,'.spec.',i{1},'_order'],nargout,verbose);
-    PHZ.spec.([i{1},'_spec'])  = checkAndFixRow(PHZ.spec.([i{1},'_spec']), [name,'.spec.',i{1},'_spec'],nargout,verbose);
-end
-
-% files
+%% files
 if ismember('files',fieldnames(PHZ))
     PHZ.files       = verifyCell(PHZ.files,[name,'.files'],verbose);
     PHZ.files       = checkAndFixColumn(PHZ.files,[name,'.files'],nargout,verbose);
 end
 
-% history
+%% history
 PHZ.history         = verifyCell(PHZ.history,[name,'.history'],verbose);
 PHZ.history         = checkAndFixColumn(PHZ.history,[name,'.history'],nargout,verbose);
 
-end
-
-function PHZ = verifySpecAndOrder(PHZ,name,noutargs,verbose)
-
-for i = {'participant','group','session','trials'}
-    resetOrder = false;
-    resetSpec = false;
-    
-    % _order
-    if ~isempty(PHZ.(i{1}))
-        
-        if ~ismember(PHZ.(i{1}),{'<collapsed>'}) 
-%             || isundefined(PHZ.(i{1}))
-            
-            % if there is stuff that needs an order
-            if length(PHZ.spec.([i{1},'_order'])) ~= length(unique(cellstr(PHZ.(i{1}))))
-                resetOrder = true;
-                if noutargs == 0, warning([name,'.spec.',i{1},'_order has an incorrect number of items.'])
-                elseif verbose, disp([name,'.spec.',i{1},'_order had an incorrect number of items and was reset.'])
-                end
-                
-            elseif ~all(ismember(unique(cellstr(PHZ.(i{1}))),PHZ.spec.([i{1},'_order'])))
-                resetOrder = true;
-                if noutargs == 0, warning([name,'.spec.',i{1},'_order has incorrect item names.'])
-                elseif verbose, disp([name,'.spec.',i{1},'_order had incorrect item names and was reset.'])
-                end
-                
-            end
-            
-            if resetOrder
-                PHZ.spec.([i{1},'_order']) = cellstr(unique(cellstr(PHZ.(i{1}))));
-                
-                % if numeric, order numerically
-                if ~any(isnan(str2double(PHZ.spec.([i{1},'_order']))))
-                    PHZ.spec.([i{1},'_order']) = str2double(PHZ.spec.([i{1},'_order']));
-                    PHZ.spec.([i{1},'_order']) = sort(PHZ.spec.([i{1},'_order']));
-                    PHZ.spec.([i{1},'_order']) = cellstr(num2str(PHZ.spec.([i{1},'_order'])));
-                    PHZ.spec.([i{1},'_order']) = strrep(PHZ.spec.([i{1},'_order']),' ','');
-                end
-            end
-        end
-        
-        % make ordinal
-        if iscategorical(PHZ.(i{1})) && all(~isundefined(PHZ.(i{1})))
-            PHZ.(i{1}) = categorical(PHZ.(i{1}),PHZ.spec.([i{1},'_order']),'Ordinal',true);
-            
-            if ismember('rej',fieldnames(PHZ))
-                if ismember(i{1},fieldnames(PHZ.rej)) && ~strcmp(PHZ.rej.(i{1}),'<collapsed>')
-                    PHZ.rej.(i{1}) = categorical(PHZ.rej.(i{1}),PHZ.spec.([i{1},'_order']),'Ordinal',true);
-                end
-            end
-        end
-        
-        % else make sure order is empty
-    elseif ~isempty(PHZ.spec.([i{1},'_order']))
-        PHZ.spec.([i{1},'_order']) = {};
-        disp([name,'.spec.',i{1},'_order was emptied (set to {})'])
-    end
-
-    
-    
-    % _spec
-    if ~isempty(PHZ.spec.([i{1},'_order']))
-        
-        if ~ismember(PHZ.(i{1}),{'<collapsed>'}) 
-%             || isundefined(PHZ.(i{1}))
-            
-            % if there is an order, make sure spec is same length
-            if length(PHZ.spec.([i{1},'_order'])) ~= length(PHZ.spec.([i{1},'_spec']))
-                resetSpec = true;
-                if noutargs == 0, warning([name,'.spec.',i{1},'_spec has an incorrect number of items.'])
-                elseif verbose, disp([name,'.spec.',i{1},'_spec had an incorrect number of items and was reset to the default order.'])
-                end
-            end
-        else PHZ.spec.([i{1},'_spec']) = {};
-        end
-        
-        % else _order is empty, make sure spec is empty
-    elseif ~isempty(PHZ.spec.([i{1},'_spec']))
-        PHZ.spec.([i{1},'_spec']) = {};
-        disp([name,'.spec.',i{1},'_spec was emptied (set to {})'])
-
-    end
-    
-    if resetSpec
-        for j = 1:length(PHZ.spec.([i{1},'_order']))
-            PHZ.spec.([i{1},'_spec']){j} = '';
-        end
-    end
-end
-end
-
-function checkSameLength(a,b,name1,name2)
-if length(a) ~= length(b)
-    error([name1,' & ',name2,' should be the same length.'])
-end
 end
 
 function C = verifyNumeric(C,name,verbose)
@@ -333,10 +291,10 @@ function PHZ = orderPHZfields(PHZ)
 if isstruct(PHZ.region)
     
     % if spec order doesn't match the struct, recreate the struct
-    if ~strcmp(strjoin(fieldnames(PHZ.region)),strjoin(PHZ.spec.region_order))
+    if ~strcmp(strjoin(fieldnames(PHZ.region)),strjoin(PHZ.tags.region))
         rname = fieldnames(PHZ.region);
-        for i = 1:length(PHZ.spec.region_order)
-            temp.(PHZ.spec.region_order{i}) = PHZ.region.(rname{i});
+        for i = 1:length(PHZ.tags.region)
+            temp.(PHZ.tags.region{i}) = PHZ.region.(rname{i});
         end
         PHZ.region = temp;
     end
@@ -369,9 +327,10 @@ mainOrder = {'study'
     
     'resp'
     'spec'
-    'files'
     
     'misc'
+    'files'
+    'tags'
     'history'};
 
 if ~all(ismember(fieldnames(PHZ),mainOrder))

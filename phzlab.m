@@ -36,7 +36,7 @@ function phzlab
 %   phz_plot:        Visualize data as line or bar graphs.
 %   phz_writetable:  Export features to a MATLAB table or csv file.
 % 
-% Version 0.7.6 Written by Gabriel A. Nespoli 2016-03-31.
+% Version 0.7.7 Written by Gabriel A. Nespoli 2016-03-31.
 
 % to do:
 % - phz_writetable: option to stack to one case per row ("one participant
@@ -48,6 +48,7 @@ function phzlab
 % - paolo's problem with undefined
 % - flip the spec and regular fields for grouping vars
 % - phz_changfield should warn if some info is wrong
+% - phz_load: if no ext given from command line, default to .phz
 
 % medium to do:
 % - phz_plot: fix dispn
