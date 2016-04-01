@@ -1,24 +1,25 @@
-function PHZ = phz_rect(PHZ,varargin)
+function PHZ = phz_rect(PHZ,recttype,verbose)
 %PHZ_RECT  Full- or half-wave rectification.
 % 
-% PHZ = PHZ_RECT(PHZ,RECTTYPE) applies full- or half-wave rectification to
-%   all trials in PHZ.data and PHZ.rej.data. RECTTYPE is a string; 'full'
-%   takes the absolute value and 'half' sets all negative values to 0.
+% usage:    PHZ = phz_rect(PHZ,RECTTYPE)
 % 
-%   New fields are created in the PHZ structure:
-%     PHZ.rect = The value specified in RECTTYPE.
+% inputs:   PHZ         = PHZLAB data structure.
+%           RECTTYPE    = Type of rectification to perform. Enter 'full'
+%                         to take the absolute value of each data point,
+%                         or 'half' to set all negative values to 0.
+% 
+% outputs:  PHZ.data    = Rectified data.
+% 
+% examples:
+%   PHZ = phz_rect(PHZ,'full')  >> Full-wave rectification.
+%   PHZ = phz_rect(PHZ,'half')  >> Half-wave rectification.
 %
-% Written by Gabriel A. Nespoli 2016-01-27. Revised 2016-03-21.
+% Written by Gabriel A. Nespoli 2016-01-27. Revised 2016-04-01.
 
+% get input
 if nargout == 0 && nargin == 0, help phz_rect, return, end
-
-% defaults
-recttype = 'full'; % 'full' or 'half'
-verbose = true;
-
-% user-defined
-if nargin > 1, recttype = varargin{1}; end
-if nargin > 2, verbose = varargin{2}; end
+if nargin < 2, recttype = 'full'; end % 'full' or 'half'
+if nargin < 3, verbose = true; end
 
 % check input
 if isempty(recttype), return, end
@@ -36,7 +37,9 @@ switch lower(recttype)
 end
 
 % add to PHZ.history
-PHZ.rect = recttype;
-PHZ = phzUtil_history(PHZ,[recttype,' wave rectification.'],verbose);
+PHZ = phzUtil_history(PHZ,[upper(recttype(1)),lower(recttype(2:end)),' wave rectification.'],verbose);
 
+if ismember('blc',fieldnames(PHZ))
+    PHZ.blc.values = [];
+    PHZ = phzUtil_history(PHZ,'Due to rectification, the current baseline-correction is no longer undoable.',verbose);
 end

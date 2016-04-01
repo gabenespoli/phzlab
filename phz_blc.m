@@ -33,6 +33,8 @@ if do_blc || do_restore
     % restore previously-subtracted baseline
     if do_restore
         
+        if isempty(PHZ.blc.values), error('The current baseline-correction is undoable, probably due to previous preprocessing.'), end
+        
         if ismember('rej',fieldnames(PHZ))
             PHZ.data     = PHZ.data     + repmat(PHZ.blc.values(PHZ.rej.data_locs),1,size(PHZ.data,2));
             PHZ.rej.data = PHZ.rej.data + repmat(PHZ.blc.values(PHZ.rej.locs),1,size(PHZ.rej.data,2));
@@ -64,7 +66,7 @@ if do_blc || do_restore
         
         
         
-        if ischar(region), region = PHZ.region.(region); end
+        if ischar(region), region = PHZ.regions.(region); end
         PHZ.blc.region = region;
         
         % add to history
@@ -99,7 +101,7 @@ if all(isempty(region))
     
 elseif ismember('blc',fieldnames(PHZ))
     
-    if ischar(region), newRegion = PHZ.region.(region);
+    if ischar(region), newRegion = PHZ.regions.(region);
     else               newRegion = region;
     end
     
