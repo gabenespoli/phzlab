@@ -14,14 +14,10 @@ function PHZ = phz_blc(PHZ,region,varargin)
 %     PHZ.blc.values = The value of the mean of the baseline region for
 %                    each trial.
 % 
-% Written by Gabriel A. Nespoli 2016-02-16. Revised 2016-03-31.
+% Written by Gabriel A. Nespoli 2016-02-16. Revised 2016-04-01.
 
 if nargout == 0 && nargin == 0, help phz_blc, return, end
-
-% parse input
 if nargin > 2, verbose = varargin{1}; else verbose = true; end
-
-% verify input
 [PHZ,do_blc,do_restore] = phz_verifyBLinput(PHZ,region,verbose);
 
 % if new baseline-subtraction is requested, do it
