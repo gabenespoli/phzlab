@@ -44,25 +44,60 @@ for i = {'participant','group','session','trials'}, field = i{1};
     PHZ.tags.(field) = verifyCategorical(PHZ.tags.(field),[name,'.tags.',field],verbose);
     PHZ.tags.(field) = checkAndFixColumn(PHZ.tags.(field),[name,'.tags.',field],nargout,verbose);
     
-    if ~isempty(PHZ.tags.(field)) && length(PHZ.tags.(field)) ~= size(PHZ.data,1), error([name,'.tags.',field,' has an incorrect number of elements.']), end
-    if isempty(PHZ.tags.(field)) && length(PHZ.(field)) == 1, PHZ.tags.(field) = repmat(PHZ.(field),size(PHZ.data,1)); end
-    if ~isempty(PHZ.tags.(field)) && isempty(PHZ.(field))
-        PHZ.(field) = unique(PHZ.tags.(field));
+    % grouping vars && tags
+    if isempty(PHZ.tags.(field)) || any(isundefined(PHZ.(field)))
         
-        % if numeric, order numerically
-        if ~any(isnan(str2double(PHZ.(field))))
-            PHZ.(field) = str2double(PHZ.(field));
-            PHZ.(field) = sort(PHZ.(field));
-            PHZ.(field) = cellstr(num2str(PHZ.(field)));
-            PHZ.(field) = strrep(PHZ.(field),' ','');
+        if isempty(PHZ.(field)) || isundefined(PHZ.(field))
+            % do nothing, both are empty
+            
+        elseif length(PHZ.(field)) == 1
+            % auto-create tags if only one type of grouping var
+            PHZ.tags.(field) = repmat(PHZ.(field),size(PHZ.data,1));
+            
+        elseif length(PHZ.(field)) > 1
+            warning(['It is unknown which values of ''',field,''' apply to which trials.'])
+            % tags remains empty despite multiple values in grouping var
+            
+        else error(['Problem with PHZ.',field,'.'])
+        end
+        
+    else % if ~isempty(PHZ.tags.(field))
+        
+        % make sure tags is same length as trials
+        if (length(PHZ.tags.(field)) ~= size(PHZ.data,1))
+            error([name,'.tags.',field,' must be the same length as the number of trials.'])
+        end
+        
+            % make ordinal
+    if ~isempty(PHZ.(field))
+        PHZ.(field)      = categorical(PHZ.(field),     cellstr(PHZ.(field)),'Ordinal',true);
+        PHZ.tags.(field) = categorical(PHZ.tags.(field),cellstr(PHZ.(field)),'Ordinal',true);
+    end
+        
+        % empty grouping var if there are tags not represented
+        if ~isempty(PHZ.(field)) && ~all(ismember(PHZ.tags.(field),PHZ.(field)))
+            PHZ.(field) = [];
+            resetStr = ' because it did not represent all trial tags';
+        else resetStr = '';
+        end
+        
+        % if empty grouping var, reset (auto-create) from tags
+        if isempty(PHZ.(field))
+            
+            PHZ.(field) = unique(PHZ.tags.(field));
+            
+            % if numeric, order numerically
+            if ~any(isnan(str2double(PHZ.(field))))
+                PHZ.(field) = str2double(PHZ.(field));
+                PHZ.(field) = sort(PHZ.(field));
+                PHZ.(field) = cellstr(num2str(PHZ.(field)));
+                PHZ.(field) = strrep(PHZ.(field),' ','');
+            end
+            PHZ = phzUtil_history(PHZ,['PHZ.',field,' was reset',resetStr,'.'],verbose);
         end
     end
     
-    % make ordinal
-    if ~isempty(PHZ.(field))
-        PHZ.(field) = categorical(PHZ.(field),'Ordinal',true);
-        PHZ.tags.(field) = categorical(PHZ.tags.(field),cellstr(PHZ.(field)),'Ordinal',true);
-    end
+
     
     % verify spec
     resetSpec = [];
@@ -121,15 +156,15 @@ elseif ismember('freqs',fieldnames(PHZ))
 end
 
 %% region
-if isstruct(PHZ.region)
-    rname = fieldnames(PHZ.region);
+if isstruct(PHZ.regions)
+    rname = fieldnames(PHZ.regions);
     for i = 1:length(rname)
-        PHZ.region.(rname{i}) = verifyNumeric(PHZ.region.(rname{i}),[name,'.region.(rname{i})'],verbose);
-        PHZ.region.(rname{i})   = checkAndFix1x2(PHZ.region.(rname{i}),[name,'.region.(rname{i})'],nargout,verbose);
+        PHZ.regions.(rname{i}) = verifyNumeric(PHZ.regions.(rname{i}),[name,'.region.(rname{i})'],verbose);
+        PHZ.regions.(rname{i})   = checkAndFix1x2(PHZ.regions.(rname{i}),[name,'.region.(rname{i})'],nargout,verbose);
     end
     
-elseif isnumeric(PHZ.region)
-    PHZ.region = checkAndFix1x2(PHZ.region,[name,'.region'],nargout,verbose);
+elseif isnumeric(PHZ.regions)
+    PHZ.regions = checkAndFix1x2(PHZ.regions,[name,'.region'],nargout,verbose);
 end
 
 PHZ.tags.region = verifyCell(PHZ.tags.region,[name,'.tags.region'],verbose);
@@ -287,16 +322,23 @@ end
 
 function PHZ = orderPHZfields(PHZ)
 
+% correct for an older version of phzlab: change 'region' to 'regions'
+if ismember('region',fieldnames(PHZ))
+    PHZ.regions = PHZ.region;
+    PHZ = rmfield(PHZ,'region');
+    PHZ = orderPHZfields(PHZ);
+end
+
 % region structure
-if isstruct(PHZ.region)
+if isstruct(PHZ.regions)
     
     % if spec order doesn't match the struct, recreate the struct
-    if ~strcmp(strjoin(fieldnames(PHZ.region)),strjoin(PHZ.tags.region))
-        rname = fieldnames(PHZ.region);
+    if ~strcmp(strjoin(fieldnames(PHZ.regions)),strjoin(PHZ.tags.region))
+        rname = fieldnames(PHZ.regions);
         for i = 1:length(PHZ.tags.region)
-            temp.(PHZ.tags.region{i}) = PHZ.region.(rname{i});
+            temp.(PHZ.tags.region{i}) = PHZ.regions.(rname{i});
         end
-        PHZ.region = temp;
+        PHZ.regions = temp;
     end
 end
 
