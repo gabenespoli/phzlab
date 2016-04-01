@@ -11,10 +11,9 @@ function PHZ = phz_region(PHZ,region,varargin)
 %   Fields are changed in the PHZ structure:
 %     PHZ.region = The value specified in REGION.
 % 
-% Written by Gabriel A. Nespoli 2016-02-08. Revised 2016-03-21.
+% Written by Gabriel A. Nespoli 2016-02-08. Revised 2016-04-01.
 
 if nargout == 0 && nargin == 0, help phz_region, return, end
-
 if isempty(region), return, end
 
 % defaults
@@ -31,7 +30,7 @@ elseif ismember('freqs',fieldnames(PHZ)), indField = 'freqs';
 end
 
 % convert input to vector of indices
-possibleRegions = PHZ.spec.region_order;
+possibleRegions = PHZ.tags.regions;
 
 if isnumeric(region) && length(region) == 1;
     region = possibleRegions{region};
@@ -40,7 +39,7 @@ end
 if ischar(region)
     if ismember(region,possibleRegions)
         regionLabel = region;
-        region = PHZ.region.(region);
+        region = PHZ.regions.(region);
         if isempty(region), error('This region is empty.'), end
     else error('Invalid region.')
     end
@@ -61,7 +60,7 @@ if ismember('rej',fieldnames(PHZ)),
 end
 
 % cleanup PHZ fields
-PHZ.region = regionLabel;
+PHZ.regions = regionLabel;
 
 PHZ = phzUtil_history(PHZ,['Restricted to ''',regionLabel,''' region.'],verbose);
 
