@@ -1,5 +1,5 @@
 function phz_workflow(datatype)
-%PHZ_WORKFLOW  Display sample workflows for a specific kind of data.
+%PHZ_WORKFLOW  Display sample workflows for a specific type of data.
 % 
 % 
 
