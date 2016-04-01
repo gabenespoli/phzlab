@@ -7,15 +7,15 @@ function PHZ = phz_trials(PHZ)
 %
 % Written by Gabe Nespoli 2016-01-27. Revised 2016-03-22.
 
-if nargout == 0 && nargin == 0, help phz_alternatetrials, return, end
+if nargout == 0 && nargin == 0, help phz_trials, return, end
 
 numTrials = size(PHZ.data,1);
 
 if ~mod(numTrials,2) % (if FFR.trials is even)
-    PHZ.trials = repmat([1;2],[numTrials/2,1]);
+    PHZ.tags.trials = repmat([1;2],[numTrials/2,1]);
     
 else % (FFR.trials is odd)
-    PHZ.trials = [repmat([1;2],[(numTrials/2)-0.5,1]); 1];
+    PHZ.tags.trials = [repmat([1;2],[(numTrials/2)-0.5,1]); 1];
 
 end
 
