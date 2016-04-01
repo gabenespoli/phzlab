@@ -40,16 +40,14 @@ for i = 1:length(varargin)
     end 
 end
 
-% get indices of artifacts and copy them to PHZ.REJ
+% get indices of artifacts and copy them to PHZ.rej.locs
 [PHZ,returnFlag] = phz_findArtifacts(PHZ,threshold,rejType,verbose);
-
 if returnFlag, return, end
 
-for i = {'participant','group','session','trials'}
-    if length(PHZ.(i{1})) == size(PHZ.data,1)
-        PHZ.rej.(i{1}) = PHZ.(i{1})(PHZ.rej.locs);
-        PHZ.(i{1})(PHZ.rej.locs) = [];
-    end
+% copy tags over to PHZ.rej.(field)
+for i = {'participant','group','session','trials'}, field = i{1};
+    PHZ.rej.(field) = PHZ.tags.(field)(PHZ.rej.locs);
+    PHZ.tags.(field)(PHZ.rej.locs) = [];
 end
 PHZ.rej.data = PHZ.data(PHZ.rej.locs,:);
 PHZ.data(PHZ.rej.locs,:) = [];
@@ -127,20 +125,20 @@ end
 function PHZ = phz_unreject(PHZ,verbose)
 
 % concatenate all locs, data, trials, etc.
-alllocs = [PHZ.rej.data_locs; PHZ.rej.locs];
-alldata = [PHZ.data;      PHZ.rej.data];
-if length(PHZ.participant) > 1, allpart     = [PHZ.participant; PHZ.rej.participant]; end
-if length(PHZ.group) > 1,       allgroup    = [PHZ.group;       PHZ.rej.group]; end
-if length(PHZ.session) > 1,     allsession  = [PHZ.session;     PHZ.rej.session]; end
-if length(PHZ.trials) > 1,      alltrials   = [PHZ.trials;      PHZ.rej.trials]; end
+locs            = [PHZ.rej.data_locs;    PHZ.rej.locs];
+data            = [PHZ.data;             PHZ.rej.data];
+participant     = [PHZ.tags.participant; PHZ.rej.participant];
+group           = [PHZ.tags.group;       PHZ.rej.group];
+session         = [PHZ.tags.session;     PHZ.rej.session];
+trials          = [PHZ.tags.trials;      PHZ.rej.trials];
 
 % sort locs, then sort others based on it
-[PHZ.rej.data_locs,ind] = sort(alllocs);
-PHZ.data                = alldata(ind,:);
-if length(PHZ.participant) > 1, PHZ.participant = allpart(ind); end
-if length(PHZ.group) > 1,       PHZ.group       = allgroup(ind); end
-if length(PHZ.session) > 1,     PHZ.session     = allsession(ind); end
-if length(PHZ.trials) > 1,      PHZ.trials      = alltrials(ind); end
+[~,ind]                 = sort(locs);
+PHZ.data                = data(ind,:);
+PHZ.tags.participant    = participant(ind);
+PHZ.tags.group          = group(ind);
+PHZ.tags.session        = session(ind);
+PHZ.tags.trials         = trials(ind);
 
 PHZ = rmfield(PHZ,'rej');
 
