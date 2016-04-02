@@ -36,7 +36,7 @@ function phzlab
 %   phz_plot:        Visualize data as line or bar graphs.
 %   phz_writetable:  Export features to a MATLAB table or csv file.
 % 
-% Version 0.7.7 Written by Gabriel A. Nespoli 2016-03-31.
+% Version 0.8 Written by Gabriel A. Nespoli 2016-04-01.
 
 % to do:
 % - phz_writetable: option to stack to one case per row ("one participant
@@ -100,6 +100,10 @@ function phzlab
 % phz_trials: changed function name of phz_alternatetrials
 % phzUtil_findAudioMarkers: function added.
 % phz_blc: removed restriction that blc be done before rej
+
+% v0.8
+% -- swap grouping vars and order, add tags field
+% -- change region field to regions
 
 help phzlab
 

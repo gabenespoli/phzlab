@@ -1,82 +1,86 @@
 function PHZ = phz_create(filetype,files,varargin)
 %PHZ_CREATE  Create a new PHZ structure.
 % 
-% PHZ = PHZ_CREATE(FILETYPE,FILES) creates a PHZ structure from the data in FILES.
-%   FILES can be a string with a filename, a cell array of strings of
-%   filenames, or a folder of files. Only .mat files are recognized.
-%   Leaving FILES empty ('') opens a prompt to select a file or file(s) 
-%   from which to create PHZ files. The 'participant', 'group', and 
-%   'session' fields of the PHZ structure are filled using the first three 
-%   items in the filename that are delimited by a hyphen ('-').
-%   'filetype'    = The type of data file being loaded. Note that this file
-%                   must have been "saved as" a MATLAB (or .mat) file.
-%                   Default is 'acq' for a BIOPAC AcqKnowledge file.
+% usage:    PHZ = phz_create
+%           PHZ = phz_create(FILETYPE)
+%           PHZ = phz_create(FILETYPE,FILES)
+%           PHZ = phz_create(FILETYPE,FOLDER)
+%           PHZ = phz_create(FILETYPE,...,'Param1','Value1',etc.)
 % 
-% PHZ = PHZ_CREATE(FILES,'Param1','Value1') specifies the following:
-%   'channel'     = If the data file contains multiple channels, you must
-%                   specify which channel to extract. CHANNEL can be a
-%                   number or a string. If it is a string, there must be a
-%                   labels (or similar) variable in the data file indexing
-%                   the channels in the data variable.
-%   'delimiter'   = Specifies the delimiter in the filename for separating
-%                   'participant, 'group', and 'session' information.
-% X 'namestr'     = Specifies the file naming convention. NAMESTR must
-%                   contain at least one of 'participant', 'group', and
-%                   'session', and each must be separated by a delimiter.
-%                   Other options are 'study' and 'datatype'. The default 
-%                   NAMESTR is 'participant-group-session'.
-%   'study'       = Fills the 'study' field of the PHZ structure.
-%   'datatype'    = Fills the 'datatype' field of the PHZ structure.
-%   'savefolder'  = The folder where the new PHZ file should be saved.
-%                   SAVEFOLDER must be specified if multiple PHZ files are
-%                   being created. Specify the empty string ('') to use the
-%                   same folder as where the data files are saved. Default
-%                   is not to save the new PHZ structure. Files are saved
-%                   using the phz_save function, the file will have the 
-%                   '.phz' extension, and should be loaded using the
-%                   phz_load function.
+% inputs:   PHZ         = PHZLAB data structure.
+%           FILETYPE    = The type of file to import. Options are 'acq'
+%           FILES       = String or cell array of strings specifying the
+%                         file(s) to import. If left empty, a dialog box
+%                         pops up for you to select a file or files.
+%           FOLDER      = A folder of files from which to create PHZ files.
+%                         Specify a save folder to save each one.
+%           'channel'   = If the data file contains multiple channels, you 
+%                         must specify which channel to extract. CHANNEL 
+%                         can be a number or a string. If it is a string, 
+%                         there must be a labels (or similar) variable in 
+%                         the data file indexing the channels in the 
+%                         data variable.
+%           'delimiter' = Specifies the delimiter in the filename for
+%                         separating 'participant, 'group', and 'session'
+%                         information.
+%        X  'namestr'   = Specifies the file naming convention. NAMESTR 
+%                         must contain at least one of 'participant', 
+%                         'group', and 'session', and each must be 
+%                         separated by a delimiter. Other options are 
+%                         'study' and 'datatype'. The default NAMESTR is 
+%                         'participant-group-session'.
+%           'study'     = Fills the 'study' field of the PHZ structure.
+%           'datatype'  = Fills the 'datatype' field of the PHZ structure.
+%           'savefolder'= The folder where the new PHZ file should be
+%                         saved. SAVEFOLDER must be specified if multiple 
+%                         PHZ files are being created. Specify the empty 
+%                         string ('') to use the same folder as where the 
+%                         data files are saved. Default is not to save the 
+%                         new PHZ structure. Files are saved using the 
+%                         phz_save function, the file will have the '.phz' 
+%                         extension, and should be loaded using the 
+%                         phz_load function.
+%       X  = This functionality isn't working yet.
 % 
-% X  = This functionality isn't working yet.
+% outputs:  PHZ structure with the following fields.
 % 
-% PHZ = PHZ_CREATE('blank') creates a blank PHZ structure with fields that
-%   are to be filled manually by the user.
-% 
-%   study           = 'string'
-%   datatype        = 'string', type of data in PHZ.data.
-%   participant     = 'string', {'1D cell array of strings'}, or [numeric].
-%                     Must be of length 1 or same length as trials.
-%   group           = (same as participant)
-%   session         = (same as participant)
-%   trials          = 'string', {'1D cell array of strings'}, or [numeric].
-%                     Must be same length as size(data,1).
-%   times           = [numeric], vector of times for each sample (in s).
-%                     Must be same length as size(data,2).
-%   data            = [numeric], 2D array TRIALS-by-TIME.
-%   units           = 'string', units of data in PHZ.data.
-%   srate           = [numeric], sampling frequency.
-%   region.baseline = [numeric], endpoints of baseline region (in s).
-%   region.target   = [numeric], endpoints of target region. Also
-%                     available are target2, target3, and target4 (in s).
-%   resp.q1         = {'1D cell array of strings'}, behavioural responses
-%                     to each trial. Also available are q2, q3, q4, and q5.
-%   resp.q1_acc     = [numeric], column of accuracy values.
-%   resp.q1_rt      = [numeric], column of reaction times.
-%   spec.*_order    = {'1D cell array of strings'}, specifying the unique
-%                     values and the desired order of a grouping variable.
-%                     Replace '*' with 'participant', 'group', 'session',
-%                     'trials', and 'region'.
-%   spec.*_spec     = {'1D cell array of strings'} specifying the colour
-%                     and line type specfications for plotting. Must be the
-%                     same length as spec.*_order. See the help for the
-%                     plot.m function for more detail on line types.
-%   misc            = Any type, available for user data.
+%           study           = 'string'
+%           datatype        = 'string', type of data in PHZ.data.
+%           participant     = 'string' or [numeric].
+%           group           = (same as participant)
+%           session         = (same as participant)
+%           trials          = 'string', {'1D cell array of strings'}, 
+%                             or [numeric]. Must be same length as
+%                             size(data,1).
+%           times           = [numeric], vector of times for each sample
+%                             (in s). Must be same length as size(data,2).
+%           data            = [numeric], 2D array TRIALS-by-TIME.
+%           units           = 'string', units of data in PHZ.data.
+%           srate           = [numeric], sampling frequency.
+%           region.region   = [numeric], endpoints of region (in s). 
+%                             Default available regions are 'baseline', 
+%                             'target', 'target2', 'target3', and
+%                             'target4'.
+%           resp.q1         = {'1D cell array of strings'}, behavioural 
+%                             responses to each trial. Also available are 
+%                             q2, q3, q4, and q5.
+%           resp.q1_acc     = [numeric], column of accuracy values.
+%           resp.q1_rt      = [numeric], column of reaction times.
+%           spec.*          = {'1D cell array of strings'} specifies the
+%                             lineSpec property (incl. colour) for
+%                             plotting. Must be the same length as the
+%                             corresponding grouping variable (i.e.,
+%                             participant, group, session, or trials. See
+%                             the help for the plot.m function for more 
+%                             details on line types.
+%           tags.*          = Grouping-variable tags for each trial.
 %
-% Written by Gabe Nespoli 2016-01-27. Revised 2016-03-25.
+% Written by Gabe Nespoli 2016-01-27. Revised 2016-04-01.
 
 if nargout == 0 && nargin == 0, help phz_create, return
 elseif nargout == 0 && nargin > 0, error('Assign an output argument.')
 end
-if isempty(filetype), error('Specify a file type.'), end
+if nargin == 0 || isempty(filetype), PHZ = getBlankPHZ(1); return, end
 
 % defaults
 study = '';
@@ -133,7 +137,7 @@ for i = 1:2:length(varargin)
     end
 end
 
-if nargin == 0, PHZ = getBlankPHZ(verbose); return, end
+
 
 % check things before starting
 if ~ischar(savefolder) && length(files) > 1
@@ -231,18 +235,24 @@ PHZ.resp.q5 = {};
 PHZ.resp.q5_acc = [];
 PHZ.resp.q5_rt = [];
 
-PHZ.spec.participant_order = {};
 PHZ.spec.participant_spec = {};
-PHZ.spec.group_order = {};
 PHZ.spec.group_spec = {};
-PHZ.spec.session_order = {};
 PHZ.spec.session_spec = {};
-PHZ.spec.trials_order = {};
 PHZ.spec.trials_spec = {};
-PHZ.spec.region_order = {'baseline','target','target2','target3','target4'};
-PHZ.spec.region_spec = {'k','b','g','y','r'};
+
+
+PHZ.spec.region = {'k','b','g','y','r'};
+
+
 
 PHZ.misc = [];
+
+PHZ.tags.participant = categorical;
+PHZ.tags.group = categorical;
+PHZ.tags.session = categorical;
+PHZ.tags.trials = categorical;
+PHZ.spec.region_order = {'baseline','target','target2','target3','target4'};
+
 PHZ.history = {};
 
 % add creation date to FFR.history

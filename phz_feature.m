@@ -1,8 +1,19 @@
 function [PHZ,featureTitle] = phz_feature(PHZ,feature,varargin)
 %PHZ_FEATURE  Calculate the specified feature on each trial.
 % 
-% PHZ = PHZ_FEATURE(PHZ,FEATURE) returns the value of FEATURE for each
-%   trial in PHZ.data. Possible features are listed below:
+% usage:    PHZ = phz_feature(PHZ,FEATURE)
+%           PHZ = phz_feature(PHZ,FEATURE,'Param1,'Value1',etc.)
+% 
+% inputs:   PHZ       = PHZLAB data structure.
+%           FEATURE   = String specifying the desired feature. Possible
+%                       features are listed below.
+%           'region'  = Calls phz_region to restrict the time or frequency 
+%                       region used for feature extration.
+%           'summary' = Summarizes the resulting features by averaging 
+%                       across grouping variables. For FFT, this averaging 
+%                       is done before calulating the FFT; different 
+%                       participants are kept separate for this averaging. 
+%                       See phz_summary for more details.
 % 
 %   Time-domain features:
 %   'mean'          = Average value.
@@ -34,40 +45,29 @@ function [PHZ,featureTitle] = phz_feature(PHZ,feature,varargin)
 %   Behavioural features:
 %   'acc','acc2',...= Accuracy value in PHZ.resp.q1_acc, q2, etc.
 %   'rt','rt2',...  = Reaction time in PHZ.resp.q1_rt, q2, etc.
-%
-%   New fields are created in the PHZ structure:
-%     PHZ.feature = The value specified in FEATURE.
 % 
 %   Note: For all features except 'acc' and 'rt', data are returned for
-%     non-rejected trials. For 'acc' and 'rt', all trials are included
-%     regardless of whether or not they are rejected.
+%         non-rejected trials. For 'acc' and 'rt', all trials are included
+%         regardless of whether or not they are rejected.
+%
+% outputs:  PHZ.data    = The data of the extracted feature for each trial.
+%           PHZ.feature = The value specified in FEATURE.
 % 
-% PHZ = PHZ_FEATURE(PHZ,FEATURE,'Param1','Value1') additionally specifies
-%   any of the following parameters:
-%   
-%   'region'    = Calls phz_region to restrict the time or frequency region
-%                 used for feature extration.
-%   'summary'   = Summarizes the resulting features by averaging across
-%                 grouping variables. For FFT, this averaging is done
-%                 before calulating the FFT; different participants are
-%                 kept separate for this averaging. See phz_summary for
-%                 more details.
-% 
-% Written by Gabriel A. Nespoli 2016-02-15. Revised 2016-03-22.
+% Written by Gabriel A. Nespoli 2016-02-15. Revised 2016-04-01.
 
 if nargout == 0 && nargin == 0, help phz_feature, return, end
 
 % defaults
-region = []; % 'baseline', 'target', 'target2', etc., or {}
-keepVars = {'all'}; % 'trials', 'group', 'session', 'all', or 'none'
+region = [];
+keepVars = [];
 verbose = true;
 
 % user-defined
 for i = 1:2:length(varargin)
     switch varargin{i}
-        case 'region',  region = varargin{i+1};
-        case 'summary', keepVars = varargin{i+1};
-        case 'verbose', verbose = varargin{i+1};
+        case 'region',               region = varargin{i+1};
+        case {'summary','keepvars'}, keepVars = varargin{i+1};
+        case 'verbose',              verbose = varargin{i+1};
     end
 end
 

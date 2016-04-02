@@ -1,48 +1,53 @@
-function PHZ = phz_summary(PHZ,keepVars,varargin)
-%PHZ_SUMMARY  Collapse across grouping variables of a PHZ or PHZS.
+function PHZ = phz_summary(PHZ,keepVars,verbose)
+%PHZ_SUMMARY  Average across grouping variables.
 % 
-% PHZ = PHZ_SUMMARY(PHZ,KEEPVARS) averages trials together. Data are 
-%   summarized based on the grouping variables specified in KEEPVARS.
-%   KEEPVARS is a string or a cell array of strings and can contain a
-%   combination of 'participant', 'group', 'session', and 'trials'.
-%   Use 'all' to retain all trials (do no averaging) or 'none' or ''
-%   (empty) to average all trials together. 'all', 'none', and '' cannot
-%   be used with other KEEPVARS.
+% usage:    PHZ = phz_summary(PHZ,KEEPVARS)
 % 
-%   New fields are created in the PHZ structure:
-%     PHZ.summary.keepVars     = The values specified in KEEPVARS.
-%     PHZ.summary.stdError     = Standard error of each average.
-%     PHZ.summary.nParticipant = Number of participants in each average.
-%     PHZ.summary.nTrials      = Number of trials in each average.
+% inputs:   PHZ       = PHZLAB data structure.
+%           KEEPVARS  = A string or a cell array of strings and can contain
+%                       a combination of 'participant', 'group', 'session', 
+%                       and 'trials'. Use 'all' or [] (empty) to retain all 
+%                       trials (i.e., do nothing) or 'none' to average 
+%                       all trials together (i.e., discard all grouping
+%                       variables. 'all' and 'none' cannot be used with
+%                       other KEEPVARS.
+% 
+% outputs:  PHZ.data                 = The data summarized by KEEPVARS.
+%           PHZ.summary.keepVars     = The values specified in KEEPVARS.
+%           PHZ.summary.stdError     = Standard error of each average.
+%           PHZ.summary.nParticipant = No. of participants in each average.
+%           PHZ.summary.nTrials      = No. of trials in each average.
+% 
+% examples:
+%   PHZ = phz_summary(PHZ,'trials') >> For each value in PHZ.trials,
+%         average all of those trials together. The number of trials in
+%         PHZ.data will correspond to the number of different kinds of
+%         trials.
+%   PHZ = phz_summary(PHZ,{'trials','group') >> For each unique combination
+%         of PHZ.trials and PHZ.group, average those trials together.
 %
-% Written by Gabriel A. Nespoli 2016-03-17. Revised 2016-03-21.
+% Written by Gabriel A. Nespoli 2016-03-17. Revised 2016-04-01.
 
 if nargout == 0 && nargin == 0, help phz_summary, return, end
-
-if nargin > 2, verbose = varargin{1}; else verbose = true; end
+if isempty(keepVars), return, end
+if nargin < 3, verbose = true; end
 
 PHZ = phz_check(PHZ); % (make ordinal if there are new orders)
-keepVars = phzUtil_verifySummaryType(keepVars);
+keepVars = verifyKeepVars(keepVars);
 if ismember(keepVars{1},{'all'}), return, end
 PHZ.summary.keepVars = keepVars;
 
 if ismember(keepVars{1},{'none'})
     PHZ.summary.stdError = ste(PHZ.data);
-    PHZ.summary.nParticipant = length(unique(cellstr(PHZ.participant)));
+    PHZ.summary.nParticipant = length(PHZ.participant);
     PHZ.summary.nTrials = size(PHZ.data,1);
     PHZ.data = mean(PHZ.data,1);
-%     keepVars = 'none'; % for loseVars
     
 else
-    
     % get categories to collapse across
     for i = 1:length(keepVars)
-        if ischar(PHZ.(keepVars{i}))
-            PHZ.(keepVars{i}) = categorical(repmat({PHZ.(keepVars{i})},[size(PHZ.data,1) 1]));
-        end
-        
-        if i == 1, varInd = PHZ.(keepVars{i});
-        else       varInd = varInd .* PHZ.(keepVars{i});
+        if i == 1, varInd = PHZ.tags.(keepVars{i});
+        else       varInd = varInd .* PHZ.tags.(keepVars{i});
         end
     end
     varTypes = unique(varInd); % this will be in the proper spec order because they are ordinal categorical arrays
@@ -56,48 +61,38 @@ else
     for i = 1:length(varTypes)
         temp = PHZ.data(varInd == varTypes(i),:);
         PHZ.summary.stdError(i,:) = ste(temp);
-        
-        if length(PHZ.participant) == 1
-            PHZ.summary.nParticipant(i) = 1;
-        else
-            PHZ.summary.nParticipant(i) = length(unique(cellstr(PHZ.participant(varInd == varTypes(i)))));
-        end
-        
+        PHZ.summary.nParticipant(i) = length(unique(PHZ.tags.participant(varInd == varTypes(i))));
         PHZ.summary.nTrials(i) = size(temp,1);
         newData(i,:) = mean(temp,1);
     end
     PHZ.data = newData;
     
-    % adjust PHZ.(summaryType) vars
+    % adjust PHZ.(keepVars) vars
     varTypes = regexp(cellstr(varTypes),' ','split');
-    for i = 1:length(keepVars)
+    for i = 1:length(keepVars), field = keepVars{i};
         newVar = cell(size(PHZ.data,1),1);
         for j = 1:length(varTypes);
             newVar{j} = varTypes{j}{i};
         end
-        PHZ.(keepVars{i}) = categorical(newVar,PHZ.spec.([keepVars{i},'_order']),'Ordinal',true);
+        PHZ.tags.(field) = categorical(newVar,cellstr(PHZ.(field)),'Ordinal',true);
     end 
 end
 
 % cleanup
 loseVars = {'participant','group','session','trials'};
 loseVars(ismember(loseVars,keepVars)) = [];
-for i = 1:length(loseVars)
-    if length(unique(cellstr(PHZ.(loseVars{i})))) > 1
-        PHZ.(loseVars{i}) = '<collapsed>';
-        PHZ.spec.([loseVars{i},'_order']) = strjoin(PHZ.spec.([loseVars{i},'_order']),'_');
-        PHZ.spec.([loseVars{i},'_spec']) = {};
-    end
+for i = loseVars, field = i{1};
+    PHZ.tags.(field) = '<collapsed>';
 end
 
-for i = 1:length(keepVars)
-    if ismember(keepVars{i},{'participant','group','session','trials'})
-        if length(unique(PHZ.(keepVars{i}))) == 1
-            PHZ.(keepVars{i}) = cellstr(unique(PHZ.(keepVars{i})));
-            PHZ.(keepVars{i}) = PHZ.(keepVars{i}){1};
-        end
-    end
-end
+% this should be taken care of in phz_check
+% for i = keepVars, field = i{1};
+%     if ismember(field,{'participant','group','session','trials'})
+%         if length(unique(PHZ.tags.(field))) ~= length(PHZ.(field))
+%             PHZ.(field) = unique(PHZ.tags.(field));
+%         end
+%     end
+% end
 
 if ismember('blc',fieldnames(PHZ))
     PHZ.blc.values = '<collapsed>';
@@ -122,4 +117,25 @@ function y = ste(x,varargin)
 %STE  Standard error.
 if nargin > 1, dim = varargin{1}; else dim = 1; end
 y = std(x,0,dim) / sqrt(size(x,dim));
+end
+
+function keepVars = verifyKeepVars(keepVars)
+
+if ~iscell(keepVars), keepVars = {keepVars}; end
+
+if ~isempty(keepVars)
+    
+    if ~all(ismember(keepVars,{'trials','session','group','participant','all','',' ','none'}))
+        error('Invalid summaryType.')
+    end
+    
+    if any(ismember({'all','',' ','none'},keepVars)) && length(keepVars) > 1
+        error('A value in summaryType must be used on its own, but is being used with other summaryTypes.')
+    end
+    
+    if ismember(keepVars{1},{' '}) || isempty(keepVars{1})
+        keepVars = {'none'};
+    end
+    
+end
 end

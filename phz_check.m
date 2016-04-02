@@ -1,24 +1,19 @@
-function PHZ = phz_check(PHZ,varargin)
-% PHZ_CHECK  Verify the integrity of a PHZ or PHZS structure.
+function PHZ = phz_check(PHZ,verbose)
+% PHZ_CHECK  Verify and fix a PHZ structure.
 % 
-% USAGE:
-%   PHZ = phz_check(PHZ)
+% usage:    PHZ = phz_check(PHZ)
 % 
-% Written by Gabriel A. Nespoli 2016-02-08. Revised 2016-03-29.
+% Written by Gabriel A. Nespoli 2016-02-08. Revised 2016-04-01.
 
 if nargout == 0 && nargin == 0, help phz_check, end
-
-if nargin > 1, verbose = varargin{1};
-else           verbose = true;
-end
+if nargin < 2, verbose = true; end
 
 % get name of input variable for accurate feedback
 name = inputname(1);
 
+% pre-checking
+PHZ = backwardsCompatibility(PHZ,verbose);
 PHZ = orderPHZfields(PHZ);
-
-% verify data types
-% -----------------
 
 %% basic
 if ~isstruct(PHZ), error([name,' variable should be a structure.']), end
@@ -41,6 +36,11 @@ for i = {'participant','group','session','trials'}, field = i{1};
     PHZ.(field) = checkAndFixRow(PHZ.(field),[name,'.',field],nargout,verbose);
     
     % tags
+    if ischar(PHZ.tags.(field)) && strcmp(PHZ.tags.(field),'<collapsed>')
+        PHZ = resetSpec(PHZ,field);
+        continue
+    end
+    
     PHZ.tags.(field) = verifyCategorical(PHZ.tags.(field),[name,'.tags.',field],verbose);
     PHZ.tags.(field) = checkAndFixColumn(PHZ.tags.(field),[name,'.tags.',field],nargout,verbose);
     
@@ -96,11 +96,9 @@ for i = {'participant','group','session','trials'}, field = i{1};
             PHZ = phzUtil_history(PHZ,['PHZ.',field,' was reset',resetStr,'.'],verbose);
         end
     end
-    
 
-    
     % verify spec
-    resetSpec = [];
+    do_resetSpec = [];
     if ~isempty(PHZ.(field))
         
         if ~ismember(PHZ.tags.(field),{'<collapsed>'})
@@ -108,7 +106,7 @@ for i = {'participant','group','session','trials'}, field = i{1};
             
             % if there is an order, make sure spec is same length
             if length(PHZ.(field)) ~= length(PHZ.spec.(field))
-                resetSpec = true;
+                do_resetSpec = true;
                 if noutargs == 0, warning([name,'.spec.',field,' has an incorrect number of items.'])
                 elseif verbose, disp([name,'.spec.',field,' had an incorrect number of items and was reset to the default order.'])
                 end
@@ -123,20 +121,9 @@ for i = {'participant','group','session','trials'}, field = i{1};
         
     end
     
-    if resetSpec
-        for j = 1:length(PHZ.(field))
-            PHZ.spec.(field){j} = '';
-        end
-    end
-    
-    
+    if do_resetSpec, PHZ = resetSpec(PHZ,field); end
     
 end
-
-
-
-
-
 
 %% times / freqs
 if all(ismember({'times','freqs'},fieldnames(PHZ))), error('Cannot have both TIMES and FREQS fields.'), end
@@ -167,9 +154,9 @@ elseif isnumeric(PHZ.regions)
     PHZ.regions = checkAndFix1x2(PHZ.regions,[name,'.region'],nargout,verbose);
 end
 
-PHZ.tags.region = verifyCell(PHZ.tags.region,[name,'.tags.region'],verbose);
-PHZ.tags.region = checkAndFixRow(PHZ.tags.region,[name,'.tags.region'],nargout,verbose);
-if length(PHZ.tags.region) ~= 5, error('There should be 5 region names in PHZ.tags.region.'), end
+PHZ.tags.regions = verifyCell(PHZ.tags.regions,[name,'.tags.region'],verbose);
+PHZ.tags.regions = checkAndFixRow(PHZ.tags.regions,[name,'.tags.region'],nargout,verbose);
+if length(PHZ.tags.regions) ~= 5, error('There should be 5 region names in PHZ.tags.regions.'), end
 
 %% resp
 if ~isstruct(PHZ.resp), error([name,'.resp should be a structure.']), end
@@ -320,23 +307,52 @@ if length(x) ~= 1
 end
 end
 
-function PHZ = orderPHZfields(PHZ)
+function PHZ = backwardsCompatibility(PHZ,verbose)
 
-% correct for an older version of phzlab: change 'region' to 'regions'
+% swap grouping and order vars, add tags (older than v0.8)
+if ~ismember('tags',fieldnames(PHZ))
+    for i = {'participant','group','session','trials'}, field = i{1};
+        PHZ.tags.(field) = PHZ.(field);
+        PHZ.(field) = PHZ.spec.([field,'_order']);
+        PHZ.spec.(field) = PHZ.spec.([field,'_spec']);
+        PHZ.spec = rmfield(PHZ.spec,{[field,'_order'] [field,'_spec']});
+    end
+    PHZ.tags.regions = PHZ.spec.region_order;
+    PHZ.spec.regions = PHZ.spec.region_spec;
+    PHZ.spec = rmfield(PHZ.spec,{'region_order','region_spec'});
+    PHZ = phzUtil_history(PHZ,'Converted PHZ structure to v0.8.',verbose);
+end
+
+% change field 'region' to 'regions' (0.7.6 and older)
 if ismember('region',fieldnames(PHZ))
     PHZ.regions = PHZ.region;
     PHZ = rmfield(PHZ,'region');
-    PHZ = orderPHZfields(PHZ);
 end
+
+if ismember('region',fieldnames(PHZ.tags))
+    PHZ.tags.regions = PHZ.tags.region;
+    PHZ.tags = rmfield(PHZ.tags,'region');
+end
+
+if ismember('region',fieldnames(PHZ.spec))
+    PHZ.spec.regions = PHZ.spec.region;
+    PHZ.spec = rmfield(PHZ.spec,'region');
+end
+
+end
+
+function PHZ = orderPHZfields(PHZ)
+
+
 
 % region structure
 if isstruct(PHZ.regions)
     
     % if spec order doesn't match the struct, recreate the struct
-    if ~strcmp(strjoin(fieldnames(PHZ.regions)),strjoin(PHZ.tags.region))
+    if ~strcmp(strjoin(fieldnames(PHZ.regions)),strjoin(PHZ.tags.regions))
         rname = fieldnames(PHZ.regions);
-        for i = 1:length(PHZ.tags.region)
-            temp.(PHZ.tags.region{i}) = PHZ.regions.(rname{i});
+        for i = 1:length(PHZ.tags.regions)
+            temp.(PHZ.tags.regions{i}) = PHZ.regions.(rname{i});
         end
         PHZ.regions = temp;
     end
@@ -354,17 +370,17 @@ mainOrder = {'study'
     'times'
     'freqs'
     'data'
+    'feature'
     
     'units'
     'srate'
-
-    'summary'
-    'feature'
-    'region'
+    
     'regions'
+    'region'
+    'summary'
+    
     'rej'
     'blc'
-    'rect'
     'norm'
     
     'resp'
@@ -382,6 +398,10 @@ end
 mainOrder = mainOrder(ismember(mainOrder,fieldnames(PHZ)));
 PHZ = orderfields(PHZ,mainOrder);
 
+end
 
-
+function PHZ = resetSpec(PHZ,field)
+for j = 1:length(PHZ.(field))
+    PHZ.spec.(field){j} = '';
+end
 end

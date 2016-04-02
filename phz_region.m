@@ -1,28 +1,31 @@
-function PHZ = phz_region(PHZ,region,varargin)
+function PHZ = phz_region(PHZ,region,verbose)
 %PHZ_REGION  Restrict data to a specified time or frequency region.
 % 
-% PHZ = PHZ_REGION(PHZ,REGION) deletes portions of PHZ.data that are
-%   outside of the specified time or frequency region REGION. REGION can be
-%   a string specifying a region (e.g., 'baseline', 'target'), a 1-by-2
-%   numeric vector with start and end times in seconds (or frequencies in
-%   Hz (e.g., [0 3]), or a 1-by-N numeric vector of indices
-%   (e.g., [1:3001]).
-%
-%   Fields are changed in the PHZ structure:
-%     PHZ.region = The value specified in REGION.
+% usage:    PHZ = phz_region(PHZ,REGION)
+% 
+% inputs:   PHZ     = PHZLAB data structure.
+%           REGION  = A string specifying a region in PHZ.regions, a 1-by-2 
+%                     vector specifying the start and end times in seconds, 
+%                     or a 1-by-N vector (length > 2) of indices.
+% 
+% outputs:  PHZ.data    = Data for specified region only.
+%           PHZ.regions = Value specified in REGION.
+% 
+% examples:
+%   PHZ = phz_region(PHZ,'target') >> Restricts PHZ.data to the 'target'
+%         region only.
+%   PHZ = phz_region(PHZ,[0 3]) >> Restricts PHZ.data to the region from
+%         0 to 3 seconds.
+%   PHZ = phz_region(PHZ,[1:3001]) >> Restricts PHZ.data to the region from
+%         the first sample to the 3001st sample. For a sampling rate of
+%         1000 Hz, this would correspond to 0-3 seconds.
 % 
 % Written by Gabriel A. Nespoli 2016-02-08. Revised 2016-04-01.
 
 if nargout == 0 && nargin == 0, help phz_region, return, end
 if isempty(region), return, end
-
-% defaults
-regionLabel = '';
-verbose = true;
-
-% check input
 if ~isnumeric(region) && ~ischar(region), error('Invalid region.'), end
-if nargin > 2, verbose = varargin{1}; end
+if nargin < 3, verbose = true; end
 
 % get ind field
 if ismember('times',fieldnames(PHZ)), indField = 'times';
@@ -36,6 +39,7 @@ if isnumeric(region) && length(region) == 1;
     region = possibleRegions{region};
 end
 
+regionLabel = '';
 if ischar(region)
     if ismember(region,possibleRegions)
         regionLabel = region;

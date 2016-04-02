@@ -1,34 +1,36 @@
-function PHZ = phz_blc(PHZ,region,varargin)
-%PHZ_BLC  Subtract the mean of a baseline region from each trial.
+function PHZ = phz_blc(PHZ,region,verbose)
+%PHZ_BLC  Subtract the mean of a region from each trial.
 % 
-% PHZ = PHZ_BLC(PHZ,REGION) takes the mean of the region REGION for each
-%   trial and subtracts it from that trial. REGION can be a string
-%   specifying a region of interest (i.e., 'baseline', 'target', or other
-%   region name specified in PHZ.spec.*_order), or a vector of length 2 
-%   specifying the endpoints of the desired region in seconds (e.g., 
-%   [-1 0]) or Hertz (e.g., [0 500]). Leaving REGION empty restores a
-%   previously subtracted baseline (if there is one).
+% usage:    PHZ = phz_blc(PHZ,REGION)
 % 
-%   New fields are created in the PHZ structure:
-%     PHZ.blc.region = The value specified in REGION.
-%     PHZ.blc.values = The value of the mean of the baseline region for
-%                    each trial.
+% inputs:   PHZ      = PHZLAB data structure.
+%           REGION   = Baseline region to subtract. REGION is a string
+%                      specifying a region in PHZ.regions, a 1-by-2 vector 
+%                      specifying the start and end times in seconds, or a
+%                      1-by-N vector (length > 2) of indices. Setting
+%                      REGION to empty ([]) restores a previous
+%                      subtraction.
+% 
+% outputs:  PHZ.data       = Baseline-corrected data.
+%           PHZ.blc.region = Start and end times of region used for blc.
+%           PHZ.blc.values = Mean of blc region for each trial.
+%           * If baseline is restored (REGION = []), the 'blc' field is
+%               removed from the PHZ structure.
+% 
+% examples:
+%   PHZ = phz_blc(PHZ,'baseline') >> Subtract the mean of the baseline
+%         region (as specified in PHZ.regions.baseline) from each trial.
+%   PHZ = phz_blc(PHZ,[-1 0]) >> Subtract the mean of -1s to 0s.
+%   PHZ = phz_blc(PHZ,[]) >> Undo baseline correction.
 % 
 % Written by Gabriel A. Nespoli 2016-02-16. Revised 2016-04-01.
 
 if nargout == 0 && nargin == 0, help phz_blc, return, end
-if nargin > 2, verbose = varargin{1}; else verbose = true; end
+if nargin < 3, verbose = true; end
 [PHZ,do_blc,do_restore] = phz_verifyBLinput(PHZ,region,verbose);
 
 % if new baseline-subtraction is requested, do it
 if do_blc || do_restore
-    
-%     % if things are rejected, un-reject first
-%     if ismember('rej',fieldnames(PHZ))
-%         threshold = PHZ.rej.threshold;
-%         if ~isempty(threshold), PHZ = phz_rej(PHZ,[],verbose); end
-%     else threshold = [];
-%     end
     
     % restore previously-subtracted baseline
     if do_restore
@@ -41,7 +43,6 @@ if do_blc || do_restore
         else
             PHZ.data = PHZ.data + repmat(PHZ.blc.values,1,size(PHZ.data,2));
         end
-        
         
         PHZ = rmfield(PHZ,'blc');
         PHZ = phzUtil_history(PHZ,'Added back previously removed baseline.',verbose);
@@ -63,9 +64,7 @@ if do_blc || do_restore
             PHZ.blc.values = mean(PHZb.data,2);
             PHZ.data = PHZ.data - repmat(PHZ.blc.values,[1 size(PHZ.data,2)]);
         end
-        
-        
-        
+         
         if ischar(region), region = PHZ.regions.(region); end
         PHZ.blc.region = region;
         
@@ -73,15 +72,22 @@ if do_blc || do_restore
         PHZ = phzUtil_history(PHZ,['Subtracted mean of ',...
             phzUtil_num2strRegion(region),' from data.'],verbose);
     end
-    
-%     % if things were rejected, re-reject
-%     if ~isempty(threshold)
-%         PHZ = phz_rej(PHZ,threshold,verbose);
-%     end
 end
 end
 
 function [PHZ,do_blc,do_restore] = phz_verifyBLinput(PHZ,region,verbose)
+
+% check region input
+if ~isempty(region)
+    if ischar(region)
+        newRegion = PHZ.regions.(region);
+        
+    elseif isnumeric(region) && length(region) == 2
+        newRegion = region;
+        
+    else error('Invalid region input.')
+    end
+end
 
 if all(isempty(region))
     
@@ -100,10 +106,6 @@ if all(isempty(region))
     end
     
 elseif ismember('blc',fieldnames(PHZ))
-    
-    if ischar(region), newRegion = PHZ.regions.(region);
-    else               newRegion = region;
-    end
     
     if all(newRegion == PHZ.blc.region)
         
