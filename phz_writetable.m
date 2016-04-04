@@ -27,27 +27,20 @@ function varargout = phz_writetable(PHZ,varargin)
 % Written by Gabriel A. Nespoli 2016-03-07. Revised 2016-03-21.
 
 if nargout == 0 && nargin == 0, help phz_writetable, return, end
-
-% gather raw data
-if ~(isstruct(PHZ) && phzUtil_isphzs(PHZ))
-    error('Problem with PHZS input.')
-end
-% if isempty(PHZS),                               PHZS = phz_gather;
-% elseif ischar(PHZS) && isdir(PHZS),             PHZS = phz_gather(PHZS);
-% elseif isstruct(PHZS) && phzUtil_isphzs(PHZS),
-% else error('Problem with PHZS input.')
-% end
+if isempty(PHZ), PHZ = phz_gather; else PHZ = phz_check(PHZ); end
 
 % defaults
-subset = {};
-rect = [];
-transform = [];
-blc = [];
-rej = [];
-normtype = [];
-region = '';
-feature = '';
+% subset = [];
+% rect = [];
+% transform = [];
+% blc = [];
+% rej = [];
+% normtype = [];
+region = [];
+feature = [];
 keepVars = {'all'};
+
+unstackVars = [];
 
 filename = {};
 infoname = {};
@@ -55,36 +48,48 @@ infoname = {};
 verbose = true;
 
 % user-defined
+if any(strcmp(varargin(1:2:end),'verbose'))
+    i = find(strcmp(varargin(1:2:end),'verbose')) * 2 - 1;
+    verbose = varargin{i+1};
+    varargin([i,i+1]) = [];
+end
+
 for i = 1:2:length(varargin)
     switch lower(varargin{i})
-        case 'subset',                  subset = varargin{i+1};
-        case {'rect','rectify'},        rect = varargin{i+1};
-        case 'transform',               transform = varargin{i+1};
-        case {'blc','baselinecorrect'}, blc = varargin{i+1};
-        case {'rej','reject'},          rej = varargin{i+1};
-        case {'norm','normtype'},       normtype = varargin{i+1};
+        
+        % do preprocessing in order of input
+        case 'subset',                  PHZ = phz_subset(PHZ,varargin{i+1},verbose);
+        case {'rect','rectify'},        PHZ = phz_rect(PHZ,varargin{i+1},verbose);
+        case {'filter','filt'},         PHZ = phz_filter(PHZ,varargin{i+1},verbose);
+        case {'smooth','smoothing'},    PHZ = phz_smooth(PHZ,varargin{i+1},verbose);
+        case 'transform',               PHZ = phz_transform(PHZ,varargin{i+1},verbose);
+        case {'blc','baselinecorrect'}, PHZ = phz_blc(PHZ,varargin{i+1},verbose);
+        case {'rej','reject'},          PHZ = phz_rej(PHZ,varargin{i+1},verbose);
+        case {'norm','normtype'},       PHZ = phz_norm(PHZ,varargin{i+1},verbose);
+        
         case 'region',                  region = varargin{i+1};
         case {'feature','features'},    feature = varargin{i+1};
         case {'summary','keepvars'},    keepVars = varargin{i+1};
             
+        case {'unstack','cast'},        unstackVars = varargin{i+1};
+            
         case {'save','filename'},       filename = addToCell(filename,varargin{i+1});
         case {'info','infoname'},       infoname = addToCell(infoname,varargin{i+1});
             
-        case 'verbose',                 verbose = varargin{i+1};
     end
 end
 
 % verify input
+if isempty(feature), error('A feature must be specified.'), end
 if ~iscell(feature), feature = {feature}; end
 
 % data preprocessing
-PHZ = phz_check(PHZ);
-PHZ = phz_subset(PHZ,subset);
-PHZ = phz_rect(PHZ,rect,verbose);
-PHZ = phz_transform(PHZ,transform,verbose);
-PHZ = phz_blc(PHZ,blc,verbose);
-PHZ = phz_rej(PHZ,rej,verbose);
-PHZ = phz_norm(PHZ,normtype);
+% PHZ = phz_subset(PHZ,subset,verbose);
+% PHZ = phz_rect(PHZ,rect,verbose);
+% PHZ = phz_transform(PHZ,transform,verbose);
+% PHZ = phz_blc(PHZ,blc,verbose);
+% PHZ = phz_rej(PHZ,rej,verbose);
+% PHZ = phz_norm(PHZ,normtype);
 PHZ = phz_region(PHZ,region,verbose);
 
 disp('Calculating features...')
@@ -105,7 +110,7 @@ for i = 1:length(feature)
         else addVars = keepVars;
         end
         
-        d = table(s.(addVars{1}),'VariableNames',addVars(1));
+        d = table(s.tags.(addVars{1}),'VariableNames',addVars(1));
         d.Properties.VariableUnits = {''};
         d.Properties.VariableDescriptions = {''};
         d.Properties.Description = [PHZ.study,' ',upper(PHZ.datatype),' data'];
@@ -120,7 +125,7 @@ for i = 1:length(feature)
         d.Properties.UserData.history = PHZ.history;
         
         for j = 1:length(addVars) - 1
-            d.(addVars{j+1}) = s.(addVars{j+1});
+            d.(addVars{j+1}) = s.tags.(addVars{j+1});
             d.Properties.VariableUnits{end} = '';
             d.Properties.VariableDescriptions{end} = '';
         end
@@ -130,9 +135,27 @@ for i = 1:length(feature)
     d.(s.feature) = s.data;
     d.Properties.VariableUnits{end} = s.units;
     d.Properties.VariableDescriptions{end} = featureTitle;
-     
+    
 end
 
+% unstack
+if ~isempty(unstackVars)
+    if ~iscell(unstackVars), unstackVars = {unstackVars}; end
+    d = unstack(d,feature,unstackVars{1});
+    
+    if length(unstackVars) == 2
+        dataVars = d.Properties.VariableNames;
+        rm = ismember(dataVars,{'participant','group','session','trials'});
+        dataVars(rm) = [];
+        
+        d = unstack(d,dataVars,unstackVars{2});
+        
+    elseif length(unstackVars) > 2, error('Cannot unstack more than 2 variables.')
+    end
+end
+
+% finish up
+checkForEmptyCells(d);
 d = insertOtherInfo(d,infoname);
 printOrSaveToFile(filename,d)
 varargout{1} = d;
@@ -180,6 +203,18 @@ for i = 1:length(infoname)
         catch, warning(['No ''participant'' or ''id'' variable found in ''',infoname{i},'''.']);
         end
     end
+end
+end
+
+function checkForEmptyCells(d)
+rm = [];
+for i = 1:width(d)
+    if ~isnumeric(d{:,i}), rm = [rm i]; end
+end
+temp = d;
+temp(:,rm) = [];
+if any(isnan(table2array(temp)))
+    warning('There are empty cells in the data table.')
 end
 end
 

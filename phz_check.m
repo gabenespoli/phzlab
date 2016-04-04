@@ -47,7 +47,7 @@ for i = {'participant','group','session','trials'}, field = i{1};
     % grouping vars && tags
     if isempty(PHZ.tags.(field)) || any(isundefined(PHZ.(field)))
         
-        if isempty(PHZ.(field)) || isundefined(PHZ.(field))
+        if isempty(PHZ.(field)) || any(isundefined(PHZ.(field)))
             % do nothing, both are empty
             
         elseif length(PHZ.(field)) == 1
@@ -65,7 +65,13 @@ for i = {'participant','group','session','trials'}, field = i{1};
         
         % make sure tags is same length as trials
         if (length(PHZ.tags.(field)) ~= size(PHZ.data,1))
-            error([name,'.tags.',field,' must be the same length as the number of trials.'])
+            
+            % if only one value, repeat it to the number of trials
+            if length(unique(PHZ.tags.(field))) == 1
+                PHZ.tags.(field) = repmat(PHZ.tags.(field),size(PHZ.data,1),1);
+            else
+                error([name,'.tags.',field,' must be the same length as the number of trials.'])
+            end
         end
         
             % make ordinal
@@ -93,7 +99,8 @@ for i = {'participant','group','session','trials'}, field = i{1};
                 PHZ.(field) = cellstr(num2str(PHZ.(field)));
                 PHZ.(field) = strrep(PHZ.(field),' ','');
             end
-            PHZ = phzUtil_history(PHZ,['PHZ.',field,' was reset',resetStr,'.'],verbose);
+            PHZ.history{end+1} = ['PHZ.',field,' was reset',resetStr,'.'];
+            if verbose, disp(PHZ.history{end}), end
         end
     end
 
@@ -107,7 +114,7 @@ for i = {'participant','group','session','trials'}, field = i{1};
             % if there is an order, make sure spec is same length
             if length(PHZ.(field)) ~= length(PHZ.spec.(field))
                 do_resetSpec = true;
-                if noutargs == 0, warning([name,'.spec.',field,' has an incorrect number of items.'])
+                if nargout == 0, warning([name,'.spec.',field,' has an incorrect number of items.'])
                 elseif verbose, disp([name,'.spec.',field,' had an incorrect number of items and was reset to the default order.'])
                 end
             end
@@ -320,7 +327,8 @@ if ~ismember('tags',fieldnames(PHZ))
     PHZ.tags.region = PHZ.spec.region_order;
     PHZ.spec.region = PHZ.spec.region_spec;
     PHZ.spec = rmfield(PHZ.spec,{'region_order','region_spec'});
-    PHZ = phzUtil_history(PHZ,'Converted PHZ structure to v0.8.',verbose);
+    PHZ.history{end+1} = 'Converted PHZ structure to v0.8.';
+    if verbose, disp(PHZ.history{end}), end
 end
 
 % change field 'regions' to 'region'
