@@ -21,8 +21,8 @@ function PHZ = phz_rej(PHZ,threshold,varargin)
 %     PHZ.rej.trials      = Data from PHZ.trials of rejected trials.
 %
 % Written by Gabriel A. Nespoli 2016-01-27. Revised 2016-03-23.
-
 if nargout == 0 && nargin == 0, help phz_rej, return, end
+if nargin > 1 && isempty(threshold), return, end
 
 % defaults
 rejType = 'value'; % 'value' or 'sd'
@@ -71,7 +71,7 @@ end
 function [PHZ,returnFlag] = phz_findArtifacts(PHZ,threshold,rejType,verbose)
 returnFlag = 0;
 
-if isempty(threshold) || threshold == 0
+if threshold == 0
     
     % newThresh == 0, oldThresh == 0 (do nothing and return)
     if ~ismember('rej',fieldnames(PHZ))
