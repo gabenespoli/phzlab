@@ -15,14 +15,11 @@ function PHZ = phz_rect(PHZ,recttype,verbose)
 %   PHZ = phz_rect(PHZ,'half')  >> Half-wave rectification.
 %
 % Written by Gabriel A. Nespoli 2016-01-27. Revised 2016-04-01.
-
-% get input
 if nargout == 0 && nargin == 0, help phz_rect, return, end
+if nargin > 1 && isempty(recttype), return, end
 if nargin < 2, recttype = 'full'; end % 'full' or 'half'
 if nargin < 3, verbose = true; end
 
-% check input
-if isempty(recttype), return, end
 if ismember('rej',fieldnames(PHZ)), do_rej = true; else do_rej = false; end
 
 % rectify signal
