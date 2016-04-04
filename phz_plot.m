@@ -1,6 +1,9 @@
 function phz_plot(PHZ,varargin)
 %PHZ_PLOT  Plot data from PHZ and PHZS structures.
 % 
+% *** if multiple processing functions are called they are done in the
+%     order they are input ***
+% 
 % PHZ_PLOT(PHZ,'Param1','Value1',...) plots the values in PHZ.data.
 %   PHZ_PLOT will plot a line graph or a bar graph with standard error bars 
 %   depending on the kind of data or feature specified.
@@ -39,29 +42,18 @@ function phz_plot(PHZ,varargin)
 %                 the same. If data are roughly centered on zero, this
 %                 is applied automatically. Enter 1 (true) or 0 (false)
 %                 to manually use this functionality.
-%
-%   'participant_order', 'group_order', 'session_order', 'trials_order',
-%       and 'region_order' specify the plot order and overrides the value
-%       in PHZ.spec.
 % 
 %   'participant_spec', 'group_spec', 'session_spec', 'trials_spec',
 %       and 'region_spec' specify the colour of the corresponding value in
 %       '*_order'.
 %
 % Written by Gabriel A. Nespoli 2016-02-16. Revised 2016-03-31.
-
 if nargout == 0 && nargin == 0, help phz_plot, return, end
+PHZ = phz_check(PHZ);
 
 % defaults
-subset = {};
-rect = [];
-win = [];
-transform = [];
-rej = [];
-blc = [];
-normtype = [];
-region = '';
-feature = '';
+region = [];
+feature = [];
 keepVars = {'none'};
 
 do_plotsmooth = false;
@@ -74,29 +66,26 @@ yl = [];
 xl = [];
 sameyl = [];
 
-spec.participant_order = {};
-spec.participant_spec = {};
-spec.group_order = {};
-spec.group_spec = {};
-spec.session_order = {};
-spec.session_spec = {};
-spec.trials_order = {};
-spec.trials_spec = {};
-spec.region_order = {};
-spec.region_spec = {};
-
 verbose = true;
 
 % user-defined
+if any(strcmp(varargin(1:2:end),'verbose'))
+    i = find(strcmp(varargin(1:2:end),'verbose')) * 2 - 1;
+    verbose = varargin{i+1};
+    varargin([i,i+1]) = [];
+end
+
 for i = 1:2:length(varargin)
     switch lower(varargin{i})
-        case 'subset',                  subset = varargin{i+1};
-        case {'rect','rectify'},        rect = varargin{i+1};
-        case 'smooth',                  win = varargin{i+1};
-        case 'transform',               transform = varargin{i+1};
-        case {'rej','reject'},          rej = varargin{i+1};
-        case {'blc','baselinecorrect'}, blc = varargin{i+1};            
-        case {'norm','normtype'},       normtype = varargin{i+1};
+        case 'subset',                  PHZ = phz_subset(PHZ,varargin{i+1},verbose);
+        case {'rect','rectify'},        PHZ = phz_rect(PHZ,varargin{i+1},verbose);
+        case {'filter','filt'},         PHZ = phz_filter(PHZ,varargin{i+1},verbose);
+        case {'smooth','smoothing'},    PHZ = phz_smooth(PHZ,varargin{i+1},verbose);
+        case 'transform',               PHZ = phz_transform(PHZ,varargin{i+1},verbose);
+        case {'blc','baselinecorrect'}, PHZ = phz_blc(PHZ,varargin{i+1},verbose);
+        case {'rej','reject'},          PHZ = phz_rej(PHZ,varargin{i+1},verbose);
+        case {'norm','normtype'},       PHZ = phz_norm(PHZ,varargin{i+1},verbose);
+        
         case 'region',                  region = varargin{i+1};
         case 'feature',                 feature = varargin{i+1};
         case {'summary','keepvars'},    keepVars = varargin{i+1};
@@ -110,103 +99,54 @@ for i = 1:2:length(varargin)
         case {'yl','ylim'},             yl = varargin{i+1};
         case {'xl','xlim'},             xl = varargin{i+1};
         case 'sameyl',                  sameyl = varargin{i+1};
-            
-        case {'participant_order','participantorder'},  spec.participant_order = varargin{i+1};
-        case {'participant_spec','participantspec'},    spec.participant_spec = varargin{i+1};
-        case {'group_order','grouporder'},              spec.group_order = varargin{i+1};
-        case {'group_spec','groupspec'},                spec.group_spec = varargin{i+1};
-        case {'session_order','sessionorder'},          spec.session_order = varargin{i+1};
-        case {'session_spec','sessionspec'},            spec.session_spec = varargin{i+1};
-        case {'trials_order','trialsorder'},            spec.trials_order = varargin{i+1};
-        case {'trials_spec','trialsspec'},              spec.trials_spec = varargin{i+1};
-        case {'region_order','regionorder'},            spec.region_order = varargin{i+1};
-        case {'regionregion_spec','spec'},              spec.region_spec = varargin{i+1};
-            
-        case 'verbose',                                 verbose = varargin{i+1};
-            
+                        
         otherwise, warning(['Parameter ''',varargin{i},''' is not ',...
                 'recognized and will be ignored.'])
     end
 end
 
+% process & prepare data to plot
 if length(cellstr(keepVars)) > 2, error('Cannot plot more than 2 summary types.'), end
-
-% data preprocessing
-PHZ = phz_check(PHZ);
-PHZ = phz_subset(PHZ,subset);
-PHZ = phz_rect(PHZ,rect,verbose);
-PHZ = phz_smooth(PHZ,win,verbose);
-PHZ = phz_transform(PHZ,transform,verbose);
-
-% PHZ = phz_rej(PHZ,rej,verbose);
-% PHZ = phz_blc(PHZ,blc,verbose);
-PHZ = phz_norm(PHZ,normtype);
-
 if ~isempty(feature) && ~strcmp(feature,'time'), PHZ = phz_region(PHZ,region,verbose); end
 [PHZ,featureTitle] = phz_feature(PHZ,feature,'summary',keepVars,'verbose',verbose);
 % (run phz_summary through phz_feature because fft feature needs to average
 %  over the summaryType by participant before doing the fft)
 
-% prepare to plot
-[spec,lineOrder,lineLabels,lineSpec,plotOrder,plotLabels] = getLabelsAndSpec(PHZ,spec,dispn);
-[rows,cols,pos,ytitleLoc,xtitleLoc] = getPlotDims(plotLabels);
-if isempty(yl), yl = nan(length(plotLabels),2); do_yl = true; else do_yl = false; end
+if do_plotsmooth && size(PHZ.data,2) > 1, PHZ = phz_smooth(PHZ,'mean0.05'); end
+if ismember('times',fieldnames(PHZ)),     x = PHZ.times;
+elseif ismember('freqs',fieldnames(PHZ)), x = PHZ.freqs;
+end
+
+% prepare plot stuff
+[lineOrder,lineTags,lineSpec,plotOrder,plotTags] = getLabelsAndSpec(PHZ,dispn);
+[rows,cols,pos,ytitleLoc,xtitleLoc] = getPlotDims(plotOrder);
+if isempty(yl), yl = nan(length(plotOrder),2); do_yl = true; else do_yl = false; end
 if isempty(xl), xl = nan(size(yl));             do_xl = true; else do_xl = false; end
 ytitle = getytitle(PHZ,feature,legendLoc,do_plotsmooth,featureTitle);
 
 % loop plots and plot lines/bars
 % ------------------------------
 figure('units','normalized','outerposition',pos)
-for j = 1:length(plotOrder)
+for p = 1:length(plotOrder)
+    subplot(rows,cols,p)
     
+    % get indices of data for current plot
+    if length(PHZ.summary.keepVars) > 1
+        ind = find(plotTags == plotOrder(p));
+    else ind = size(PHZ.data,1); 
+    end
+        
     % loop lines/bars
     for i = 1:length(lineOrder)
-        subplot(rows,cols,j)
+        y = PHZ.data(ind(i),:);
         
-        % reset stdError containers
-        if i == 1
-            stdErrorLocs = nan(length(lineOrder),size(PHZ.data,2));
-            stdError = nan(length(lineOrder),1);
-        end
-        
-        % get indices of current data
-        switch length(PHZ.summary.keepVars)
-            case 1
-                if ismember(PHZ.summary.keepVars{1},{' ','none'}) || isempty(PHZ.summary.keepVars{1})
-                    ind = 1;
-                else ind = find(PHZ.(PHZ.summary.keepVars{1}) == lineOrder{i});
-                end
-                
-            case 2
-                ind = intersect(find(PHZ.(PHZ.summary.keepVars{1}) == lineOrder{i}),...
-                    find(PHZ.(PHZ.summary.keepVars{2}) == plotOrder{j}));
-        end
-        
-        y = PHZ.data(ind,:);
-        stdErrorLocs(i,:) = y;
-        stdError(i,:) = PHZ.summary.stdError(ind);
-        
-%         lineLabel = lineOrder{i};
-        
-        if size(PHZ.data,2) > 1
-            
-            % line plots of time-series or fft data
-            if ismember('times',fieldnames(PHZ)),     x = PHZ.times;
-            elseif ismember('freqs',fieldnames(PHZ)), x = PHZ.freqs;
-            end
-            
-            if do_plotsmooth % x-axis limits become shorter with smoothing
-                [y,ind] = phzUtil_smooth(y);
-                x = x(ind);
-            end
+        if size(PHZ.data,2) > 1 % line plots of time-series or fft data
             plot(x,y,lineSpec{i},...
-                'DisplayName',lineLabels{i,j},...
+                'DisplayName',char(lineOrder(i)),...
                 'LineWidth',linewidth)
             if i == 1, hold on, end
             
-        else
-            
-            % bar plots of feature values
+        else % bar plots of feature values
             h = bar(i,y);
             if i == 1, hold on, end
             if ~isempty(lineSpec{i})
@@ -223,27 +163,22 @@ for j = 1:length(plotOrder)
     end
     
     % label plot, add errorbars
-    title(plotLabels{j})
-    if isempty(ytitleLoc) || ytitleLoc == j, ylabel(ytitle), end
+    title(char(plotOrder(p)))
+    if isempty(ytitleLoc) || ytitleLoc == p, ylabel(ytitle), end
     
-    if ismember(feature,{'fft','itfft','itpc'}) % FFT / PC plots
-        if isempty(xtitleLoc) || xtitleLoc == j, xlabel('Frequency (Hz)'), end
+    if ismember(PHZ.feature,{'fft','itfft','itpc'}) % FFT / PC plots
+        if isempty(xtitleLoc) || xtitleLoc == p, xlabel('Frequency (Hz)'), end
         
-    elseif ismember(feature,{'','time'}) % time series plots
-        if isempty(xtitleLoc) || xtitleLoc == j, xlabel('Time (s)'), end
+    elseif ismember(PHZ.feature,{'','time'}) % time series plots
+        if isempty(xtitleLoc) || xtitleLoc == p, xlabel('Time (s)'), end
         
-    else
-        % bar plots of feature values
-        set(gca,'XTick',1:length(lineOrder),...
-            'XTickLabel',lineLabels(:,j))
-        errorbar(1:length(lineOrder),...
-            stdErrorLocs,...
-            stdError,'.k');    
+    else % bar plots of feature values
+        set(gca,'XTick',1:length(lineOrder),'XTickLabel',cellstr(lineOrder))    
+        errorbar(gca,1:length(lineOrder),PHZ.data(ind),PHZ.summary.stdError(ind),'.k');
     end
     
     % record axes ranges
-    if do_yl, yl(j,:) = ylim; end
-%     if do_xl, xl(j,:) = xlim; end
+    if do_yl, yl(p,:) = ylim; end
     
     hold off
 end
@@ -267,14 +202,12 @@ end
 
 % loop plots and apply formatting
 % -------------------------------
-for j = 1:length(plotLabels)
-    subplot(rows,cols,j)
+for p = 1:length(plotOrder)
+    subplot(rows,cols,p)
     
     % set y- and x-axis ranges
     ylim(yl)
-    if size(PHZ.data,2) > 1
-        xlim(xl)
-    end
+    if size(PHZ.data,2) > 1, xlim(xl), end
     
     % create coloured regions to indicate ROIs
     if ~isempty(region) && (isempty(feature) || strcmp(feature,'time'))
@@ -295,8 +228,8 @@ for j = 1:length(plotLabels)
                     region{k}(2),...
                     region{k}(2)];
                 y = [yl(1) yl(2) yl(2) yl(1)];
-                obj = patch(x,y,spec.region_spec{k},'EdgeColor','none',...
-                    'DisplayName',spec.region_order{k});
+                obj = patch(x,y,PHZ.spec.region{k},'EdgeColor','none',...
+                    'DisplayName',PHZ.tags.region{k});
                 alpha(obj,0.1) % make translucent
             end
         end
@@ -315,38 +248,40 @@ end
 % Done phz_plot
 end
 
-function [spec,lineOrder,lineLabels,lineSpec,plotOrder,plotLabels,plotSpec] = getLabelsAndSpec(PHZ,spec,dispn)
+function [lineOrder,lineTags,lineSpec,plotOrder,plotTags,plotSpec] = getLabelsAndSpec(PHZ,dispn)
 
 % get order and spec
-for i = {'participant','group','session','trials','region'}
-    for j = {'order','spec'}
-        if isempty(spec.([i{1},'_',j{1}]))
-            spec.([i{1},'_',j{1}]) = PHZ.spec.([i{1},'_',j{1}]);
-        else % verify spec
-            switch j
-                case 'order'
-                    if ~all(ismember(spec.([i{1},'_',j{1}]),PHZ.spec.([i{1},'_',j{1}])))
-                        error(['User-defined spec ''',i{1},'_',j{1},''' does not have the correct labels.'])
-                    end
-                case 'spec'
-                    if length(spec.([i{1},'_',j{1}])) ~= length(PHZ.spec.([i{1},'_',j{1}]))
-                        error(['User-defined spec ''',i{1},'_',j{1},''' does not have the correct number of specs.'])
-                    end
-            end
-        end
-    end
-end
+% for i = {'participant','group','session','trials','region'}
+%     for j = {'order','spec'}
+%         if isempty(spec.([i{1},'_',j{1}]))
+%             spec.([i{1},'_',j{1}]) = PHZ.spec.([i{1},'_',j{1}]);
+%         else % verify spec
+%             switch j
+%                 case 'order'
+%                     if ~all(ismember(spec.([i{1},'_',j{1}]),PHZ.spec.([i{1},'_',j{1}])))
+%                         error(['User-defined spec ''',i{1},'_',j{1},''' does not have the correct labels.'])
+%                     end
+%                 case 'spec'
+%                     if length(spec.([i{1},'_',j{1}])) ~= length(PHZ.spec.([i{1},'_',j{1}]))
+%                         error(['User-defined spec ''',i{1},'_',j{1},''' does not have the correct number of specs.'])
+%                     end
+%             end
+%         end
+%     end
+% end
 
 % lines/bars
 if ismember(PHZ.summary.keepVars{1},{' ','none'}) || isempty(PHZ.summary.keepVars{1})
     lineOrder = {'All trials'};
     lineSpec = {''};
 else
-    lineOrder = PHZ.spec.([PHZ.summary.keepVars{1},'_order']);
-    if ~isempty(spec.([PHZ.summary.keepVars{1},'_spec']))
-        lineSpec = spec.([PHZ.summary.keepVars{1},'_spec']);
-    else lineSpec = repmat({''},1,length(PHZ.spec.([PHZ.summary.keepVars{1},'_order'])));
-    end
+    lineOrder = PHZ.(PHZ.summary.keepVars{1});
+    lineSpec = PHZ.spec.(PHZ.summary.keepVars{1});
+    lineTags = PHZ.tags.(PHZ.summary.keepVars{1});
+%     if ~isempty(spec.([PHZ.summary.keepVars{1},'_spec']))
+%         lineSpec = spec.([PHZ.summary.keepVars{1},'_spec']);
+%     else lineSpec = repmat({''},1,length(PHZ.spec.([PHZ.summary.keepVars{1},'_order'])));
+%     end
 end
 
 % plots
@@ -357,21 +292,24 @@ if length(PHZ.summary.keepVars) == 1
     end
     plotSpec = {''};
 else 
-    plotOrder = PHZ.spec.([PHZ.summary.keepVars{2},'_order']);
-    if ~isempty(spec.([PHZ.summary.keepVars{2},'_spec']))
-        plotSpec = spec.([PHZ.summary.keepVars{2},'_spec']);
-    else plotSpec = repmat({''},1,length(PHZ.spec.([PHZ.summary.keepVars{2},'_order'])));
-    end
+    plotOrder = PHZ.(PHZ.summary.keepVars{2});
+    plotSpec = PHZ.spec.(PHZ.summary.keepVars{2});
+    plotTags = PHZ.tags.(PHZ.summary.keepVars{2});
+%     if ~isempty(spec.([PHZ.summary.keepVars{2},'_spec']))
+%         plotSpec = spec.([PHZ.summary.keepVars{2},'_spec']);
+%     else plotSpec = repmat({''},1,length(PHZ.spec.([PHZ.summary.keepVars{2},'_order'])));
+%     end
 end
 
-% duplicate labels as need to make it the same size as d
-if ~isempty(lineOrder)
-    if ~iscolumn(lineOrder)
-        if isrow(lineOrder), lineOrder = lineOrder'; end
-    end
-end
-lineLabels = repmat(lineOrder,1,length(plotOrder));
-plotLabels = plotOrder;
+% duplicate labels as needed
+% if ~isempty(lineOrder)
+%     if ~iscolumn(lineOrder)
+%         if isrow(lineOrder), lineOrder = lineOrder'; end
+%     end
+% end
+% lineLabels = repmat(lineOrder,size(PHZ.data,1)/length(lineOrder),1);
+% lineLabels = repmat(lineOrder,1,length(plotOrder));
+% plotLabels = plotOrder;
 
 % add n's
 if ~ismember(dispn,{'none',''})
@@ -458,7 +396,7 @@ function ytitle = getytitle(PHZ,feature,legendLoc,smoothing,featureTitle)
 % -----------
 
 % feature title and datatype
-if ismember(feature,{'acc','acc1','acc2','acc3','acc4','acc5',...
+if ismember(PHZ.feature,{'acc','acc1','acc2','acc3','acc4','acc5',...
         'rt', 'rt1', 'rt2', 'rt3', 'rt4', 'rt5'})
     ytitle = {featureTitle};
     skipDSPtitles = true;
