@@ -235,16 +235,6 @@ PHZ.resp.q5 = {};
 PHZ.resp.q5_acc = [];
 PHZ.resp.q5_rt = [];
 
-PHZ.spec.participant_spec = {};
-PHZ.spec.group_spec = {};
-PHZ.spec.session_spec = {};
-PHZ.spec.trials_spec = {};
-
-
-PHZ.spec.region = {'k','b','g','y','r'};
-
-
-
 PHZ.misc = [];
 
 PHZ.tags.participant = categorical;
@@ -252,6 +242,12 @@ PHZ.tags.group = categorical;
 PHZ.tags.session = categorical;
 PHZ.tags.trials = categorical;
 PHZ.spec.region_order = {'baseline','target','target2','target3','target4'};
+
+PHZ.spec.participant = {};
+PHZ.spec.group = {};
+PHZ.spec.session = {};
+PHZ.spec.trials = {};
+PHZ.spec.region = {'k','b','g','y','r'};
 
 PHZ.history = {};
 

@@ -5,7 +5,7 @@ function PHZ = phz_blc(PHZ,region,verbose)
 %
 % inputs:   PHZ      = PHZLAB data structure.
 %           REGION   = Baseline region to subtract. REGION is a string
-%                      specifying a region in PHZ.regions, a 1-by-2 vector
+%                      specifying a region in PHZ.region, a 1-by-2 vector
 %                      specifying the start and end times in seconds, or a
 %                      1-by-N vector (length > 2) of indices. Setting
 %                      REGION to zero restores a previous subtraction.
@@ -18,7 +18,7 @@ function PHZ = phz_blc(PHZ,region,verbose)
 %
 % examples:
 %   PHZ = phz_blc(PHZ,'baseline') >> Subtract the mean of the baseline
-%         region (as specified in PHZ.regions.baseline) from each trial.
+%         region (as specified in PHZ.region.baseline) from each trial.
 %   PHZ = phz_blc(PHZ,[-1 0]) >> Subtract the mean of -1s to 0s.
 %   PHZ = phz_blc(PHZ,0) >> Undo baseline correction.
 %
@@ -70,8 +70,8 @@ if do_blc || do_restore
         
         % make region endpoints
         if ischar(region)
-            regionStr = [region,' ',phzUtil_num2strRegion(PHZ.regions.(region))];
-            region = PHZ.regions.(region);
+            regionStr = [region,' ',phzUtil_num2strRegion(PHZ.region.(region))];
+            region = PHZ.region.(region);
         else regionStr = phzUtil_num2strRegion(region);
         end
         PHZ.blc.region = region;

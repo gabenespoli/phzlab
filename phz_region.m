@@ -4,12 +4,12 @@ function PHZ = phz_region(PHZ,region,verbose)
 % usage:    PHZ = phz_region(PHZ,REGION)
 % 
 % inputs:   PHZ     = PHZLAB data structure.
-%           REGION  = A string specifying a region in PHZ.regions, a 1-by-2 
+%           REGION  = A string specifying a region in PHZ.region, a 1-by-2 
 %                     vector specifying the start and end times in seconds, 
 %                     or a 1-by-N vector (length > 2) of indices.
 % 
 % outputs:  PHZ.data    = Data for specified region only.
-%           PHZ.regions = Value specified in REGION.
+%           PHZ.region = Value specified in REGION.
 % 
 % examples:
 %   PHZ = phz_region(PHZ,'target') >> Restricts PHZ.data to the 'target'
@@ -33,7 +33,7 @@ elseif ismember('freqs',fieldnames(PHZ)), indField = 'freqs';
 end
 
 % convert input to vector of indices
-possibleRegions = PHZ.tags.regions;
+possibleRegions = PHZ.tags.region;
 
 if isnumeric(region) && length(region) == 1;
     region = possibleRegions{region};
@@ -43,7 +43,7 @@ regionLabel = '';
 if ischar(region)
     if ismember(region,possibleRegions)
         regionLabel = region;
-        region = PHZ.regions.(region);
+        region = PHZ.region.(region);
         if isempty(region), error('This region is empty.'), end
     else error('Invalid region.')
     end
@@ -64,7 +64,7 @@ if ismember('rej',fieldnames(PHZ)),
 end
 
 % cleanup PHZ fields
-PHZ.regions = regionLabel;
+PHZ.region = regionLabel;
 
 PHZ = phzUtil_history(PHZ,['Restricted to ''',regionLabel,''' region.'],verbose);
 

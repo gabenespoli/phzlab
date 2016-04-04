@@ -143,20 +143,20 @@ elseif ismember('freqs',fieldnames(PHZ))
 end
 
 %% region
-if isstruct(PHZ.regions)
-    rname = fieldnames(PHZ.regions);
+if isstruct(PHZ.region)
+    rname = fieldnames(PHZ.region);
     for i = 1:length(rname)
-        PHZ.regions.(rname{i}) = verifyNumeric(PHZ.regions.(rname{i}),[name,'.region.(rname{i})'],verbose);
-        PHZ.regions.(rname{i})   = checkAndFix1x2(PHZ.regions.(rname{i}),[name,'.region.(rname{i})'],nargout,verbose);
+        PHZ.region.(rname{i}) = verifyNumeric(PHZ.region.(rname{i}),[name,'.region.(rname{i})'],verbose);
+        PHZ.region.(rname{i})   = checkAndFix1x2(PHZ.region.(rname{i}),[name,'.region.(rname{i})'],nargout,verbose);
     end
     
-elseif isnumeric(PHZ.regions)
-    PHZ.regions = checkAndFix1x2(PHZ.regions,[name,'.region'],nargout,verbose);
+elseif isnumeric(PHZ.region)
+    PHZ.region = checkAndFix1x2(PHZ.region,[name,'.region'],nargout,verbose);
 end
 
-PHZ.tags.regions = verifyCell(PHZ.tags.regions,[name,'.tags.region'],verbose);
-PHZ.tags.regions = checkAndFixRow(PHZ.tags.regions,[name,'.tags.region'],nargout,verbose);
-if length(PHZ.tags.regions) ~= 5, error('There should be 5 region names in PHZ.tags.regions.'), end
+PHZ.tags.region = verifyCell(PHZ.tags.region,[name,'.tags.region'],verbose);
+PHZ.tags.region = checkAndFixRow(PHZ.tags.region,[name,'.tags.region'],nargout,verbose);
+if length(PHZ.tags.region) ~= 5, error('There should be 5 region names in PHZ.tags.region.'), end
 
 %% resp
 if ~isstruct(PHZ.resp), error([name,'.resp should be a structure.']), end
@@ -317,44 +317,41 @@ if ~ismember('tags',fieldnames(PHZ))
         PHZ.spec.(field) = PHZ.spec.([field,'_spec']);
         PHZ.spec = rmfield(PHZ.spec,{[field,'_order'] [field,'_spec']});
     end
-    PHZ.tags.regions = PHZ.spec.region_order;
-    PHZ.spec.regions = PHZ.spec.region_spec;
+    PHZ.tags.region = PHZ.spec.region_order;
+    PHZ.spec.region = PHZ.spec.region_spec;
     PHZ.spec = rmfield(PHZ.spec,{'region_order','region_spec'});
     PHZ = phzUtil_history(PHZ,'Converted PHZ structure to v0.8.',verbose);
 end
 
-% change field 'region' to 'regions' (0.7.6 and older)
-if ismember('region',fieldnames(PHZ))
-    PHZ.regions = PHZ.region;
-    PHZ = rmfield(PHZ,'region');
+% change field 'regions' to 'region'
+if ismember('regions',fieldnames(PHZ))
+    PHZ.region = PHZ.regions;
+    PHZ = rmfield(PHZ,'regions');
 end
 
-if ismember('region',fieldnames(PHZ.tags))
-    PHZ.tags.regions = PHZ.tags.region;
-    PHZ.tags = rmfield(PHZ.tags,'region');
+if ismember('regions',fieldnames(PHZ.tags))
+    PHZ.tags.region = PHZ.tags.regions;
+    PHZ.tags = rmfield(PHZ.tags,'regions');
 end
 
-if ismember('region',fieldnames(PHZ.spec))
-    PHZ.spec.regions = PHZ.spec.region;
-    PHZ.spec = rmfield(PHZ.spec,'region');
+if ismember('regions',fieldnames(PHZ.spec))
+    PHZ.spec.region = PHZ.spec.regions;
+    PHZ.spec = rmfield(PHZ.spec,'regions');
 end
-
 end
 
 function PHZ = orderPHZfields(PHZ)
 
-
-
 % region structure
-if isstruct(PHZ.regions)
+if isstruct(PHZ.region)
     
     % if spec order doesn't match the struct, recreate the struct
-    if ~strcmp(strjoin(fieldnames(PHZ.regions)),strjoin(PHZ.tags.regions))
-        rname = fieldnames(PHZ.regions);
-        for i = 1:length(PHZ.tags.regions)
-            temp.(PHZ.tags.regions{i}) = PHZ.regions.(rname{i});
+    if ~strcmp(strjoin(fieldnames(PHZ.region)),strjoin(PHZ.tags.region))
+        rname = fieldnames(PHZ.region);
+        for i = 1:length(PHZ.tags.region)
+            temp.(PHZ.tags.region{i}) = PHZ.region.(rname{i});
         end
-        PHZ.regions = temp;
+        PHZ.region = temp;
     end
 end
 
@@ -366,29 +363,34 @@ mainOrder = {'study'
     'group'
     'session'
     'trials'
+    'summary'
+    
+    'regions'
+    'region'
     
     'times'
     'freqs'
     'data'
-    'feature'
     
+    'feature'
     'units'
     'srate'
     
-    'regions'
-    'region'
-    'summary'
-    
-    'rej'
-    'blc'
-    'norm'
-    
     'resp'
-    'spec'
     
+    'proc'
+        'norm'
+        'blc'
+        'rej'
+
     'misc'
-    'files'
-    'tags'
+        % 'srate'
+        % 'times'
+        % 'freqs'
+        'tags'
+        'spec'
+        'files'
+        
     'history'};
 
 if ~all(ismember(fieldnames(PHZ),mainOrder))

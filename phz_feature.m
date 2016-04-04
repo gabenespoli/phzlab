@@ -114,7 +114,7 @@ switch lower(feature)
         % if resp data, include all trials
         if ismember(feature,{'acc','acc1','acc2','acc3','acc4','acc5',...
                 'rt', 'rt1', 'rt2', 'rt3', 'rt4', 'rt5'})
-            PHZ = phz_rej(PHZ,[],0); % restore all metadata
+            PHZ = phz_rej(PHZ,0,0); % restore all metadata
         end
         
         % calculate feature
