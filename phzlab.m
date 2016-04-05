@@ -77,6 +77,7 @@ function phzlab
 % - deal with blc for spectra. for phz_plot should the default behaviour be
 %   to blc in time domain and then fft? or to blc in freq domain?
 % - adding or subtracting averages of different trials?
+% - scroll through individual trials, reject manually
 
 % Change Log
 % ----------

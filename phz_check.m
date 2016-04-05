@@ -74,11 +74,11 @@ for i = {'participant','group','session','trials'}, field = i{1};
             end
         end
         
-            % make ordinal
-    if ~isempty(PHZ.(field))
-        PHZ.(field)      = categorical(PHZ.(field),     cellstr(PHZ.(field)),'Ordinal',true);
-        PHZ.tags.(field) = categorical(PHZ.tags.(field),cellstr(PHZ.(field)),'Ordinal',true);
-    end
+        % make ordinal
+        if ~isempty(PHZ.(field))
+            PHZ.(field)      = categorical(PHZ.(field),     cellstr(PHZ.(field)),'Ordinal',true);
+            PHZ.tags.(field) = categorical(PHZ.tags.(field),cellstr(PHZ.(field)),'Ordinal',true);
+        end
         
         % empty grouping var if there are tags not represented
         if ~isempty(PHZ.(field)) && ~all(ismember(PHZ.tags.(field),PHZ.(field)))
