@@ -37,11 +37,12 @@ function phzlab
 %   phz_plot:        Visualize data as line or bar graphs.
 %   phz_writetable:  Export features to a MATLAB table or csv file.
 % 
-% Version 0.8 Written by Gabriel A. Nespoli 2016-04-04.
+% Version 0.7.7 Written by Gabriel A. Nespoli 2016-04-04.
 
 % to do:
 % - phz_gather: keep rej/blc/norm/etc info, but not data
 % - epoching
+% - phz_changefield (do proc first?)
 % - phz_create from already-epoched csv's? import from csv
 % - changefield spec causes problems with ordinal?
 % - phz_changfield should warn if some info is wrong
@@ -98,7 +99,7 @@ function phzlab
 % phzUtil_findAudioMarkers: function added.
 % phz_blc: removed restriction that blc be done before rej
 
-% v0.8
+% v0.7.7
 % - swap grouping vars and order, add tags field. 'visible' grouping
 %   variable values are now just the unique values of the trial tags.
 % - phz_writetable: option to stack to one case per row ("one participant

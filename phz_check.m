@@ -316,7 +316,7 @@ end
 
 function PHZ = backwardsCompatibility(PHZ,verbose)
 
-% swap grouping and order vars, add tags (older than v0.8)
+% swap grouping and order vars, add tags (older than v0.7.7)
 if ~ismember('tags',fieldnames(PHZ))
     for i = {'participant','group','session','trials'}, field = i{1};
         PHZ.tags.(field) = PHZ.(field);
@@ -327,7 +327,7 @@ if ~ismember('tags',fieldnames(PHZ))
     PHZ.tags.region = PHZ.spec.region_order;
     PHZ.spec.region = PHZ.spec.region_spec;
     PHZ.spec = rmfield(PHZ.spec,{'region_order','region_spec'});
-    PHZ.history{end+1} = 'Converted PHZ structure to v0.8.';
+    PHZ.history{end+1} = 'Converted PHZ structure to v0.7.7.';
     if verbose, disp(PHZ.history{end}), end
 end
 
