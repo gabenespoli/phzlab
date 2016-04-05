@@ -26,7 +26,7 @@ numlines = 1;
 
 switch lower(fieldtype)
     
-    case {'spec','order'}
+    case {'spec','colour','colours','color','colors','linespec'}
         prompt = fieldnames(PHZ.spec);
         old = cell(size(prompt));
         for i = 1:length(old)
@@ -52,10 +52,7 @@ switch lower(fieldtype)
             'units'};
         %     'srate'}; % if srate changes, times needs to change too
         
-        if length(PHZ.session) > 1,     prompt(5) = []; end
-        if length(PHZ.group) > 1,       prompt(4) = []; end
-        if length(PHZ.participant) > 1, prompt(3) = []; end
-        
+        % gather current values of fields
         old = cell(size(prompt));
         for i = 1:length(prompt)
             old{i} = cellstr(PHZ.(prompt{i}));
@@ -64,6 +61,7 @@ switch lower(fieldtype)
         
         new = inputdlg(prompt,dlg_title,numlines,old);
         
+        % if new value, adjust
         for i = 1:length(new)
             if ~strcmp(new{i},old{i})
                 PHZ.(prompt{i}) = new{i};
@@ -73,6 +71,10 @@ switch lower(fieldtype)
         end
         
     case {'region','regions'}
+        % have region order at top
+        % then have two columns, one for names, one for endpoints
+        
+        
         prompt = PHZ.spec.region_order;
         
         old = {num2str(PHZ.region.(PHZ.spec.region_order{1})),...
