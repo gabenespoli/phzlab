@@ -20,8 +20,8 @@ if ~isstruct(PHZ), error([name,' variable should be a structure.']), end
 PHZ.study       = verifyChar(PHZ.study,[name,'.study'],verbose);
 PHZ.datatype    = verifyChar(PHZ.datatype,[name,'.datatype'],verbose);
 PHZ.units       = verifyChar(PHZ.units,[name,'.units'],verbose);
-PHZ.srate       = verifyNumeric(PHZ.srate,[name,'.srate'],verbose);
-checkSingleNumber(PHZ.srate,[name,'.srate']);
+PHZ.misc.srate       = verifyNumeric(PHZ.misc.srate,[name,'.misc.srate'],verbose);
+checkSingleNumber(PHZ.misc.srate,[name,'.misc.srate']);
 PHZ.data        = verifyNumeric(PHZ.data,[name,'.data'],verbose);
 
 %% participant, group, session, trials
