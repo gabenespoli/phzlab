@@ -15,46 +15,52 @@ function [PHZ,featureTitle] = phz_feature(PHZ,feature,varargin)
 %                       participants are kept separate for this averaging. 
 %                       See phz_summary for more details.
 % 
-%   Time-domain features:
-%   'mean'          = Average value.
-%   'max','min'     = Maximum or minimum value.
-%   'maxi','mini'   = Time (latency) of the max or min (in seconds).
-%   'rms'           = Root-mean-square of the specified region(s).
-%   'slope'         = The max slope of tangents to each point of the data
-%                     after data are smoothed with a moving point average.
-%   'slopei'        = Time of maximum slope.
-%   'area'          = Area under the curve.
-%   ''              = (blank) returns time-series data.
+%           Time-domain features:
+%           'mean'        = Average value.
+%           'max','min'   = Maximum or minimum value.
+%           'maxi','mini' = Time (latency) of the max or min (in seconds).
+%           'rms'         = Root-mean-square of the specified region(s).
+%           'slope'       = The max slope of tangents to each point of the 
+%                           data after data are smoothed with a moving 
+%                           point average.
+%           'slopei'      = Time of maximum slope.
+%           'area'        = Area under the curve.
+%           ''            = (blank) returns time-series data.
 % 
-%   Frequency-domain features:
-%   'fft'           = Amplitude spectrum. trials are averaged together in
-%                     the time domain before calculating the FFT.
-%   'fft100'        = Entering 'fft' followed by a number will return the
-%                     value of the FFT at that frequency (e.g., 'fft100'
-%                     returns the value of the 100 Hz bin).
-%   'fft100-1'      = Additionally specifies the number of bins on either
-%                     side of the specified bin to include in an average
-%                     (e.g., 'fft100-1' returns the average of 3 bins
-%                     centered on 100 Hz).
-%   'itfft'         = Intertrial FFT. Whereas the 'fft' feature averages
-%                     trials before caluclating the FFT, 'itfft' calculates
-%                     the FFT before averaging trials.
-%   'itpc'          = Intertrial phase coherence
-%   'itrc'          = Intertrial response consistency (FFR feature).
+%           Frequency-domain features:
+%           'fft'         = Amplitude spectrum. Trials are averaged 
+%                           together in the time domain before calculating.
+%           'fft100'      = Entering 'fft' followed by a number will
+%                           calculate the value of the FFT at that 
+%                           frequency (e.g., 'fft100' returns the value of
+%                           the 100 Hz bin).
+%           'fft100-1'    = Additionally specifies the number of bins on 
+%                           either side of the specified bin to include in 
+%                           an average (e.g., 'fft100-1' returns the 
+%                           average of 3 bins centered on 100 Hz).
+%           'itfft'       = Intertrial FFT. Whereas the 'fft' feature 
+%                           averages trials before caluclating the FFT,
+%                           'itfft' calculates the FFT on each trial before 
+%                           averaging trials together.
+%           'itpc'        = Intertrial phase coherence.
+%           'itrc'        = Intertrial response consistency (FFR feature).
 %
-%   Behavioural features:
-%   'acc','acc2',...= Accuracy value in PHZ.resp.q1_acc, q2, etc.
-%   'rt','rt2',...  = Reaction time in PHZ.resp.q1_rt, q2, etc.
+%           Behavioural features:
+%           'acc','acc2',... = Accuracy value in PHZ.resp.q1_acc, q2, etc.
+%           'rt','rt2',...   = Reaction time in PHZ.resp.q1_rt, q2, etc.
 % 
-%   Note: For all features except 'acc' and 'rt', data are returned for
-%         non-rejected trials. For 'acc' and 'rt', all trials are included
-%         regardless of whether or not they are rejected.
+%           Note: For all features except 'acc' and 'rt', data are 
+%                 returned for non-rejected trials. For 'acc' and 'rt', 
+%                 all trials are included regardless of whether or not 
+%                 they are rejected.
 %
 % outputs:  PHZ.data    = The data of the extracted feature for each trial.
 %           PHZ.feature = The value specified in FEATURE.
 % 
-% Written by Gabriel A. Nespoli 2016-02-15. Revised 2016-04-01.
-
+% examples:
+%   PHZ = phz_feature(PHZ,'mean')
+% 
+% Written by Gabriel A. Nespoli 2016-02-15. Revised 2016-04-04.
 if nargout == 0 && nargin == 0, help phz_feature, return, end
 
 % defaults

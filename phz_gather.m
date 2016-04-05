@@ -1,41 +1,40 @@
 function PHZS = phz_gather(varargin)
 %PHZ_GATHER  Create a PHZS structure of data from many PHZ structures.
 % 
-% PHZS = PHZ_GATHER opens a file browser to select PHZ structures to
-%   concatenate into a single PHZS structure. Files must be .mat.
+% usage:    PHZ = phz_gather
+%           PHZ = phz_gather(FOLDER)
+%           PHZ = phz_gather(...,'Param1','Value1',etc.)
 % 
-% PHZS = PHZ_GATHER(FOLDER) uses all of the .mat files in FOLDER.
-%
-% PHZS = PHZ_GATHER('Param1','Value1',...) additionally specifies one of
-%   the following parameters. Applying a summary processing function will
-%   make the filesize of PHZS smaller; this will render some trial
-%   information inaccessible, but in some cases is required.
-%
-%   Processing options: These parameter names will call the function with
-%     the same name, using the specified value as input. See the help of
-%     each function for a more detailed explanation of what they do and
-%     how to use them.
-%   'subset'     = Only gather a subset of the data in PHZ.
-%   'rect'       = Full- or half-wave rectification of PHZ.data.
-%   'blc'        = Subtract the mean of a baseline region from PHZ.data.
-%   'rej'        = Reject trials with values above a threshold.
-%   'region'     = Restrict feature extraction or plotting to a region.
-%   'feature'    = Gather a feature (e.g., mean, max, fft, etc.).
-%   'summary'    = Summarize data by grouping variables (e.g., group,
-%                  etc.). Default is 'all' (don't do any averaging).
-%
-%   Plotting options:
-%   spec.*_order = Specify order of a grouping variable. Replace '*' with
-%                  'participant', 'group', 'session', 'trials', and
-%                  'region'.
-%   spec.*_spec  = Specify the colour and line type specfications for
-%                  plotting. Must be the same length as spec.*_order. See
-%                  the help for the plot.m function for more detail on
-%                  line types.
-%
-%   Saving options:
-%   'save'       = Filename to save the PHZS structure as a .mat file after
-%                  gathering.
+% inputs:   (none)  = Opens a file browser to select files to gather.
+%           FOLDER  = Gather all .phz files in this folder.
+%           'save'  = Filename and path to save resultant PHZ structure
+%                     as a .phz file.
+%           
+%           The following functions can be called as parameter/value pairs,
+%           and are executed in the same order as they appear in the
+%           function call. See the help of each function for more details.
+%               'subset'    = Calls phz_subset.
+%               'rectify'   = Calls phz_rect.
+%               'filter'    = Calls phz_filter.
+%               'smooth'    = Calls phz_smooth.
+%               'transform' = Calls phz_transform.
+%               'blc'       = Calls phz_blc.
+%               'rej'       = Calls phz_rej.
+%               'norm'      = Calls phz_norm.
+% 
+%           The following functions can be called as parameter/value pairs,
+%           and are always executed in the order listed here, after all of
+%           the processing funtions. See the help of each function for more
+%           details.
+%               'region'    = Calls phz_region.
+%               'summary'   = Calls phz_summary.
+% 
+% outputs:  PHZ = Gathered PHZLAB data structure. More-or-less a
+%                 concatnated version of all input PHZ structures.
+% 
+% examples:
+%   PHZ = phz_gather >> Opens a file browser to select multiple files.
+%   PHZ = phz_gather('myfolder') >> Gathers all .phz files in myfolder.
 %
 % Written by Gabriel A. Nespoli 2016-02-21. Revised 2016-04-04.
 if nargout == 0 && nargin == 0, help phz_gather, return, end

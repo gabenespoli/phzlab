@@ -1,15 +1,33 @@
 function PHZ = phz_norm(PHZ,normtype,verbose)
 %PHZ_NORM  Convert data to z-scores.
 %
-% PHZ = PHZ_NORM(PHZ,NORMTYPE) converts data to z-scores based on the mean
-%   and standard deviation of trials grouped by the grouping variable
-%   NORMTYPE. NORMTYPE is a string specifying a grouping variable (i.e.,
-%   'participant' (default), 'group', 'session', 'trials', 'all', or
-%   'none'). A NORMTYPE of 'none' will take a new mean and standard
-%   deviation for each trial, while 'all' will take one mean and standard
-%   deviation for all trials. A normtype of 0 will undo normalization.
+% usage:    PHZ = PHZ_NORM(PHZ,NORMTYPE)
+% 
+% inputs:   PHZ      = PHZLAB data structure.
+%           NORMTYPE = String specifying the grouping variable within which
+%                      to normalize. For each group of trials representing
+%                      a unique value of this grouping variable, each data
+%                      point has the mean subtracted and is divided by the
+%                      standard deviation. Entering 0 undoes normalization.
+% 
+% outputs:  PHZ.norm.type     = The grouping variable used for 
+%                               normalization.
+%           PHZ.norm.mean     = If there is only one unique value of 
+%                               NORMTYPE, this is the mean value of all 
+%                               trials. Otherwise it is a vector the same 
+%                               length as the number of trials, specifying 
+%                               the mean used for each trial.
+%           PHZ.norm.stDev    = Same as above for standard deviation.
+%           PHZ.norm.oldUnits = Units of data before conversion to
+%                               z-scores.
+% 
+% examples:
+%   PHZ = phz_norm(PHZ,'participant') >> For each participant, find the
+%         mean and standard deviation of all trials, and use these values
+%         normalize data.
+%   PHZ = phz_norm(PHZ,0) >> Undo normalization.
 %
-% Written by Gabriel A. Nespoli 2016-03-27. Revised 2016-04-01.
+% Written by Gabriel A. Nespoli 2016-03-27. Revised 2016-04-04.
 if nargin == 0 && nargout == 0; help phz_norm, return, end
 if nargin > 1 && isempty(normtype), return, end
 if nargin < 2, normtype = 'participant'; end
@@ -25,6 +43,7 @@ if do_norm || do_restore
         else
             PHZ.data = (PHZ.data .* repmat(PHZ.norm.stDev,1,size(PHZ.data,2))) + repmat(PHZ.norm.mean,1,size(PHZ.data,2));
         end
+        PHZ.units = PHZ.norm.oldUnits;
         PHZ = rmfield(PHZ,'norm');
         PHZ = phzUtil_history(PHZ,'Normalization has been undone.',verbose);
     end
@@ -66,6 +85,7 @@ if do_norm || do_restore
             end
         end
         
+        PHZ.norm.oldUnits = PHZ.units;
         PHZ.units = 'z-scores';
         
         PHZ = phzUtil_history(PHZ,['Converted data to z-scores by ',normtype,'.'],verbose);

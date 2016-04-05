@@ -1,13 +1,22 @@
 function PHZ = phz_save(PHZ,varargin)
 %PHZ_SAVE  Save a PHZ or PHZS structure.
 % 
-% PHZ = PHZ_SAVE(PHZ) opens a dialog box to select save location.
-% PHZ = PHZ_SAVE(PHZ,FILENAME) saves PHZ to FILENAME as a '.mat' file.
+% usage:    PHZ = PHZ_LOAD(PHZ)
+%           PHZ = PHZ_LOAD(PHZ,FILENAME)
 % 
-% See also PHZ_LOAD, PHZ_CHECK.
+% inputs:   PHZ      = PHZLAB data structure to save.
+%           FILENAME = Filename (and path) of save location.
+% 
+% outputs:  PHZ.history = Updated to reflect the save action.
+% 
+% examples:
+%   PHZ = phz_save(PHZ) >> Browse computer to select a save location.
+%   PHZ = phz_save(PHZ,'myfile') >> Saves the PHZ structure 'PHZ' to
+%         the file 'myfile.phz' in the current directory.
+%   PHZ = phz_save('myfolder/myfile.phz') >> Saves the PHZ structure 'PHZ'
+%         to the file 'myfile.phz' in the folder 'myfolder'.
 %
-% Written by Gabriel A. Nespoli 2016-03-04. Revised 2016-03-25.
-
+% Written by Gabriel A. Nespoli 2016-03-07. Revised 2016-04-04.
 if nargout == 0 && nargin == 0, help phz_save, return, end
 
 if nargin == 1
@@ -17,7 +26,7 @@ end
 
 if nargin > 1
     [pathname,filename,ext] = fileparts(varargin{1});
-    if isempty(ext), ext = '.phz'; end
+    if isempty(ext) || ~ismember(ext,{'.phz','.mat'}), ext = '.phz'; end
     filename = fullfile(pathname,[filename,ext]);
 end
 

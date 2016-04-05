@@ -1,30 +1,31 @@
 function phzlab
 %PHZLAB  A MATLAB toolbox for analysis of physiological data.
-% PHZ structures must first be created from epoched data. The fields of
-%   the PHZ structure should be filled manually or with a script. The main
-%   functions are listed below:
+% PHZ structures are created for each recording of data, and can be
+%   filtered, epoched, and otherwise preprocessed. Multiple PHZ structures
+%   can be gathered into a single one, enabling powerful plotting
+%   functionality. Data can then be exported into a table for statistical
+%   analyses.
 % 
 % * = These functions are reversible.
-% # = These functions will soon be reversible, but aren't yet.
 % X = These functions are not available yet.
 % 
 % FILE I/O
 %   phz_create:      Create a PHZ structure from a data file.
-%   phz_gather:      Create a PHZS structure from many PHZ structures.
+%   phz_gather:      Gather many PHZ structures into a single one.
 %   phz_save:        Save a PHZ structure.
 %   phz_load:        Load a PHZ structure.
 %   phz_changefield: Change the fields of a PHZ structure.
-%   phz_trials:      Add names to each trial of epoched data.
 % 
 % PROCESSING
 % X phz_filter:      Butterworth filtering.
 % X phz_epoch:       Split a single channel of data into trials.
+% X phz_trials:      Add names to each trial of epoched data.
 %   phz_rect:        Full- or half-wave rectification.
 %   phz_smooth:      Sliding window averaging (incl. RMS)
 %   phz_transform:   Transform data (e.g., square root, etc.)
 % * phz_rej:         Remove trials with values exceeding a threshold.
-% # phz_norm:        Normalize across specified grouping variables.
 % * phz_blc:         Subtract mean of baseline region from each trial.
+% * phz_norm:        Normalize across specified grouping variables.
 % 
 % ANALYSIS
 %   phz_subset:      Keep data only from specified grouping variables.
@@ -36,21 +37,19 @@ function phzlab
 %   phz_plot:        Visualize data as line or bar graphs.
 %   phz_writetable:  Export features to a MATLAB table or csv file.
 % 
-% Version 0.8 Written by Gabriel A. Nespoli 2016-04-01.
+% Version 0.8 Written by Gabriel A. Nespoli 2016-04-04.
 
 % to do:
-% - phz_writetable: option to stack to one case per row ("one participant
-%       per row")
+% - phz_gather: keep rej/blc/norm/etc info, but not data
 % - epoching
-% - phz_create from already-epoched csv's? % - import from csv
-% - make phz_norm like rej and blc
+% - phz_create from already-epoched csv's? import from csv
 % - changefield spec causes problems with ordinal?
-% - paolo's problem with undefined
-% - flip the spec and regular fields for grouping vars
 % - phz_changfield should warn if some info is wrong
-% - phz_load: if no ext given from command line, default to .phz
+% - hide tags/norm/rect/etc. in misc, call it proc? function phz_proc to 
+%   display processing? move times & srate to misc too?
 
 % medium to do:
+% - change phz_rect to phz_rectify
 % - phz_plot: fix dispn
 % - itpc, itrc, src (require PHZ.misc.stim?)
 % - more ffr features: itpc, itrc, src, snr, playaudio, saveaudio
@@ -58,9 +57,8 @@ function phzlab
 %       for the whole epoch is gone
 % - plot ytitle always show numeric region, like blc label
 % - equal number of trials in each average?
-% - PHZ.regions.(region) can be a PHZ.trials-by-2 array, if there is a
+% - PHZ.region.(region) can be a PHZ.trials-by-2 array, if there is a
 %       different time region for each trial
-% - add difference between PHZ.regions and PHZ.region
 % - phz_feature: find rate for heart rate
 % - phz_audio: default plays audio, param/val to save
 % - auto label FFT peaks in plot
@@ -71,11 +69,10 @@ function phzlab
 % - add PHZ.spec.regionLabels so that people can rename the baseline/target
 %       regions and call on these regions with these names
 % - phz_feature: ability to control the kind of FFT
-% - phz_alternatetrials: ability to do any number of trial types and to
+% - phz_trials: ability to do any number of trial types and to
 %   name each of the trial types
 % - phz_writetable: prompt for input folder or PHZS file, then prompt for
 %       folder and filename to save as .mat or .csv
-% - phz_reject: reject reaction times above a threshold
 % - deal with blc for spectra. for phz_plot should the default behaviour be
 %   to blc in time domain and then fft? or to blc in freq domain?
 % - adding or subtracting averages of different trials?
@@ -102,8 +99,10 @@ function phzlab
 % phz_blc: removed restriction that blc be done before rej
 
 % v0.8
-% -- swap grouping vars and order, add tags field
-% -- change region field to regions
+% - swap grouping vars and order, add tags field. 'visible' grouping
+%   variable values are now just the unique values of the trial tags.
+% - phz_writetable: option to stack to one case per row ("one participant
+%       per row")
 
 help phzlab
 

@@ -1,13 +1,22 @@
 function PHZ = phz_load(varargin)
-%PHZ_LOAD  Load a PHZ or PHZS structure.
+%PHZ_LOAD  Load a PHZ structure (.phz or .mat file).
 % 
-% PHZ = PHZ_LOAD opens a dialog box to select a file to load.
-% PHZ = PHZ_LOAD(FILENAME) loads from FILENAME.
+% usage:    PHZ = PHZ_LOAD
+%           PHZ = PHZ_LOAD(FILENAME)
 % 
-% See also PHZ_SAVE, PHZ_CHECK.
+% inputs:   (none)   = A file browser will popup to select a file.
+%           FILENAME = Filename (and path) of file to load.
+% 
+% outputs:  PHZ      = PHZLAB data structure.
+% 
+% examples:
+%   PHZ = phz_load >> Browse computer to select a file to load.
+%   PHZ = phz_load('myfile.phz') >> Loads the file 'myfile.phz' from the
+%         current directory.
+%   PHZ = phz_load('myfolder/myfile.phz') >> Loads the file 'myfile.phz'
+%         from the folder 'myfolder'.
 %
-% Written by Gabriel A. Nespoli 2016-03-07. Revised 2016-03-25.
-
+% Written by Gabriel A. Nespoli 2016-03-07. Revised 2016-04-04.
 if nargout == 0 && nargin == 0, help phz_load, return, end
 
 % get filename if none given

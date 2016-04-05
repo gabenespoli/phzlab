@@ -1,43 +1,69 @@
 function varargout = phz_writetable(PHZ,varargin)
 %PHZ_WRITETABLE  Write grouping variables and features to a table.
 % 
-% D = PHZ_WRITETABLE(PHZS) writes calculates features and writes
-%   the results to a table D including grouping variables. Each row in the
-%   table represents on trial. If the 'keepVars' parameter is used 
-%   (described below), then each row represents a unique combination of the
-%   values in the grouping variables specified in 'keepVars'. A feature or
-%   set of feature(s) must be specified using parameter/value pairs as a
-%   string or cell array of strings, respectively.
+% usage:    PHZ = PHZ_WRITETABLE(PHZ,'feature',FEATURE)
+%           PHZ = PHZ_WRITETABLE(PHZ,'Param1','Value1',etc.)
 % 
-%   Processing options: These parameter names will call the function with 
-%     the same name, using the specified value as input. See the help of 
-%     each function for a more detailed explanation of what they do and 
-%     how to use them.
-%   'subset'    = Only export a subset of the data in PHZ.
-%   'rect'      = Full- or half-wave rectification of PHZ.data.
-%   'blc'       = Subtract the mean of a baseline region from PHZ.data.
-%   'rej'       = Reject trials with values above a threshold.
-%   'region'    = Restrict feature extraction or plotting to a region.
-%   'summary'   = Summarize data by grouping variables (e.g., group, etc.).
-%                 Default is 'all' (don't do any averaging).
+% inputs:   PHZ       = PHZLAB data structure.
+%           FEATURE   = A 'string' or {'cell' 'array' 'of' 'strings'}
+%                       specfying the feature(s) to calculate. FEATURE is
+%                       entered as a paramter/value pair so that the input
+%                       format is the same as phz_plot.
+%           'unstack' = Rearranges the table so that columns for grouping
+%                       variables are "unstacked" across columns. Enter a
+%                       maximum of 2 columns that should be unstacked. See
+%                       examples for more details.
+%           'save'    = Filename and path to save resultant table as either
+%                       a MATLAB file (.mat) or text file of comma-
+%                       separated values (.csv). The file extension
+%                       determines the type of file.
+%   
+%           The following functions can be called as parameter/value pairs,
+%           and are executed in the same order as they appear in the
+%           function call. See the help of each function for more details.
+%               'subset'    = Calls phz_subset.
+%               'rectify'   = Calls phz_rect.
+%               'filter'    = Calls phz_filter.
+%               'smooth'    = Calls phz_smooth.
+%               'transform' = Calls phz_transform.
+%               'blc'       = Calls phz_blc.
+%               'rej'       = Calls phz_rej.
+%               'norm'      = Calls phz_norm.
 % 
-% PHZ_WRITETABLE(PHZS,FEATURES,...,'filename',FILENAME) saves the table as
-%   a .mat or a .csv file depending on the file extension of FILENAME.
+%           The following functions can be called as parameter/value pairs,
+%           and are always executed in the order listed here, after all of
+%           the processing funtions. See the help of each function for more
+%           details.
+%               'region'    = Calls phz_region.
+%               'summary'   = Calls phz_summary. The default summary is
+%                             'none', which returns all trials.
 % 
-% Written by Gabriel A. Nespoli 2016-03-07. Revised 2016-03-21.
-
+% outputs:  d = MATLAB table.
+% 
+% examples:
+%   d = phz_writetable(PHZ,'feature',{'mean','max'},'save','myfile.csv')
+%       >> Finds the mean and max of each trial, and writes a .csv file
+%          where each trial is a row, and all grouping variable headings
+%          are present (i.e., participant, group, session, trials).
+% 
+%   d = phz_writetable(PHZ,'feature','mean','summary','trials')
+%       >> Finds the mean of each trial, then averages across each trial
+%          type. If there are 4 different trial types, then the table d
+%          will contain 4 rows, one for each trial type.
+% 
+%   d = phz_writetable(PHZ,'feature','mean','unstack','trials')
+%       >> Finds the mean of each trial type and unstacks the 'trials'
+%          grouping variable column. The resultant headings of the table
+%          will be: participant, group, session, mean_trialtype1,
+%          mean_trialtype2, etc.
+%           
+% Written by Gabriel A. Nespoli 2016-03-07. Revised 2016-04-04.
 if nargout == 0 && nargin == 0, help phz_writetable, return, end
 if isempty(PHZ), PHZ = phz_gather; else PHZ = phz_check(PHZ); end
 
 % defaults
-% subset = [];
-% rect = [];
-% transform = [];
-% blc = [];
-% rej = [];
-% normtype = [];
-region = [];
 feature = [];
+region = [];
 keepVars = {'all'};
 
 unstackVars = [];
@@ -84,12 +110,6 @@ if isempty(feature), error('A feature must be specified.'), end
 if ~iscell(feature), feature = {feature}; end
 
 % data preprocessing
-% PHZ = phz_subset(PHZ,subset,verbose);
-% PHZ = phz_rect(PHZ,rect,verbose);
-% PHZ = phz_transform(PHZ,transform,verbose);
-% PHZ = phz_blc(PHZ,blc,verbose);
-% PHZ = phz_rej(PHZ,rej,verbose);
-% PHZ = phz_norm(PHZ,normtype);
 PHZ = phz_region(PHZ,region,verbose);
 
 disp('Calculating features...')
