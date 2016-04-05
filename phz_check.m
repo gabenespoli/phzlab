@@ -99,8 +99,7 @@ for i = {'participant','group','session','trials'}, field = i{1};
                 PHZ.(field) = cellstr(num2str(PHZ.(field)));
                 PHZ.(field) = strrep(PHZ.(field),' ','');
             end
-            PHZ.history{end+1} = ['PHZ.',field,' was reset',resetStr,'.'];
-            if verbose, disp(PHZ.history{end}), end
+            PHZ = phzUtil_history(PHZ,['PHZ.',field,' was reset',resetStr,'.'],verbose,0);
         end
     end
 
@@ -327,8 +326,7 @@ if ~ismember('tags',fieldnames(PHZ))
     PHZ.tags.region = PHZ.spec.region_order;
     PHZ.spec.region = PHZ.spec.region_spec;
     PHZ.spec = rmfield(PHZ.spec,{'region_order','region_spec'});
-    PHZ.history{end+1} = 'Converted PHZ structure to v0.7.7.';
-    if verbose, disp(PHZ.history{end}), end
+    PHZ = phzUtil_history(PHZ,'Converted PHZ structure to v0.7.7.',verbose,0);
 end
 
 % change field 'regions' to 'region'
@@ -390,6 +388,7 @@ mainOrder = {'study'
         'norm'
         'blc'
         'rej'
+        'rect'
 
     'misc'
         % 'srate'

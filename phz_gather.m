@@ -134,8 +134,7 @@ for j = 1:length(files)
     for i = {'study','datatype','units'}
         field = i{1};
         if ~strcmp(PHZ.(field),PHZS.(field))
-            PHZS.history{end+1} = ['NOTE: The ''',field,''' field of ''',files{j},''' is different: ''',PHZ.(field),'''.'];
-            if verbose, disp(PHZS.history{end}), end
+            PHZS = phzUtil_history(PHZS,['NOTE: The ''',field,''' field of ''',files{j},''' is different: ''',PHZ.(field),'''.'],verbose,0);
         end
     end
 
@@ -186,8 +185,7 @@ close(w)
 % ------------
 for j = 1:length(resetFields), field = resetFields{j};
     PHZS.(field) = unique(PHZS.tags.(field));
-    PHZS.history{end+1} = ['The ',field,' field was reset to include the unique values of tags.',field,'.'];
-    if verbose, disp(PHZS.history{end}), end
+    PHZS = phzUtil_history(PHZS,['The ',field,' field was reset to include the unique values of tags.',field,'.'],verbose,0);
 end
 
 if ~ismember(keepVars,{'all'})
