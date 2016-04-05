@@ -4,15 +4,15 @@ function PHZ = phz_subset(PHZ,subset,verbose)
 % usage:    PHZ = phz_subset(PHZ,SUBSET)
 %           PHZ = phz_subset(PHZ,IND)
 %
-% inputs:   PHZ = PHZLAB data structure.
+% inputs:   PHZ    = PHZLAB data structure.
 %           SUBSET = A cell array of length 2, where the first value is a
-%                 field to restrict by (i.e., 'participant', 'group',
-%                 'session', 'trials', or a PHZ.resp field) and the second
-%                 item is a number, string, or cell array of strings with
-%                 the value(s) of the field to include.
-%           IND = A logcial vector (i.e., 1's & 0's) the same length as
-%                 the number of trials. Positions with a 1 are included,
-%                 positions with a 0 are excluded.
+%                    field to restrict by (i.e., 'participant', 'group',
+%                    'session', 'trials', or a PHZ.resp field) and the 
+%                    second item is a number, string, or cell array of 
+%                    strings with the value(s) of the field to include.
+%           IND    = A logcial vector (i.e., 1's & 0's) the same length as
+%                    the number of trials. Positions with a 1 are included,
+%                    positions with a 0 are excluded.
 %
 % outputs:  The following fields are restricted to the specified subset:
 %               PHZ.(participant/group/session/trials)
@@ -28,7 +28,7 @@ function PHZ = phz_subset(PHZ,subset,verbose)
 %   phz_subset(PHZ,PHZ.resp.q1_rt < 10) >> Only include data from trials
 %                                      with a reaction time less than 10 s.
 %
-% Written by Gabriel A. Nespoli 2016-03-08. Revised 2016-04-01.
+% Written by Gabriel A. Nespoli 2016-03-08. Revised 2016-04-04.
 
 if nargout == 0 && nargin == 0, help phz_subset, return, end
 if isempty(subset), return, end
@@ -37,9 +37,20 @@ if nargin < 3, verbose = true; end
 % get indices to keep
 if isnumeric(subset) || islogical(subset)
     indall = subset;
-    if ~ismember('rej',fieldnames(PHZ)) && length(subset) == size(PHZ.data,1) % ok, no rej
+    if ~ismember('rej',fieldnames(PHZ)) && length(subset) == size(PHZ.data,1)
         inddata = subset;
         indrej = [];
+        
+%     elseif ismember('rej',fieldnames(PHZ)) && length(subset) == length(PHZ.rej.data_locs)
+%         inddata = subset;
+%         indrej = [];
+%         PHZ.rej.locs = '<collapsed>';
+%         PHZ.rej.data = '<collapsed>';
+%         PHZ.rej.data_locs = '<collapsed>';
+%         PHZ.rej.participant = '<collapsed>';
+%         PHZ.rej.group = '<collapsed>';
+%         PHZ.rej.session = '<collapsed>';
+%         PHZ.rej.trials = '<collapsed>';
         
     elseif ismember('rej',fieldnames(PHZ)) && length(subset) == length(PHZ.rej.locs) + length(PHZ.rej.data_locs)
         inddata = subset(PHZ.rej.data_locs);
@@ -120,7 +131,7 @@ end
 for i = 1:5
     qx = ['q',num2str(i)];
     if ~isempty(PHZ.resp.(qx))
-        PHZ.resp.(qx) = PHZ.resp.(qx){indall};
+        PHZ.resp.(qx) = PHZ.resp.(qx)(indall);
         PHZ.resp.([qx,'_acc'])  = PHZ.resp.([qx,'_acc'])(indall);
         PHZ.resp.([qx,'_rt'])   = PHZ.resp.([qx,'_rt'])(indall);
     end

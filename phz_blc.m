@@ -52,11 +52,11 @@ if do_blc || do_restore
     % subtract mean of new baseline region
     if do_blc
         
-        PHZ = getBLCstructure(PHZ);
-        
         % get and subtract baseline
         PHZb = phz_region(PHZ,region,0);
         
+        PHZ = getBLCstructure(PHZ);
+
         if ismember('rej',fieldnames(PHZ))
             PHZ.blc.values = nan(length(PHZ.rej.locs) + length(PHZ.rej.data_locs),1);
             PHZ.blc.values(PHZ.rej.locs)      = mean(PHZb.rej.data,2);
@@ -115,6 +115,6 @@ end
 end
 
 function PHZ = getBLCstructure(PHZ)
-PHZ.blc.region = '';
+PHZ.blc.region = [];
 PHZ.blc.values = [];
 end

@@ -23,10 +23,10 @@ function PHZ = phz_rej(PHZ,threshold,varargin)
 %           PHZ.rej.trials      = trials trags of rejected trials.
 % 
 % examples:
-%   PHZ = phz_rej(PHZ,20)    >> Reject all trials with a value > 20.
-%   PHZ = phz_rej(PHZ,3,'sd' >> Reject trials with a value > 3 standard
-%                               deviations from the mean of all trials.
-%   PHZ = phz_rej(PHZ,0)     >> Restore all rejected trials.
+%   PHZ = phz_rej(PHZ,20)     >> Reject all trials with a value > 20.
+%   PHZ = phz_rej(PHZ,3,'sd') >> Reject trials with a value > 3 standard
+%                                deviations from the mean of all trials.
+%   PHZ = phz_rej(PHZ,0)      >> Restore all rejected trials.
 %
 % Written by Gabriel A. Nespoli 2016-01-27. Revised 2016-04-03.
 if nargout == 0 && nargin == 0, help phz_rej, return, end

@@ -51,6 +51,6 @@ while badFile
     end
 end
 
-PHZ = phzUtil_history(PHZ,['Loaded variable ''',name{i},''' from ''',filename,'''.'],0);
+PHZ = phzUtil_history(PHZ,['Loaded from ''',filename,'''.'],0);
 
 end
