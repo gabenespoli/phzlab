@@ -19,11 +19,9 @@ if ~isstruct(PHZ), error([name,' variable should be a structure.']), end
 PHZ.study       = verifyChar(PHZ.study,[name,'.study'],verbose);
 PHZ.datatype    = verifyChar(PHZ.datatype,[name,'.datatype'],verbose);
 PHZ.units       = verifyChar(PHZ.units,[name,'.units'],verbose);
-PHZ.meta.srate       = verifyNumeric(PHZ.meta.srate,[name,'.meta.srate'],verbose);
-checkSingleNumber(PHZ.meta.srate,[name,'.meta.srate']);
 PHZ.data        = verifyNumeric(PHZ.data,[name,'.data'],verbose);
 
-%% participant, group, session, trials
+%% grouping vars, meta.tags, meta.spec
 if ~isstruct(PHZ.meta.tags), error([name,'.meta.tags should be a structure.']), end
 if ~isstruct(PHZ.meta.spec), error([name,'.meta.spec should be a structure.']), end
 
@@ -131,23 +129,6 @@ for i = {'participant','group','session','trials'}, field = i{1};
     
 end
 
-%% times / freqs
-if all(ismember({'times','freqs'},fieldnames(PHZ))), error('Cannot have both TIMES and FREQS fields.'), end
-if ismember('times',fieldnames(PHZ))
-    PHZ.meta.times       = verifyNumeric(PHZ.meta.times,[name,'.meta.times'],verbose);
-    PHZ.meta.times       = checkAndFixRow(PHZ.meta.times,[name,'.meta.times'],nargout,verbose);
-    
-    % fill times
-    if isempty(PHZ.meta.times) && ~isempty(PHZ.meta.srate) && ~isempty(PHZ.data)
-        %     if
-    end
-    
-    
-elseif ismember('freqs',fieldnames(PHZ))
-    PHZ.meta.freqs       = verifyNumeric(PHZ.meta.freqs,[name,'.meta.freqs'],verbose);
-    PHZ.meta.freqs       = checkAndFixRow(PHZ.meta.freqs,[name,'.meta.freqs'],nargout,verbose);
-end
-
 %% region
 if isstruct(PHZ.region)
     rname = fieldnames(PHZ.region);
@@ -167,22 +148,30 @@ if length(PHZ.meta.tags.region) ~= 5, error('There should be 5 region names in P
 %% resp
 if ~isstruct(PHZ.resp), error([name,'.resp should be a structure.']), end
 
-%% blc
-if isstruct(PHZ.proc) && ismember('blc',fieldnames(PHZ.proc))
-    if ~isstruct(PHZ.blc), error([name,'.blc should be a structure.']), end
-    PHZ.proc.blc.region = verifyNumeric(PHZ.proc.blc.region,[name,'.proc.blc.region'],verbose);
-    PHZ.proc.blc.region = checkAndFix1x2(PHZ.proc.blc.region,[name,'.proc.blc.region'],nargout,verbose);
-    
-    if ~ismember('summary',fieldnames(PHZ))
-        PHZ.proc.blc.values = verifyNumeric(PHZ.proc.blc.values,[name,'.proc.blc.values'],verbose);
-        PHZ.proc.blc.values = checkAndFixColumn(PHZ.proc.blc.values,[name,'.proc.blc.values'],nargout,verbose);
-    else
-        if ~strcmp(PHZ.proc.blc.values,'<collapsed>'), error('Problem with PHZ.proc.blc and/or PHZ.summary.'), end
-    end
-end
 
-%% rej
-if isstruct(PHZ.proc) && ismember('rej',fieldnames(PHZ.proc))
+%% proc
+
+% filter
+% ------
+
+% epoch
+% -----
+
+% trials
+% ------
+
+% rect
+% ----
+
+% smooth
+% ------
+
+% transform
+% ---------
+
+% rej
+% ---
+if ismember('rej',fieldnames(PHZ.proc))
     if ~isstruct(PHZ.proc.rej), error([name,'.proc.rej should be a structure.']), end
     PHZ.proc.rej.threshold   = verifyNumeric(PHZ.proc.rej.threshold, [name,'.proc.rej.threshold'],verbose);
     checkSingleNumber(PHZ.proc.rej.threshold,[name,'.proc.rej.threshold']);
@@ -208,18 +197,74 @@ if isstruct(PHZ.proc) && ismember('rej',fieldnames(PHZ.proc))
     end
 end
 
-%% norm
+% blc
+% ---
+if ismember('blc',fieldnames(PHZ.proc))
+    if ~isstruct(PHZ.blc), error([name,'.blc should be a structure.']), end
+    PHZ.proc.blc.region = verifyNumeric(PHZ.proc.blc.region,[name,'.proc.blc.region'],verbose);
+    PHZ.proc.blc.region = checkAndFix1x2(PHZ.proc.blc.region,[name,'.proc.blc.region'],nargout,verbose);
+    
+    if ~ismember('summary',fieldnames(PHZ))
+        PHZ.proc.blc.values = verifyNumeric(PHZ.proc.blc.values,[name,'.proc.blc.values'],verbose);
+        PHZ.proc.blc.values = checkAndFixColumn(PHZ.proc.blc.values,[name,'.proc.blc.values'],nargout,verbose);
+    else
+        if ~strcmp(PHZ.proc.blc.values,'<collapsed>'), error('Problem with PHZ.proc.blc and/or PHZ.summary.'), end
+    end
+end
 
+% norm
+% ----
+if ismember('norm',fieldnames(PHZ.proc))
+    verifyChar(PHZ.proc.norm.type,[name,'.proc.norm.type'],verbose)
+    verifyNumeric(PHZ.proc.norm.mean,[name,'.proc.norm.mean'],verbose)
+    verifyNumeric(PHZ.proc.norm.stDev,[name,'.proc.norm.stDev'],verbose)
+    verifyChar(PHZ.proc.norm.oldUnits,[name,'.proc.norm.oldUnits'],verbose)
+    for i = {'mean','stDev'}, field = i{1};
+        if length(PHZ.proc.norm.(field)) > 1 && length(PHZ.proc.norm.(field)) ~= size(PHZ.data,1)
+            error([name,'.proc.norm.',field,' should either be of ',...
+                'length 1 or the same length as the number of trials.'])
+        end
+    end
+end
 
-%% files
+%% meta (except tags & spec)
+
+% srate
+PHZ.meta.srate = verifyNumeric(PHZ.meta.srate,[name,'.meta.srate'],verbose);
+checkSingleNumber(PHZ.meta.srate,[name,'.meta.srate']);
+
+% times / freqs
+if all(ismember({'times','freqs'},fieldnames(PHZ.meta))), error('Cannot have both TIMES and FREQS fields.'), end
+if ismember('times',fieldnames(PHZ.meta))
+    PHZ.meta.times = verifyNumeric(PHZ.meta.times,[name,'.meta.times'],verbose);
+    PHZ.meta.times = checkAndFixRow(PHZ.meta.times,[name,'.meta.times'],nargout,verbose);
+    
+    % fill times
+    if isempty(PHZ.meta.times) && ~isempty(PHZ.meta.srate) && ~isempty(PHZ.data)
+    end
+    
+elseif ismember('freqs',fieldnames(PHZ.meta))
+    PHZ.meta.freqs = verifyNumeric(PHZ.meta.freqs,[name,'.meta.freqs'],verbose);
+    PHZ.meta.freqs = checkAndFixRow(PHZ.meta.freqs,[name,'.meta.freqs'],nargout,verbose);
+end
+
+% filename
+if ismember('filename',filednames(PHZ.meta))
+    verifyChar(PHZ.meta.filename,[name,'.meta.filename'],verbose)
+    if ~exist(PHZ.meta.filename,'file')
+        warning('The filename for this PHZ file doesn''t seem to exist...')
+    end
+end
+
+% files
 if ismember('files',fieldnames(PHZ.meta))
-    PHZ.meta.files       = verifyCell(PHZ.meta.files,[name,'.meta.files'],verbose);
-    PHZ.meta.files       = checkAndFixColumn(PHZ.meta.files,[name,'.meta.files'],nargout,verbose);
+    PHZ.meta.files = verifyCell(PHZ.meta.files,[name,'.meta.files'],verbose);
+    PHZ.meta.files = checkAndFixColumn(PHZ.meta.files,[name,'.meta.files'],nargout,verbose);
 end
 
 %% history
-PHZ.history         = verifyCell(PHZ.history,[name,'.history'],verbose);
-PHZ.history         = checkAndFixColumn(PHZ.history,[name,'.history'],nargout,verbose);
+PHZ.history = verifyCell(PHZ.history,[name,'.history'],verbose);
+PHZ.history = checkAndFixColumn(PHZ.history,[name,'.history'],nargout,verbose);
 
 end
 
@@ -267,11 +312,6 @@ try
     if isnumeric(C), C = num2str(C);     end
     if ischar(C),    C = cellstr(C);     end
     if iscell(C),    C = categorical(C); end
-    
-%     if isordinal(C) && length(unique(C)) == 1
-%         C = categorical(C,'Ordinal',false);
-%     end
-    
     if verbose, disp(['Changed ',name,' to a categorical array.']), end
 catch, error([name,' should be a categorical array.'])
 end
@@ -394,7 +434,7 @@ if ismember('filename',fieldnames(PHZ.misc))
     PHZ.misc = rmfield(PHZ.misc,'filename');
 end
 
-PHZ.proc = [];
+PHZ.proc = struct;
 PHZ = phzUtil_history(PHZ,'Converted PHZ structure to v0.8.',verbose,0);
 end
 
