@@ -3,8 +3,7 @@ function PHZ = phz_check(PHZ,verbose)
 % 
 % usage:    PHZ = phz_check(PHZ)
 % 
-% Written by Gabriel A. Nespoli 2016-02-08. Revised 2016-04-01.
-
+% Written by Gabriel A. Nespoli 2016-02-08. Revised 2016-04-04.
 if nargout == 0 && nargin == 0, help phz_check, end
 if nargin < 2, verbose = true; end
 
@@ -25,8 +24,8 @@ checkSingleNumber(PHZ.meta.srate,[name,'.meta.srate']);
 PHZ.data        = verifyNumeric(PHZ.data,[name,'.data'],verbose);
 
 %% participant, group, session, trials
-if ~isstruct(PHZ.tags), error([name,'.tags should be a structure.']), end
-if ~isstruct(PHZ.spec), error([name,'.spec should be a structure.']), end
+if ~isstruct(PHZ.meta.tags), error([name,'.meta.tags should be a structure.']), end
+if ~isstruct(PHZ.meta.spec), error([name,'.meta.spec should be a structure.']), end
 
 for i = {'participant','group','session','trials'}, field = i{1};
     
@@ -36,23 +35,23 @@ for i = {'participant','group','session','trials'}, field = i{1};
     PHZ.(field) = checkAndFixRow(PHZ.(field),[name,'.',field],nargout,verbose);
     
     % tags
-    if ischar(PHZ.tags.(field)) && strcmp(PHZ.tags.(field),'<collapsed>')
+    if ischar(PHZ.meta.tags.(field)) && strcmp(PHZ.meta.tags.(field),'<collapsed>')
         PHZ = resetSpec(PHZ,field);
         continue
     end
     
-    PHZ.tags.(field) = verifyCategorical(PHZ.tags.(field),[name,'.tags.',field],verbose);
-    PHZ.tags.(field) = checkAndFixColumn(PHZ.tags.(field),[name,'.tags.',field],nargout,verbose);
+    PHZ.meta.tags.(field) = verifyCategorical(PHZ.meta.tags.(field),[name,'.meta.tags.',field],verbose);
+    PHZ.meta.tags.(field) = checkAndFixColumn(PHZ.meta.tags.(field),[name,'.meta.tags.',field],nargout,verbose);
     
     % grouping vars && tags
-    if isempty(PHZ.tags.(field)) || any(isundefined(PHZ.(field)))
+    if isempty(PHZ.meta.tags.(field)) || any(isundefined(PHZ.(field)))
         
         if isempty(PHZ.(field)) || any(isundefined(PHZ.(field)))
             % do nothing, both are empty
             
         elseif length(PHZ.(field)) == 1
             % auto-create tags if only one type of grouping var
-            PHZ.tags.(field) = repmat(PHZ.(field),size(PHZ.data,1));
+            PHZ.meta.tags.(field) = repmat(PHZ.(field),size(PHZ.data,1));
             
         elseif length(PHZ.(field)) > 1
             warning(['It is unknown which values of ''',field,''' apply to which trials.'])
@@ -64,11 +63,11 @@ for i = {'participant','group','session','trials'}, field = i{1};
     else % if ~isempty(PHZ.tags.(field))
         
         % make sure tags is same length as trials
-        if (length(PHZ.tags.(field)) ~= size(PHZ.data,1))
+        if (length(PHZ.meta.tags.(field)) ~= size(PHZ.data,1))
             
             % if only one value, repeat it to the number of trials
-            if length(unique(PHZ.tags.(field))) == 1
-                PHZ.tags.(field) = repmat(PHZ.tags.(field),size(PHZ.data,1),1);
+            if length(unique(PHZ.meta.tags.(field))) == 1
+                PHZ.meta.tags.(field) = repmat(PHZ.meta.tags.(field),size(PHZ.data,1),1);
             else
                 error([name,'.tags.',field,' must be the same length as the number of trials.'])
             end
@@ -77,11 +76,11 @@ for i = {'participant','group','session','trials'}, field = i{1};
             % make ordinal
     if ~isempty(PHZ.(field))
         PHZ.(field)      = categorical(PHZ.(field),     cellstr(PHZ.(field)),'Ordinal',true);
-        PHZ.tags.(field) = categorical(PHZ.tags.(field),cellstr(PHZ.(field)),'Ordinal',true);
+        PHZ.meta.tags.(field) = categorical(PHZ.meta.tags.(field),cellstr(PHZ.(field)),'Ordinal',true);
     end
         
         % empty grouping var if there are tags not represented
-        if ~isempty(PHZ.(field)) && ~all(ismember(PHZ.tags.(field),PHZ.(field)))
+        if ~isempty(PHZ.(field)) && ~all(ismember(PHZ.meta.tags.(field),PHZ.(field)))
             PHZ.(field) = [];
             resetStr = ' because it did not represent all trial tags';
         else resetStr = '';
@@ -90,7 +89,7 @@ for i = {'participant','group','session','trials'}, field = i{1};
         % if empty grouping var, reset (auto-create) from tags
         if isempty(PHZ.(field))
             
-            PHZ.(field) = unique(PHZ.tags.(field));
+            PHZ.(field) = unique(PHZ.meta.tags.(field));
             
             % if numeric, order numerically
             if ~any(isnan(str2double(PHZ.(field))))
@@ -108,23 +107,23 @@ for i = {'participant','group','session','trials'}, field = i{1};
     do_resetSpec = [];
     if ~isempty(PHZ.(field))
         
-        if ~ismember(PHZ.tags.(field),{'<collapsed>'})
+        if ~ismember(PHZ.meta.tags.(field),{'<collapsed>'})
             %             || isundefined(PHZ.(i{1}))
             
             % if there is an order, make sure spec is same length
-            if length(PHZ.(field)) ~= length(PHZ.spec.(field))
+            if length(PHZ.(field)) ~= length(PHZ.meta.spec.(field))
                 do_resetSpec = true;
-                if nargout == 0, warning([name,'.spec.',field,' has an incorrect number of items.'])
-                elseif verbose, disp([name,'.spec.',field,' had an incorrect number of items and was reset to the default order.'])
+                if nargout == 0, warning([name,'.meta.spec.',field,' has an incorrect number of items.'])
+                elseif verbose, disp([name,'.meta.spec.',field,' had an incorrect number of items and was reset to the default order.'])
                 end
             end
-        else PHZ.spec.(field) = {};
+        else PHZ.meta.spec.(field) = {};
         end
         
         % else _order is empty, make sure spec is empty
-    elseif ~isempty(PHZ.spec.(field))
-        PHZ.spec.(field) = {};
-        disp([name,'.spec.',field,' was emptied (set to {})'])
+    elseif ~isempty(PHZ.meta.spec.(field))
+        PHZ.meta.spec.(field) = {};
+        disp([name,'.meta.spec.',field,' was emptied (set to {})'])
         
     end
     
@@ -135,18 +134,18 @@ end
 %% times / freqs
 if all(ismember({'times','freqs'},fieldnames(PHZ))), error('Cannot have both TIMES and FREQS fields.'), end
 if ismember('times',fieldnames(PHZ))
-    PHZ.times       = verifyNumeric(PHZ.times,[name,'.times'],verbose);
-    PHZ.times       = checkAndFixRow(PHZ.times,[name,'.times'],nargout,verbose);
+    PHZ.meta.times       = verifyNumeric(PHZ.meta.times,[name,'.meta.times'],verbose);
+    PHZ.meta.times       = checkAndFixRow(PHZ.meta.times,[name,'.meta.times'],nargout,verbose);
     
     % fill times
-    if isempty(PHZ.times) && ~isempty(PHZ.srate) && ~isempty(PHZ.data)
+    if isempty(PHZ.meta.times) && ~isempty(PHZ.meta.srate) && ~isempty(PHZ.data)
         %     if
     end
     
     
 elseif ismember('freqs',fieldnames(PHZ))
-    PHZ.freqs       = verifyNumeric(PHZ.freqs,[name,'.freqs'],verbose);
-    PHZ.freqs       = checkAndFixRow(PHZ.freqs,[name,'.freqs'],nargout,verbose);
+    PHZ.meta.freqs       = verifyNumeric(PHZ.meta.freqs,[name,'.meta.freqs'],verbose);
+    PHZ.meta.freqs       = checkAndFixRow(PHZ.meta.freqs,[name,'.meta.freqs'],nargout,verbose);
 end
 
 %% region
@@ -161,64 +160,73 @@ elseif isnumeric(PHZ.region)
     PHZ.region = checkAndFix1x2(PHZ.region,[name,'.region'],nargout,verbose);
 end
 
-PHZ.tags.region = verifyCell(PHZ.tags.region,[name,'.tags.region'],verbose);
-PHZ.tags.region = checkAndFixRow(PHZ.tags.region,[name,'.tags.region'],nargout,verbose);
-if length(PHZ.tags.region) ~= 5, error('There should be 5 region names in PHZ.tags.region.'), end
+PHZ.meta.tags.region = verifyCell(PHZ.meta.tags.region,[name,'.meta.tags.region'],verbose);
+PHZ.meta.tags.region = checkAndFixRow(PHZ.meta.tags.region,[name,'.meta.tags.region'],nargout,verbose);
+if length(PHZ.meta.tags.region) ~= 5, error('There should be 5 region names in PHZ.meta.tags.region.'), end
 
 %% resp
 if ~isstruct(PHZ.resp), error([name,'.resp should be a structure.']), end
 
 %% blc
-if ismember('blc',fieldnames(PHZ))
+if isstruct(PHZ.proc) && ismember('blc',fieldnames(PHZ.proc))
     if ~isstruct(PHZ.blc), error([name,'.blc should be a structure.']), end
-    PHZ.blc.region = verifyNumeric(PHZ.blc.region,[name,'.blc.region'],verbose);
-    PHZ.blc.region = checkAndFix1x2(PHZ.blc.region,[name,'.blc.region'],nargout,verbose);
+    PHZ.proc.blc.region = verifyNumeric(PHZ.proc.blc.region,[name,'.proc.blc.region'],verbose);
+    PHZ.proc.blc.region = checkAndFix1x2(PHZ.proc.blc.region,[name,'.proc.blc.region'],nargout,verbose);
     
     if ~ismember('summary',fieldnames(PHZ))
-        PHZ.blc.values = verifyNumeric(PHZ.blc.values,[name,'.blc.values'],verbose);
-        PHZ.blc.values = checkAndFixColumn(PHZ.blc.values,[name,'.blc.values'],nargout,verbose);
+        PHZ.proc.blc.values = verifyNumeric(PHZ.proc.blc.values,[name,'.proc.blc.values'],verbose);
+        PHZ.proc.blc.values = checkAndFixColumn(PHZ.proc.blc.values,[name,'.proc.blc.values'],nargout,verbose);
     else
-        if ~strcmp(PHZ.blc.values,'<collapsed>'), error('Problem with PHZ.blc and/or PHZ.summary.'), end
+        if ~strcmp(PHZ.proc.blc.values,'<collapsed>'), error('Problem with PHZ.proc.blc and/or PHZ.summary.'), end
     end
 end
 
 %% rej
-if ismember('rej',fieldnames(PHZ))
-    if ~isstruct(PHZ.rej), error([name,'.rej should be a structure.']), end
-    PHZ.rej.threshold   = verifyNumeric(PHZ.rej.threshold, [name,'.rej.threshold'],verbose);
-    checkSingleNumber(PHZ.rej.threshold,[name,'.rej.threshold']);
-    PHZ.rej.units = verifyChar(PHZ.rej.units,[name,'.rej.units'],verbose);
+if isstruct(PHZ.proc) && ismember('rej',fieldnames(PHZ.proc))
+    if ~isstruct(PHZ.proc.rej), error([name,'.proc.rej should be a structure.']), end
+    PHZ.proc.rej.threshold   = verifyNumeric(PHZ.proc.rej.threshold, [name,'.proc.rej.threshold'],verbose);
+    checkSingleNumber(PHZ.proc.rej.threshold,[name,'.proc.rej.threshold']);
+    PHZ.proc.rej.units = verifyChar(PHZ.proc.rej.units,[name,'.proc.rej.units'],verbose);
     
     if ~ismember('summary',fieldnames(PHZ))
-        PHZ.rej.data        = verifyNumeric(PHZ.rej.data,      [name,'.rej.data'],verbose);
-        PHZ.rej.data_locs   = verifyNumeric(PHZ.rej.data_locs, [name,'.rej.data_locs'],verbose);
+        PHZ.proc.rej.data        = verifyNumeric(PHZ.proc.rej.data,      [name,'.proc.rej.data'],verbose);
+        PHZ.proc.rej.data_locs   = verifyNumeric(PHZ.proc.rej.data_locs, [name,'.proc.rej.data_locs'],verbose);
         
         for i = {'participant','group','session','trials'}
-            PHZ.rej.(i{1}) = verifyCategorical(PHZ.rej.(i{1}),[name,'.rej.(i{1})'],verbose);
-            PHZ.rej.(i{1}) = checkAndFixColumn(PHZ.rej.(i{1}),[name,'.rej.(i{1})'],nargout,verbose);
+            PHZ.proc.rej.(i{1}) = verifyCategorical(PHZ.proc.rej.(i{1}),[name,'.proc.rej.(i{1})'],verbose);
+            PHZ.proc.rej.(i{1}) = checkAndFixColumn(PHZ.proc.rej.(i{1}),[name,'.proc.rej.(i{1})'],nargout,verbose);
         end
     else
-        if ~strcmp(PHZ.rej.locs,'<collapsed>'),         error('Problem with PHZ.rej and/or PHZ.summary.'), end
-        if ~strcmp(PHZ.rej.data,'<collapsed>'),         error('Problem with PHZ.rej and/or PHZ.summary.'), end
-        if ~strcmp(PHZ.rej.data_locs,'<collapsed>'),    error('Problem with PHZ.rej and/or PHZ.summary.'), end
-        if ~strcmp(PHZ.rej.participant,'<collapsed>'),  error('Problem with PHZ.rej and/or PHZ.summary.'), end
-        if ~strcmp(PHZ.rej.group,'<collapsed>'),        error('Problem with PHZ.rej and/or PHZ.summary.'), end
-        if ~strcmp(PHZ.rej.session,'<collapsed>'),      error('Problem with PHZ.rej and/or PHZ.summary.'), end
-        if ~strcmp(PHZ.rej.trials,'<collapsed>'),       error('Problem with PHZ.rej and/or PHZ.summary.'), end
-        if ~strcmp(PHZ.rej.data,'<collapsed>'),         error('Problem with PHZ.rej and/or PHZ.summary.'), end
+        if ~strcmp(PHZ.proc.rej.locs,'<collapsed>'),         error('Problem with PHZ.proc.rej and/or PHZ.summary.'), end
+        if ~strcmp(PHZ.proc.rej.data,'<collapsed>'),         error('Problem with PHZ.proc.rej and/or PHZ.summary.'), end
+        if ~strcmp(PHZ.proc.rej.data_locs,'<collapsed>'),    error('Problem with PHZ.proc.rej and/or PHZ.summary.'), end
+        if ~strcmp(PHZ.proc.rej.participant,'<collapsed>'),  error('Problem with PHZ.proc.rej and/or PHZ.summary.'), end
+        if ~strcmp(PHZ.proc.rej.group,'<collapsed>'),        error('Problem with PHZ.proc.rej and/or PHZ.summary.'), end
+        if ~strcmp(PHZ.proc.rej.session,'<collapsed>'),      error('Problem with PHZ.proc.rej and/or PHZ.summary.'), end
+        if ~strcmp(PHZ.proc.rej.trials,'<collapsed>'),       error('Problem with PHZ.proc.rej and/or PHZ.summary.'), end
+        if ~strcmp(PHZ.proc.rej.data,'<collapsed>'),         error('Problem with PHZ.proc.rej and/or PHZ.summary.'), end
     end
 end
 
+%% norm
+
+
 %% files
-if ismember('files',fieldnames(PHZ))
-    PHZ.files       = verifyCell(PHZ.files,[name,'.files'],verbose);
-    PHZ.files       = checkAndFixColumn(PHZ.files,[name,'.files'],nargout,verbose);
+if ismember('files',fieldnames(PHZ.meta))
+    PHZ.meta.files       = verifyCell(PHZ.meta.files,[name,'.meta.files'],verbose);
+    PHZ.meta.files       = checkAndFixColumn(PHZ.meta.files,[name,'.meta.files'],nargout,verbose);
 end
 
 %% history
 PHZ.history         = verifyCell(PHZ.history,[name,'.history'],verbose);
 PHZ.history         = checkAndFixColumn(PHZ.history,[name,'.history'],nargout,verbose);
 
+end
+
+function PHZ = resetSpec(PHZ,field)
+for j = 1:length(PHZ.(field))
+    PHZ.meta.spec.(field){j} = '';
+end
 end
 
 function C = verifyNumeric(C,name,verbose)
@@ -316,8 +324,8 @@ end
 
 function PHZ = backwardsCompatibility(PHZ,verbose)
 
-% swap grouping and order vars, add tags (older than v0.8)
-if ~ismember('tags',fieldnames(PHZ))
+% swap grouping and order vars, add tags (older than v0.7.7)
+if ~ismember('tags',fieldnames(PHZ)) && ~ismember('meta',fieldnames(PHZ))
     for i = {'participant','group','session','trials'}, field = i{1};
         PHZ.tags.(field) = PHZ.(field);
         PHZ.(field) = PHZ.spec.([field,'_order']);
@@ -327,8 +335,7 @@ if ~ismember('tags',fieldnames(PHZ))
     PHZ.tags.region = PHZ.spec.region_order;
     PHZ.spec.region = PHZ.spec.region_spec;
     PHZ.spec = rmfield(PHZ.spec,{'region_order','region_spec'});
-    PHZ.history{end+1} = 'Converted PHZ structure to v0.8.';
-    if verbose, disp(PHZ.history{end}), end
+    PHZ = phzUtil_history(PHZ,'Converted PHZ structure to v0.7.7.',verbose,0);
 end
 
 % change field 'regions' to 'region'
@@ -337,15 +344,58 @@ if ismember('regions',fieldnames(PHZ))
     PHZ = rmfield(PHZ,'regions');
 end
 
-if ismember('regions',fieldnames(PHZ.tags))
-    PHZ.tags.region = PHZ.tags.regions;
-    PHZ.tags = rmfield(PHZ.tags,'regions');
+if ismember('regions',fieldnames(PHZ.meta.tags))
+    PHZ.meta.tags.region = PHZ.meta.tags.regions;
+    PHZ.meta.tags = rmfield(PHZ.meta.tags,'regions');
 end
 
-if ismember('regions',fieldnames(PHZ.spec))
-    PHZ.spec.region = PHZ.spec.regions;
-    PHZ.spec = rmfield(PHZ.spec,'regions');
+if ismember('regions',fieldnames(PHZ.meta.spec))
+    PHZ.meta.spec.region = PHZ.meta.spec.regions;
+    PHZ.meta.spec = rmfield(PHZ.meta.spec,'regions');
 end
+
+% move stuff to meta and create proc (older than v0.8)
+if ~all(ismember({'proc','meta'},fieldnames(PHZ))) && any(ismember({'rej','blc','norm'},fieldnames(PHZ)))
+    warning(['Preprocessing (rej, blc, norm) must be undone ',...
+        'before this file can be compatible with this version of ',...
+        'PHZLAB.'])
+    s = input('Should PHZLAB undo this preprocessing? [y/n]','s');
+    switch lower(s)
+        case 'n', disp('Aborting...'), error(' ')
+        case 'y',
+            PHZ = phz_norm(PHZ,0);
+            PHZ = phz_blc(PHZ,0);
+            PHZ = phz_rej(PHZ,0);
+    end
+end
+
+if ismember('times',fieldnames(PHZ))
+    PHZ.meta.times = PHZ.times;
+    PHZ = rmfield(PHZ,'times');
+elseif ismember('freqs',fieldnames(PHZ))
+    PHZ.meta.freqs = PHZ.freqs;
+    PHZ = rmfield(PHZ,'freqs');
+end
+
+for i = {'srate','tags','spec'}, field = i{1};
+    if ismember(field,fieldnames(PHZ))
+        PHZ.meta.(field) = PHZ.(field);
+        PHZ = rmfield(PHZ,field);
+    end
+end
+
+if ismember('files',fieldnames(PHZ))
+    PHZ.meta.files = PHZ.files;
+    PHZ = rmfield(PHZ,'files');
+end
+
+if ismember('filename',fieldnames(PHZ.misc))
+    PHZ.meta.filename = PHZ.misc.filename;
+    PHZ.misc = rmfield(PHZ.misc,'filename');
+end
+
+PHZ.proc = [];
+PHZ = phzUtil_history(PHZ,'Converted PHZ structure to v0.8.',verbose,0);
 end
 
 function PHZ = orderPHZfields(PHZ)
@@ -354,17 +404,19 @@ function PHZ = orderPHZfields(PHZ)
 if isstruct(PHZ.region)
     
     % if spec order doesn't match the struct, recreate the struct
-    if ~strcmp(strjoin(fieldnames(PHZ.region)),strjoin(PHZ.tags.region))
+    if ~strcmp(strjoin(fieldnames(PHZ.region)),strjoin(PHZ.meta.tags.region))
         rname = fieldnames(PHZ.region);
-        for i = 1:length(PHZ.tags.region)
-            temp.(PHZ.tags.region{i}) = PHZ.region.(rname{i});
+        for i = 1:length(PHZ.meta.tags.region)
+            temp.(PHZ.meta.tags.region{i}) = PHZ.region.(rname{i});
         end
         PHZ.region = temp;
     end
 end
 
 % main structure
-mainOrder = {'study'
+% --------------
+mainOrder = {
+    'study'
     'datatype'
     
     'participant'
@@ -372,46 +424,40 @@ mainOrder = {'study'
     'session'
     'trials'
     'summary'
-    
-    'regions'
     'region'
     
-    'times'
-    'freqs'
     'data'
-    
     'feature'
     'units'
-    'srate'
     
     'resp'
-    
     'proc'
-        'norm'
-        'blc'
-        'rej'
-
+    'meta'
     'misc'
-        % 'srate'
-        % 'times'
-        % 'freqs'
-        'tags'
-        'spec'
-        'files'
-        
     'history'};
-
 if ~all(ismember(fieldnames(PHZ),mainOrder))
-    error('Invalid fields present in PHZ structure. Use PHZ.misc to store miscellaneous data.')
+    error(['Invalid fields present in PHZ structure. ',...
+        'Use PHZ.misc to store miscellaneous data.'])
 end
-
 mainOrder = mainOrder(ismember(mainOrder,fieldnames(PHZ)));
 PHZ = orderfields(PHZ,mainOrder);
 
+% meta structure
+% --------------
+metaOrder = {
+    'srate'
+    'times'
+    'freqs'
+    
+    'tags'
+    'spec'
+    'filename'
+    'files'
+    };
+if ~all(ismember(fieldnames(PHZ.meta),metaOrder))
+    error(['Invalid fields present in PHZ structure. ',...
+        'Use PHZ.misc to store miscellaneous data.'])
 end
-
-function PHZ = resetSpec(PHZ,field)
-for j = 1:length(PHZ.(field))
-    PHZ.spec.(field){j} = '';
-end
+metaOrder = metaOrder(ismember(metaOrder,fieldnames(PHZ.meta)));
+PHZ.meta = orderfields(PHZ.meta,metaOrder);
 end
