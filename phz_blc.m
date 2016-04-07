@@ -55,10 +55,9 @@ if do_blc || do_restore
     % subtract mean of new baseline region
     if do_blc
         
-        PHZ = getBLCstructure(PHZ);
-        
         % get and subtract baseline
         PHZb = phz_region(PHZ,region,0);
+        PHZ = getBLCstructure(PHZ);
         
         if ismember('rej',fieldnames(PHZ.proc))
             PHZ.proc.blc.values = nan(length(PHZ.proc.rej.locs) + length(PHZ.proc.rej.data_locs),1);

@@ -119,7 +119,7 @@ end
 for i = 1:5
     qx = ['q',num2str(i)];
     if ~isempty(PHZ.resp.(qx))
-        PHZ.resp.(qx) = PHZ.resp.(qx){indall};
+        PHZ.resp.(qx) = PHZ.resp.(qx)(indall);
         PHZ.resp.([qx,'_acc'])  = PHZ.resp.([qx,'_acc'])(indall);
         PHZ.resp.([qx,'_rt'])   = PHZ.resp.([qx,'_rt'])(indall);
     end

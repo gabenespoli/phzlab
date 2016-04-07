@@ -90,11 +90,13 @@ for i = {'participant','group','session','trials'}, field = i{1};
             end
         end
         
+
             % make ordinal
     if ~isempty(PHZ.(field))
         PHZ.(field)      = categorical(PHZ.(field),     cellstr(PHZ.(field)),'Ordinal',true);
         PHZ.meta.tags.(field) = categorical(PHZ.meta.tags.(field),cellstr(PHZ.(field)),'Ordinal',true);
     end
+
         
         % empty grouping var if there are tags not represented
         if ~isempty(PHZ.(field)) && ~all(ismember(PHZ.meta.tags.(field),PHZ.(field)))
@@ -115,8 +117,7 @@ for i = {'participant','group','session','trials'}, field = i{1};
                 PHZ.(field) = cellstr(num2str(PHZ.(field)));
                 PHZ.(field) = strrep(PHZ.(field),' ','');
             end
-            PHZ.history{end+1} = ['PHZ.',field,' was reset',resetStr,'.'];
-            if verbose, disp(PHZ.history{end}), end
+            PHZ = phzUtil_history(PHZ,['PHZ.',field,' was reset',resetStr,'.'],verbose,0);
         end
     end
 
@@ -382,6 +383,7 @@ function PHZ = backwardsCompatibility(PHZ,verbose)
 
 % swap grouping and order vars, add tags (older than v0.7.7)
 if ~ismember('tags',fieldnames(PHZ)) && ~ismember('meta',fieldnames(PHZ))
+
     for i = {'participant','group','session','trials'}, field = i{1};
         PHZ.tags.(field) = PHZ.(field);
         PHZ.(field) = PHZ.spec.([field,'_order']);
@@ -392,6 +394,7 @@ if ~ismember('tags',fieldnames(PHZ)) && ~ismember('meta',fieldnames(PHZ))
     PHZ.spec.region = PHZ.spec.region_spec;
     PHZ.spec = rmfield(PHZ.spec,{'region_order','region_spec'});
     PHZ = phz_history(PHZ,'Converted PHZ structure to v0.7.7.',verbose,0);
+
 end
 
 % if ~ismember('meta',fieldnames(PHZ)), PHZ.meta = struct; end

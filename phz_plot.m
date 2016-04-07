@@ -118,10 +118,10 @@ elseif ismember('freqs',fieldnames(PHZ)), x = PHZ.freqs;
 end
 
 % prepare plot stuff
-[lineOrder,lineTags,lineSpec,plotOrder,plotTags] = getLabelsAndSpec(PHZ,dispn);
+[lineOrder,~,lineSpec,plotOrder,plotTags] = getLabelsAndSpec(PHZ,dispn);
 [rows,cols,pos,ytitleLoc,xtitleLoc] = getPlotDims(plotOrder);
 if isempty(yl), yl = nan(length(plotOrder),2); do_yl = true; else do_yl = false; end
-if isempty(xl), xl = nan(size(yl));             do_xl = true; else do_xl = false; end
+if isempty(xl), xl = nan(size(yl));            do_xl = true; else do_xl = false; end
 ytitle = getytitle(PHZ,feature,legendLoc,do_plotsmooth,featureTitle);
 
 % loop plots and plot lines/bars
@@ -131,9 +131,9 @@ for p = 1:length(plotOrder)
     subplot(rows,cols,p)
     
     % get indices of data for current plot
-    if length(PHZ.summary.keepVars) > 1
+    if ismember('summary',fieldnames(PHZ)) && length(PHZ.summary.keepVars) > 1
         ind = find(plotTags == plotOrder(p));
-    else ind = size(PHZ.data,1); 
+    else ind = 1:size(PHZ.data,1); 
     end
         
     % loop lines/bars
@@ -208,7 +208,7 @@ for p = 1:length(plotOrder)
     % set y- and x-axis ranges
     ylim(yl)
     if size(PHZ.data,2) > 1, xlim(xl), end
-    
+    %{
     % create coloured regions to indicate ROIs
     if ~isempty(region) && (isempty(feature) || strcmp(feature,'time'))
         if ~iscell(region), region = {region}; end
@@ -234,7 +234,7 @@ for p = 1:length(plotOrder)
             end
         end
     end
-    
+    %}
     % add legend
     if size(PHZ.data,2) > 1 && ~isempty(legendLoc)
         legend('-DynamicLegend','Location',legendLoc)
@@ -251,9 +251,17 @@ end
 function [lineOrder,lineTags,lineSpec,plotOrder,plotTags,plotSpec] = getLabelsAndSpec(PHZ,dispn)
 
 % lines/bars
-if ismember(PHZ.summary.keepVars{1},{' ','none'}) || isempty(PHZ.summary.keepVars{1})
+if ~ismember('summary',fieldnames(PHZ))
+    lineOrder = cellstr(num2str((1:size(PHZ.data,1))));
+    lineSpec = cell(size(lineOrder));
+    for j = 1:length(lineOrder)
+        lineSpec{j} = '';
+    end
+    lineTags = [];
+elseif ismember(PHZ.summary.keepVars{1},{' ','none'}) || isempty(PHZ.summary.keepVars{1})
     lineOrder = {'All trials'};
     lineSpec = {''};
+    lineTags = [];
 else
     lineOrder = PHZ.(PHZ.summary.keepVars{1});
     lineSpec = PHZ.meta.spec.(PHZ.summary.keepVars{1});
@@ -261,12 +269,17 @@ else
 end
 
 % plots
-if length(PHZ.summary.keepVars) == 1
+if ~ismember('summary',fieldnames(PHZ))
+    plotOrder = {''};
+    plotSpec = {''};
+    plotTags = [];
+elseif length(PHZ.summary.keepVars) == 1
     if length(PHZ.participant) > 1 || isundefined(PHZ.participant)
         plotOrder = {'All participants'};
     else plotOrder = {['Participant ',char(PHZ.participant)]};
     end
     plotSpec = {''};
+    plotTags = [];
 else 
     plotOrder = PHZ.(PHZ.summary.keepVars{2});
     plotSpec = PHZ.meta.spec.(PHZ.summary.keepVars{2});
