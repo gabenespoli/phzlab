@@ -1,10 +1,10 @@
-function PHZ = phzUtil_history(PHZ,str,verbose,check)
-%PHZUTIL_HISTORY Add item to the history of a PHZ structure.
+function PHZ = phz_history(PHZ,str,verbose,check)
+%PHZ_HISTORY Add item to the history of a PHZ structure.
 %   Includes date, time, and name of caller function.
 % 
 % Written by Gabriel A. Nespoli 2016-02-08.
 
-if nargout == 0 && nargin == 0, help phzUtil_history, end
+if nargout == 0 && nargin == 0, help phz_history, end
 
 % parse input
 if nargin < 3, verbose = true; end

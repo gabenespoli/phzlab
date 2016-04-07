@@ -60,7 +60,7 @@ function [PHZ,featureTitle] = phz_feature(PHZ,feature,varargin)
 % examples:
 %   PHZ = phz_feature(PHZ,'mean')
 % 
-% Written by Gabriel A. Nespoli 2016-02-15. Revised 2016-04-04.
+% Written by Gabriel A. Nespoli 2016-02-15. Revised 2016-04-07.
 if nargout == 0 && nargin == 0, help phz_feature, return, end
 
 % defaults
@@ -133,7 +133,7 @@ switch lower(feature)
             case {'rms'}, featureTitle = 'RMS';                          PHZ.data  = rms(PHZ.data,2);
             case {'area'}, featureTitle = 'Area Under Curve';            PHZ.data  = trapz(PHZ.data,2);   
             case {'slope','slopei','slopelatency'} % find maximum slope
-                PHZ.data = phzUtil_smooth(PHZ.data);
+                PHZ.data = phz_smooth(PHZ.data,'mean0.05');
                 temp = nan(size(PHZ.data,1),2);
                 for i = 1:size(PHZ.data,1)
                     [temp(i,1),temp(i,2)] = max(gradient(PHZ.data(i,:)));
@@ -179,7 +179,7 @@ end
 
 % if isempty(PHZ.region), PHZ.region = 'epoch'; end
 if ~strcmp(PHZ.feature,'time')
-    PHZ = phzUtil_history(PHZ,['Extracted feature ''',feature,'''.'],verbose);
+    PHZ = phz_history(PHZ,['Extracted feature ''',feature,'''.'],verbose);
 end
 
 % apply summary

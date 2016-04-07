@@ -5,10 +5,10 @@ function PHZS = phz_gather(varargin)
 %           PHZ = phz_gather(FOLDER)
 %           PHZ = phz_gather(...,'Param1','Value1',etc.)
 % 
-% inputs:   (none)  = Opens a file browser to select files to gather.
-%           FOLDER  = Gather all .phz files in this folder.
-%           'save'  = Filename and path to save resultant PHZ structure
-%                     as a .phz file.
+% inputs:   (none) = Opens a file browser to select files to gather.
+%           FOLDER = Gather all .phz files in this folder.
+%           'save' = Filename and path to save resultant PHZ structure
+%                    as a .phz file.
 %           
 %           The following functions can be called as parameter/value pairs,
 %           and are executed in the same order as they appear in the
@@ -82,8 +82,8 @@ for j = 1:length(files)
     % load data
     if verbose, disp(['Loading data from file ',fileProgress]), end
     
-    PHZS.files{j} = fullfile(folder,files{j});
-    PHZ = phz_load(PHZS.files{j},verbose); % runs phz_check.m
+    PHZS.meta.files{j} = fullfile(folder,files{j});
+    PHZ = phz_load(PHZS.meta.files{j},verbose); % runs phz_check.m
     
     % do user-defined preprocessing
     for i = 1:2:length(processing)
@@ -107,35 +107,33 @@ for j = 1:length(files)
     if j == 1
         PHZS = PHZ;
         PHZS.history = {};
-        PHZS = phzUtil_history(PHZS,'Gathered PHZ structure created.',verbose);
-        PHZS = phzUtil_history(PHZS,['Preprocessing: ',strjoin(processing)],verbose);
+        PHZS = phz_history(PHZS,'Gathered PHZ structure created.',verbose);
+        PHZS = phz_history(PHZS,['Preprocessing: ',strjoin(processing)],verbose);
         
         % (soon these will be tucked into PHZ.proc)
-        if ismember('rej',fieldnames(PHZS)), PHZS = rmfield(PHZS,'rej'); end
-        if ismember('blc',fieldnames(PHZS)), PHZS = rmfield(PHZS,'blc'); end
-        if ismember('norm',fieldnames(PHZS)), PHZS = rmfield(PHZS,'norm'); end
+        if ismember('rej',fieldnames(PHZS.proc)), PHZS.proc = rmfield(PHZS.proc,'rej'); end
+        if ismember('blc',fieldnames(PHZS.proc)), PHZS.proc = rmfield(PHZS.proc,'blc'); end
+        if ismember('norm',fieldnames(PHZS.proc)), PHZS.proc = rmfield(PHZS.proc,'norm'); end
         
         continue
     end
     
     % make sure data length is compatible
     if size(PHZS.data,2) ~= size(PHZ.data,2)
-        PHZS = phzUtil_history(PHZS,['NOTE: The length of the data in ''',files{j},''' was different, so it was not included.'],verbose);
+        PHZS = phz_history(PHZS,['NOTE: The length of the data in ''',files{j},''' was different, so it was not included.'],verbose,0);
         continue
     end
     
     % make sure sampling frequency is compatible
     if PHZ.srate ~= PHZS.srate
-        PHZS = phzUtil_history(PHZS,['NOTE: The ''srate'' field of ''',files{j},''' is different (',num2str(PHZ.(field)),'), so it was not included.'],verbose);
+        PHZS = phz_history(PHZS,['NOTE: The ''srate'' field of ''',files{j},''' is different (',num2str(PHZ.(field)),'), so it was not included.'],verbose,0);
         continue
     end
     
     % basic fields (strings)
-    for i = {'study','datatype','units'}
-        field = i{1};
+    for i = {'study','datatype','units'}, field = i{1};
         if ~strcmp(PHZ.(field),PHZS.(field))
-            PHZS.history{end+1} = ['NOTE: The ''',field,''' field of ''',files{j},''' is different: ''',PHZ.(field),'''.'];
-            if verbose, disp(PHZS.history{end}), end
+            PHZS = phz_history(PHZS,['NOTE: The ''',field,''' field of ''',files{j},''' is different: ''',PHZ.(field),'''.'],verbose,0);
         end
     end
 
@@ -148,9 +146,9 @@ for j = 1:length(files)
             if ~ismember(field,resetFields), resetFields{end+1} = field; end
         end
         
-        PHZ.tags.(field) = categorical(PHZ.tags.(field),'Ordinal',false);
-        PHZS.tags.(field) = categorical(PHZS.tags.(field),'Ordinal',false);
-        PHZS.tags.(field) = [PHZS.tags.(field); PHZ.tags.(field)];
+        PHZ.meta.tags.(field) = categorical(PHZ.meta.tags.(field),'Ordinal',false);
+        PHZS.meta.tags.(field) = categorical(PHZS.meta.tags.(field),'Ordinal',false);
+        PHZS.meta.tags.(field) = [PHZS.meta.tags.(field); PHZ.meta.tags.(field)];
     end
     
     % data
@@ -185,9 +183,8 @@ close(w)
 % cleanup PHZS
 % ------------
 for j = 1:length(resetFields), field = resetFields{j};
-    PHZS.(field) = unique(PHZS.tags.(field));
-    PHZS.history{end+1} = ['The ',field,' field was reset to include the unique values of tags.',field,'.'];
-    if verbose, disp(PHZS.history{end}), end
+    PHZS.(field) = unique(PHZS.meta.tags.(field));
+    PHZS = phz_history(PHZS,['The ',field,' field was reset to include the unique values of tags.',field,'.'],verbose,0);
 end
 
 if ~ismember(keepVars,{'all'})
@@ -203,7 +200,7 @@ end
 
 % save to file (& phz_check)
 if ~isempty(filename)
-    phz_save(PHZS,filename)
+    PHZS = phz_save(PHZS,filename);
 else PHZS = phz_check(PHZS);
 end
 
@@ -224,9 +221,9 @@ if i == 1
     elseif ismember('freqs',fieldnames(PHZ)), PHZS.freqs = PHZ.freqs;
     end
     
-    rname = fieldnames(PHZ.regions);
+    rname = fieldnames(PHZ.region);
     for j = 1:length(rname)
-        PHZS.region.(rname{j}) = PHZ.regions.(rname{j});
+        PHZS.region.(rname{j}) = PHZ.region.(rname{j});
     end
     
     if ismember('summary',fieldnames(PHZ))

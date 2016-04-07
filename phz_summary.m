@@ -3,14 +3,14 @@ function PHZ = phz_summary(PHZ,keepVars,verbose)
 % 
 % usage:    PHZ = phz_summary(PHZ,KEEPVARS)
 % 
-% inputs:   PHZ       = PHZLAB data structure.
-%           KEEPVARS  = A string or a cell array of strings and can contain
-%                       a combination of 'participant', 'group', 'session', 
-%                       and 'trials'. Use 'all' or [] (empty) to retain all 
-%                       trials (i.e., do nothing) or 'none' to average 
-%                       all trials together (i.e., discard all grouping
-%                       variables. 'all' and 'none' cannot be used with
-%                       other KEEPVARS.
+% inputs:   PHZ      = PHZLAB data structure.
+%           KEEPVARS = A string or a cell array of strings and can contain
+%                      a combination of 'participant', 'group', 'session', 
+%                      and 'trials'. Use 'all' or [] (empty) to retain all 
+%                      trials (i.e., do nothing) or 'none' to average 
+%                      all trials together (i.e., discard all grouping
+%                      variables. 'all' and 'none' cannot be used with
+%                      other KEEPVARS.
 % 
 % outputs:  PHZ.data                 = The data summarized by KEEPVARS.
 %           PHZ.summary.keepVars     = The values specified in KEEPVARS.
@@ -26,8 +26,7 @@ function PHZ = phz_summary(PHZ,keepVars,verbose)
 %   PHZ = phz_summary(PHZ,{'trials','group') >> For each unique combination
 %         of PHZ.trials and PHZ.group, average those trials together.
 %
-% Written by Gabriel A. Nespoli 2016-03-17. Revised 2016-04-01.
-
+% Written by Gabriel A. Nespoli 2016-03-17. Revised 2016-04-07.
 if nargout == 0 && nargin == 0, help phz_summary, return, end
 if isempty(keepVars), return, end
 if nargin < 3, verbose = true; end
@@ -42,12 +41,11 @@ if ismember(keepVars{1},{'none'})
     PHZ.summary.nParticipant = length(PHZ.participant);
     PHZ.summary.nTrials = size(PHZ.data,1);
     PHZ.data = mean(PHZ.data,1);
-    
 else
     % get categories to collapse across
     for i = 1:length(keepVars)
-        if i == 1, varInd = PHZ.tags.(keepVars{i});
-        else       varInd = varInd .* PHZ.tags.(keepVars{i});
+        if i == 1, varInd = PHZ.meta.tags.(keepVars{i});
+        else       varInd = varInd .* PHZ.meta.tags.(keepVars{i});
         end
     end
     varTypes = unique(varInd); % this will be in the proper spec order because they are ordinal categorical arrays
@@ -61,7 +59,7 @@ else
     for i = 1:length(varTypes)
         temp = PHZ.data(varInd == varTypes(i),:);
         PHZ.summary.stdError(i,:) = ste(temp);
-        PHZ.summary.nParticipant(i) = length(unique(PHZ.tags.participant(varInd == varTypes(i))));
+        PHZ.summary.nParticipant(i) = length(unique(PHZ.meta.tags.participant(varInd == varTypes(i))));
         PHZ.summary.nTrials(i) = size(temp,1);
         newData(i,:) = mean(temp,1);
     end
@@ -74,7 +72,7 @@ else
         for j = 1:length(varTypes);
             newVar{j} = varTypes{j}{i};
         end
-        PHZ.tags.(field) = categorical(newVar,cellstr(PHZ.(field)),'Ordinal',true);
+        PHZ.meta.tags.(field) = categorical(newVar,cellstr(PHZ.(field)),'Ordinal',true);
     end 
 end
 
@@ -82,34 +80,25 @@ end
 loseVars = {'participant','group','session','trials'};
 loseVars(ismember(loseVars,keepVars)) = [];
 for i = loseVars, field = i{1};
-    PHZ.tags.(field) = '<collapsed>';
+    PHZ.meta.tags.(field) = '<collapsed>';
 end
 
-% this should be taken care of in phz_check
-% for i = keepVars, field = i{1};
-%     if ismember(field,{'participant','group','session','trials'})
-%         if length(unique(PHZ.tags.(field))) ~= length(PHZ.(field))
-%             PHZ.(field) = unique(PHZ.tags.(field));
-%         end
-%     end
-% end
-
-if ismember('blc',fieldnames(PHZ))
-    PHZ.blc.values = '<collapsed>';
+if ismember('blc',fieldnames(PHZ.proc))
+    PHZ.proc.blc.values = '<collapsed>';
 end
 
-if ismember('rej',fieldnames(PHZ))
-    PHZ.rej.locs = '<collapsed>';
-    PHZ.rej.data = '<collapsed>';
-    PHZ.rej.data_locs = '<collapsed>';
-    PHZ.rej.participant = '<collapsed>';
-    PHZ.rej.group = '<collapsed>';
-    PHZ.rej.session = '<collapsed>';
-    PHZ.rej.trials = '<collapsed>';
+if ismember('rej',fieldnames(PHZ.proc))
+    PHZ.proc.rej.locs = '<collapsed>';
+    PHZ.proc.rej.data = '<collapsed>';
+    PHZ.proc.rej.data_locs = '<collapsed>';
+    PHZ.proc.rej.participant = '<collapsed>';
+    PHZ.proc.rej.group = '<collapsed>';
+    PHZ.proc.rej.session = '<collapsed>';
+    PHZ.proc.rej.trials = '<collapsed>';
 end
 
 if isempty(keepVars), keepVars = {''}; end
-PHZ = phzUtil_history(PHZ,['Summarized data by ''',strjoin(keepVars),'''.'],verbose);
+PHZ = phz_history(PHZ,['Summarized data by ''',strjoin(keepVars),'''.'],verbose);
 
 end
 

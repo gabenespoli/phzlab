@@ -51,7 +51,7 @@ function phz_plot(PHZ,varargin)
 % outputs:  Use phz_changefield to edit the order in which lines and bars
 %           are plotted, as well as their colour and line style.
 % 
-% Written by Gabriel A. Nespoli 2016-02-16. Revised 2016-04-04.
+% Written by Gabriel A. Nespoli 2016-02-16. Revised 2016-04-07.
 if nargout == 0 && nargin == 0, help phz_plot, return, end
 PHZ = phz_check(PHZ);
 
@@ -228,8 +228,8 @@ for p = 1:length(plotOrder)
                     region{k}(2),...
                     region{k}(2)];
                 y = [yl(1) yl(2) yl(2) yl(1)];
-                obj = patch(x,y,PHZ.spec.region{k},'EdgeColor','none',...
-                    'DisplayName',PHZ.tags.region{k});
+                obj = patch(x,y,PHZ.meta.spec.region{k},'EdgeColor','none',...
+                    'DisplayName',PHZ.meta.tags.region{k});
                 alpha(obj,0.1) % make translucent
             end
         end
@@ -250,38 +250,14 @@ end
 
 function [lineOrder,lineTags,lineSpec,plotOrder,plotTags,plotSpec] = getLabelsAndSpec(PHZ,dispn)
 
-% get order and spec
-% for i = {'participant','group','session','trials','region'}
-%     for j = {'order','spec'}
-%         if isempty(spec.([i{1},'_',j{1}]))
-%             spec.([i{1},'_',j{1}]) = PHZ.spec.([i{1},'_',j{1}]);
-%         else % verify spec
-%             switch j
-%                 case 'order'
-%                     if ~all(ismember(spec.([i{1},'_',j{1}]),PHZ.spec.([i{1},'_',j{1}])))
-%                         error(['User-defined spec ''',i{1},'_',j{1},''' does not have the correct labels.'])
-%                     end
-%                 case 'spec'
-%                     if length(spec.([i{1},'_',j{1}])) ~= length(PHZ.spec.([i{1},'_',j{1}]))
-%                         error(['User-defined spec ''',i{1},'_',j{1},''' does not have the correct number of specs.'])
-%                     end
-%             end
-%         end
-%     end
-% end
-
 % lines/bars
 if ismember(PHZ.summary.keepVars{1},{' ','none'}) || isempty(PHZ.summary.keepVars{1})
     lineOrder = {'All trials'};
     lineSpec = {''};
 else
     lineOrder = PHZ.(PHZ.summary.keepVars{1});
-    lineSpec = PHZ.spec.(PHZ.summary.keepVars{1});
-    lineTags = PHZ.tags.(PHZ.summary.keepVars{1});
-%     if ~isempty(spec.([PHZ.summary.keepVars{1},'_spec']))
-%         lineSpec = spec.([PHZ.summary.keepVars{1},'_spec']);
-%     else lineSpec = repmat({''},1,length(PHZ.spec.([PHZ.summary.keepVars{1},'_order'])));
-%     end
+    lineSpec = PHZ.meta.spec.(PHZ.summary.keepVars{1});
+    lineTags = PHZ.meta.tags.(PHZ.summary.keepVars{1});
 end
 
 % plots
@@ -293,23 +269,9 @@ if length(PHZ.summary.keepVars) == 1
     plotSpec = {''};
 else 
     plotOrder = PHZ.(PHZ.summary.keepVars{2});
-    plotSpec = PHZ.spec.(PHZ.summary.keepVars{2});
-    plotTags = PHZ.tags.(PHZ.summary.keepVars{2});
-%     if ~isempty(spec.([PHZ.summary.keepVars{2},'_spec']))
-%         plotSpec = spec.([PHZ.summary.keepVars{2},'_spec']);
-%     else plotSpec = repmat({''},1,length(PHZ.spec.([PHZ.summary.keepVars{2},'_order'])));
-%     end
+    plotSpec = PHZ.meta.spec.(PHZ.summary.keepVars{2});
+    plotTags = PHZ.meta.tags.(PHZ.summary.keepVars{2});
 end
-
-% duplicate labels as needed
-% if ~isempty(lineOrder)
-%     if ~iscolumn(lineOrder)
-%         if isrow(lineOrder), lineOrder = lineOrder'; end
-%     end
-% end
-% lineLabels = repmat(lineOrder,size(PHZ.data,1)/length(lineOrder),1);
-% lineLabels = repmat(lineOrder,1,length(plotOrder));
-% plotLabels = plotOrder;
 
 % add n's
 if ~ismember(dispn,{'none',''})
@@ -390,7 +352,7 @@ switch length(plotLabels)
 end
 end
 
-function ytitle = getytitle(PHZ,feature,legendLoc,smoothing,featureTitle)
+function ytitle = getytitle(PHZ,feature,legendLoc,do_plotsmooth,featureTitle)
 
 % main titles
 % -----------
@@ -416,22 +378,19 @@ end
 if skipDSPtitles, return, end % skip dsp titles for acc and rt
 
 % smoothing
-if smoothing && isempty(feature), ytitle = {[ytitle{1} ' (smoothed)']}; end
+if do_plotsmooth && isempty(feature), ytitle = {[ytitle{1} ' (smoothed)']}; end
 
 % region name and baseline-correction
 if ~isempty(feature) || (isempty(feature) && isempty(legendLoc))
     if ~isempty(PHZ.region) && ~isstruct(PHZ.region)
         ytitle = [ytitle; {['region: ',PHZ.region]}];
-%         if isnumeric(PHZ.region), ytitle = [ytitle; {['region ',phzUtil_num2strRegion(PHZ.region)]}];
-%         elseif ischar(PHZ.region),ytitle = [ytitle; {[PHZ.region,' region']}];
-%         end
     end
     
-    if ismember('blc',fieldnames(PHZ))
-        ytitle = [ytitle; {['baseline-correction: ',phzUtil_num2strRegion(PHZ.blc.region)]}];
+    if ismember('blc',fieldnames(PHZ.proc))
+        ytitle = [ytitle; {['baseline-correction: ',phzUtil_num2strRegion(PHZ.proc.blc.region)]}];
     end
 
-elseif ismember('blc',fieldnames(PHZ))
+elseif ismember('blc',fieldnames(PHZ.proc))
     ytitle = [ytitle; {'baseline-corrected'}];
 end
 end

@@ -57,7 +57,7 @@ function varargout = phz_writetable(PHZ,varargin)
 %          will be: participant, group, session, mean_trialtype1,
 %          mean_trialtype2, etc.
 %           
-% Written by Gabriel A. Nespoli 2016-03-07. Revised 2016-04-04.
+% Written by Gabriel A. Nespoli 2016-03-07. Revised 2016-04-07.
 if nargout == 0 && nargin == 0, help phz_writetable, return, end
 if isempty(PHZ), PHZ = phz_gather; else PHZ = phz_check(PHZ); end
 
@@ -140,12 +140,12 @@ for i = 1:length(feature)
         if ischar(PHZ.region), d.Properties.UserData.region = PHZ.region;
         else d.Properties.UserData.region = 'epoch';
         end
-        d.Properties.UserData.files = PHZ.files;
+        d.Properties.UserData.files = PHZ.meta.files;
         d.Properties.UserData.misc = PHZ.misc;
         d.Properties.UserData.history = PHZ.history;
         
         for j = 1:length(addVars) - 1
-            d.(addVars{j+1}) = s.tags.(addVars{j+1});
+            d.(addVars{j+1}) = s.meta.tags.(addVars{j+1});
             d.Properties.VariableUnits{end} = '';
             d.Properties.VariableDescriptions{end} = '';
         end

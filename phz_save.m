@@ -37,7 +37,7 @@ end
 
 PHZ.misc.filename = filename;
 
-PHZ = phzUtil_history(PHZ,['Saved to ''',filename,'''.'],verbose);
+PHZ = phz_history(PHZ,['Saved to ''',filename,'''.'],verbose);
 
 fprintf('Saving...')
 

@@ -8,7 +8,7 @@ function PHZ = phz_region(PHZ,region,verbose)
 %                     vector specifying the start and end times in seconds, 
 %                     or a 1-by-N vector (length > 2) of indices.
 % 
-% outputs:  PHZ.data    = Data for specified region only.
+% outputs:  PHZ.data   = Data for specified region only.
 %           PHZ.region = Value specified in REGION.
 % 
 % examples:
@@ -20,8 +20,7 @@ function PHZ = phz_region(PHZ,region,verbose)
 %         the first sample to the 3001st sample. For a sampling rate of
 %         1000 Hz, this would correspond to 0-3 seconds.
 % 
-% Written by Gabriel A. Nespoli 2016-02-08. Revised 2016-04-01.
-
+% Written by Gabriel A. Nespoli 2016-02-08. Revised 2016-04-07.
 if nargout == 0 && nargin == 0, help phz_region, return, end
 if isempty(region), return, end
 if ~isnumeric(region) && ~ischar(region), error('Invalid region.'), end
@@ -33,7 +32,7 @@ elseif ismember('freqs',fieldnames(PHZ)), indField = 'freqs';
 end
 
 % convert input to vector of indices
-possibleRegions = PHZ.tags.region;
+possibleRegions = PHZ.meta.tags.region;
 
 if isnumeric(region) && length(region) == 1;
     region = possibleRegions{region};
@@ -60,13 +59,13 @@ if isempty(region), error('Region is empty.'), end
 PHZ.data = PHZ.data(:,region);
 PHZ.(indField) = PHZ.(indField)(region);
 if ismember('rej',fieldnames(PHZ)), 
-    PHZ.rej.data = PHZ.rej.data(:,region);
+    PHZ.proc.rej.data = PHZ.proc.rej.data(:,region);
 end
 
 % cleanup PHZ fields
 PHZ.region = regionLabel;
 
-PHZ = phzUtil_history(PHZ,['Restricted to ''',regionLabel,''' region.'],verbose);
+PHZ = phz_history(PHZ,['Restricted to ''',regionLabel,''' region.'],verbose);
 
 end
 

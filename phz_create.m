@@ -137,8 +137,6 @@ for i = 1:2:length(varargin)
     end
 end
 
-
-
 % check things before starting
 if ~ischar(savefolder) && length(files) > 1
     error('When creating more than one PHZ file, specify a folder where they should be saved.')
@@ -155,9 +153,8 @@ for i = 1:length(files)
     if verbose, disp(['Loading data from file ',fileProgress]), end
     PHZ = getBlankPHZ(verbose); % get new blank PHZ structure
     PHZ.study = study;
-    PHZ.misc.datafile = fullfile(folder,files{i});
-    s = load(PHZ.misc.datafile,'-mat');
-    
+    PHZ.meta.datafile = fullfile(folder,files{i});
+    s = load(PHZ.meta.datafile,'-mat');
     
     % get grouping vars from filename ('participant-group-session.mat')
     [~,name] = fileparts(files{i});
@@ -180,14 +177,14 @@ for i = 1:length(files)
             end
             
             PHZ.data = transpose(s.data(:,channel));
-            PHZ.times = (s.start_sample:1:length(PHZ.data)) / PHZ.srate;
+            PHZ.meta.times = (s.start_sample:1:length(PHZ.data)) / PHZ.srate;
             
         otherwise, error('Unknown file type.')
     end
     
     % save PHZ file
     if ischar(savefolder)
-        [pathstr,name] = fileparts(PHZ.misc.datafile);
+        [pathstr,name] = fileparts(PHZ.meta.datafile);
         if isempty(savefolder), savefolder = pathstr; end
         PHZ = phz_save(PHZ,fullfile(savefolder,[name,'.phz']));
     else PHZ = phz_check(PHZ);
@@ -207,17 +204,15 @@ PHZ.participant = '';
 PHZ.group = ''; % aka between-subjects variable
 PHZ.session = ''; % aka within-subjects variable
 PHZ.trials = ''; % trialtype label for each trial (i.e., trial order)
-PHZ.times = []; % in seconds
-
-PHZ.data = []; % actual data, 2D, trials X time
-PHZ.units = '';
-PHZ.srate = []; % sampling frequency in Hz
 
 PHZ.region.baseline = []; % baseline region if data are baseline-corrected
 PHZ.region.target = [];
 PHZ.region.target2 = [];
 PHZ.region.target3 = [];
 PHZ.region.target4 = [];
+
+PHZ.data = []; % actual data, 2D, trials X time
+PHZ.units = '';
 
 PHZ.resp.q1 = {};
 PHZ.resp.q1_acc = [];
@@ -235,19 +230,24 @@ PHZ.resp.q5 = {};
 PHZ.resp.q5_acc = [];
 PHZ.resp.q5_rt = [];
 
-PHZ.misc = [];
+PHZ.proc = struct;
 
-PHZ.tags.participant = categorical;
-PHZ.tags.group = categorical;
-PHZ.tags.session = categorical;
-PHZ.tags.trials = categorical;
-PHZ.spec.region_order = {'baseline','target','target2','target3','target4'};
+PHZ.meta.srate = []; % sampling frequency in Hz
+PHZ.meta.times = []; % in seconds
 
-PHZ.spec.participant = {};
-PHZ.spec.group = {};
-PHZ.spec.session = {};
-PHZ.spec.trials = {};
-PHZ.spec.region = {'k','b','g','y','r'};
+PHZ.meta.tags.participant = categorical;
+PHZ.meta.tags.group = categorical;
+PHZ.meta.tags.session = categorical;
+PHZ.meta.tags.trials = categorical;
+PHZ.meta.tags.region = {'baseline','target','target2','target3','target4'};
+
+PHZ.meta.spec.participant = {};
+PHZ.meta.spec.group = {};
+PHZ.meta.spec.session = {};
+PHZ.meta.spec.trials = {};
+PHZ.meta.spec.region = {'k','b','g','y','r'};
+
+PHZ.misc = struct;
 
 PHZ.history = {};
 

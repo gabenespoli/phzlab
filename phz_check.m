@@ -18,8 +18,27 @@ PHZ = orderPHZfields(PHZ);
 if ~isstruct(PHZ), error([name,' variable should be a structure.']), end
 PHZ.study       = verifyChar(PHZ.study,[name,'.study'],verbose);
 PHZ.datatype    = verifyChar(PHZ.datatype,[name,'.datatype'],verbose);
+
+PHZ.srate = verifyNumeric(PHZ.srate,[name,'.srate'],verbose);
+checkSingleNumber(PHZ.srate,[name,'.srate']);
+
 PHZ.units       = verifyChar(PHZ.units,[name,'.units'],verbose);
 PHZ.data        = verifyNumeric(PHZ.data,[name,'.data'],verbose);
+
+%% times / freqs
+if all(ismember({'times','freqs'},fieldnames(PHZ))), error('Cannot have both TIMES and FREQS fields.'), end
+if ismember('times',fieldnames(PHZ))
+    PHZ.times = verifyNumeric(PHZ.times,[name,'.times'],verbose);
+    PHZ.times = checkAndFixRow(PHZ.times,[name,'.times'],nargout,verbose);
+    
+    % fill times
+    if isempty(PHZ.times) && ~isempty(PHZ.srate) && ~isempty(PHZ.data)
+    end
+    
+elseif ismember('freqs',fieldnames(PHZ))
+    PHZ.freqs = verifyNumeric(PHZ.freqs,[name,'.freqs'],verbose);
+    PHZ.freqs = checkAndFixRow(PHZ.freqs,[name,'.freqs'],nargout,verbose);
+end
 
 %% grouping vars, meta.tags, meta.spec
 if ~isstruct(PHZ.meta.tags), error([name,'.meta.tags should be a structure.']), end
@@ -160,14 +179,25 @@ if ~isstruct(PHZ.resp), error([name,'.resp should be a structure.']), end
 % trials
 % ------
 
-% rect
-% ----
+% rectify
+% -------
+if ismember('rectify',fieldnames(PHZ.proc))
+    verifyChar(PHZ.proc.rectify,[name,'.proc.rectify'],verbose);
+end
 
 % smooth
 % ------
+if ismember('smooth',fieldnames(PHZ.proc))
+    verifyChar(PHZ.proc.smooth,[name,'.proc.smooth'],verbose);
+end
 
 % transform
 % ---------
+if ismember('transform',fieldnames(PHZ.proc))
+    if ~ischar(PHZ.proc.transform)
+        verifyCell(PHZ.proc.transform,[name,'.proc.transform'],verbose);
+    end
+end
 
 % rej
 % ---
@@ -215,10 +245,10 @@ end
 % norm
 % ----
 if ismember('norm',fieldnames(PHZ.proc))
-    verifyChar(PHZ.proc.norm.type,[name,'.proc.norm.type'],verbose)
-    verifyNumeric(PHZ.proc.norm.mean,[name,'.proc.norm.mean'],verbose)
-    verifyNumeric(PHZ.proc.norm.stDev,[name,'.proc.norm.stDev'],verbose)
-    verifyChar(PHZ.proc.norm.oldUnits,[name,'.proc.norm.oldUnits'],verbose)
+    verifyChar(PHZ.proc.norm.type,[name,'.proc.norm.type'],verbose);
+    verifyNumeric(PHZ.proc.norm.mean,[name,'.proc.norm.mean'],verbose);
+    verifyNumeric(PHZ.proc.norm.stDev,[name,'.proc.norm.stDev'],verbose);
+    verifyChar(PHZ.proc.norm.oldUnits,[name,'.proc.norm.oldUnits'],verbose);
     for i = {'mean','stDev'}, field = i{1};
         if length(PHZ.proc.norm.(field)) > 1 && length(PHZ.proc.norm.(field)) ~= size(PHZ.data,1)
             error([name,'.proc.norm.',field,' should either be of ',...
@@ -229,31 +259,17 @@ end
 
 %% meta (except tags & spec)
 
-% srate
-PHZ.meta.srate = verifyNumeric(PHZ.meta.srate,[name,'.meta.srate'],verbose);
-checkSingleNumber(PHZ.meta.srate,[name,'.meta.srate']);
-
-% times / freqs
-if all(ismember({'times','freqs'},fieldnames(PHZ.meta))), error('Cannot have both TIMES and FREQS fields.'), end
-if ismember('times',fieldnames(PHZ.meta))
-    PHZ.meta.times = verifyNumeric(PHZ.meta.times,[name,'.meta.times'],verbose);
-    PHZ.meta.times = checkAndFixRow(PHZ.meta.times,[name,'.meta.times'],nargout,verbose);
-    
-    % fill times
-    if isempty(PHZ.meta.times) && ~isempty(PHZ.meta.srate) && ~isempty(PHZ.data)
-    end
-    
-elseif ismember('freqs',fieldnames(PHZ.meta))
-    PHZ.meta.freqs = verifyNumeric(PHZ.meta.freqs,[name,'.meta.freqs'],verbose);
-    PHZ.meta.freqs = checkAndFixRow(PHZ.meta.freqs,[name,'.meta.freqs'],nargout,verbose);
-end
-
 % filename
-if ismember('filename',filednames(PHZ.meta))
-    verifyChar(PHZ.meta.filename,[name,'.meta.filename'],verbose)
+if ismember('filename',fieldnames(PHZ.meta))
+    verifyChar(PHZ.meta.filename,[name,'.meta.filename'],verbose);
     if ~exist(PHZ.meta.filename,'file')
         warning('The filename for this PHZ file doesn''t seem to exist...')
     end
+end
+
+% datafile
+if ismember('datafile',fieldnames(PHZ.meta))
+    verifyChar(PHZ.meta.datafile,[name,'.meta.datafile'],verbose);
 end
 
 % files
@@ -375,24 +391,27 @@ if ~ismember('tags',fieldnames(PHZ)) && ~ismember('meta',fieldnames(PHZ))
     PHZ.tags.region = PHZ.spec.region_order;
     PHZ.spec.region = PHZ.spec.region_spec;
     PHZ.spec = rmfield(PHZ.spec,{'region_order','region_spec'});
-    PHZ = phzUtil_history(PHZ,'Converted PHZ structure to v0.7.7.',verbose,0);
+    PHZ = phz_history(PHZ,'Converted PHZ structure to v0.7.7.',verbose,0);
 end
 
-% change field 'regions' to 'region'
-if ismember('regions',fieldnames(PHZ))
-    PHZ.region = PHZ.regions;
-    PHZ = rmfield(PHZ,'regions');
-end
-
-if ismember('regions',fieldnames(PHZ.meta.tags))
-    PHZ.meta.tags.region = PHZ.meta.tags.regions;
-    PHZ.meta.tags = rmfield(PHZ.meta.tags,'regions');
-end
-
-if ismember('regions',fieldnames(PHZ.meta.spec))
-    PHZ.meta.spec.region = PHZ.meta.spec.regions;
-    PHZ.meta.spec = rmfield(PHZ.meta.spec,'regions');
-end
+% if ~ismember('meta',fieldnames(PHZ)), PHZ.meta = struct; end
+% if ~ismember('proc',fieldnames(PHZ)), PHZ.proc = struct; end
+% 
+% % change field 'regions' to 'region'
+% if ismember('regions',fieldnames(PHZ))
+%     PHZ.region = PHZ.regions;
+%     PHZ = rmfield(PHZ,'regions');
+% end
+% 
+% if ismember('regions',fieldnames(PHZ.meta.tags))
+%     PHZ.meta.tags.region = PHZ.meta.tags.regions;
+%     PHZ.meta.tags = rmfield(PHZ.meta.tags,'regions');
+% end
+% 
+% if ismember('regions',fieldnames(PHZ.meta.spec))
+%     PHZ.meta.spec.region = PHZ.meta.spec.regions;
+%     PHZ.meta.spec = rmfield(PHZ.meta.spec,'regions');
+% end
 
 % move stuff to meta and create proc (older than v0.8)
 if ~all(ismember({'proc','meta'},fieldnames(PHZ))) && any(ismember({'rej','blc','norm'},fieldnames(PHZ)))
@@ -409,33 +428,36 @@ if ~all(ismember({'proc','meta'},fieldnames(PHZ))) && any(ismember({'rej','blc',
     end
 end
 
-if ismember('times',fieldnames(PHZ))
-    PHZ.meta.times = PHZ.times;
-    PHZ = rmfield(PHZ,'times');
-elseif ismember('freqs',fieldnames(PHZ))
-    PHZ.meta.freqs = PHZ.freqs;
-    PHZ = rmfield(PHZ,'freqs');
-end
+% if ismember('times',fieldnames(PHZ))
+%     PHZ.meta.times = PHZ.times;
+%     PHZ = rmfield(PHZ,'times');
+% elseif ismember('freqs',fieldnames(PHZ))
+%     PHZ.meta.freqs = PHZ.freqs;
+%     PHZ = rmfield(PHZ,'freqs');
+% end
+updateTo8 = false;
 
-for i = {'srate','tags','spec'}, field = i{1};
-    if ismember(field,fieldnames(PHZ))
+for i = {'tags','spec'}, field = i{1};
+    if ismember(field,fieldnames(PHZ)), updateTo8 = true;
         PHZ.meta.(field) = PHZ.(field);
         PHZ = rmfield(PHZ,field);
     end
 end
 
-if ismember('files',fieldnames(PHZ))
+if ismember('files',fieldnames(PHZ)), updateTo8 = true;
     PHZ.meta.files = PHZ.files;
     PHZ = rmfield(PHZ,'files');
 end
 
-if ismember('filename',fieldnames(PHZ.misc))
+if ismember('filename',fieldnames(PHZ.misc)), updateTo8 = true;
     PHZ.meta.filename = PHZ.misc.filename;
     PHZ.misc = rmfield(PHZ.misc,'filename');
 end
 
-PHZ.proc = struct;
-PHZ = phzUtil_history(PHZ,'Converted PHZ structure to v0.8.',verbose,0);
+if updateTo8
+    PHZ.proc = struct;
+    PHZ = phz_history(PHZ,'Converted PHZ structure to v0.8.',verbose,0);
+end
 end
 
 function PHZ = orderPHZfields(PHZ)
@@ -463,12 +485,17 @@ mainOrder = {
     'group'
     'session'
     'trials'
+
     'summary'
     'region'
+    
+    'times'
+    'freqs'
     
     'data'
     'feature'
     'units'
+    'srate'
     
     'resp'
     'proc'
@@ -485,17 +512,15 @@ PHZ = orderfields(PHZ,mainOrder);
 % meta structure
 % --------------
 metaOrder = {
-    'srate'
-    'times'
-    'freqs'
-    
     'tags'
     'spec'
+    
     'filename'
+    'datafile'
     'files'
     };
 if ~all(ismember(fieldnames(PHZ.meta),metaOrder))
-    error(['Invalid fields present in PHZ structure. ',...
+    error(['Invalid fields present in PHZ.meta structure. ',...
         'Use PHZ.misc to store miscellaneous data.'])
 end
 metaOrder = metaOrder(ismember(metaOrder,fieldnames(PHZ.meta)));

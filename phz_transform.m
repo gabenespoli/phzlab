@@ -32,19 +32,10 @@ for i = 1:length(transform)
     if isnumeric(transform{i})
         transformStr = ['Multiplied by ',num2str(transform{i}),'.'];
         PHZ.data = PHZ.data * transform{i};
-        if do_rej, PHZ.rej.data = PHZ.rej.data * transform{i}; end
+        if do_rej, PHZ.proc.rej.data = PHZ.proc.rej.data * transform{i}; end
         
     else
         switch lower(transform{i})
-%             case {'full','abs'}
-%                 transformStr = 'Full-wave rectification.';
-%                 PHZ.data = abs(PHZ.data);
-%                 if do_rej, PHZ.rej.data = abs(PHZ.rej.data); end
-%                 
-%             case {'half','truncate','trunc'}
-%                 transformStr = 'Half-wave rectification.';
-%                 PHZ.data(PHZ.data < 0) = 0;
-%                 if do_rej, PHZ.rej.data(PHZ.rej.data < 0) = 0; end
                 
             case {'sqrt','squareroot'}
                 if any(PHZ.data < 0)
@@ -53,32 +44,37 @@ for i = 1:length(transform)
                 end
                 transformStr = 'Square root transformation.';
                 PHZ.data = sqrt(PHZ.data);
-                if do_rej, PHZ.rej.data = sqrt(PHZ.rej.data); end
+                if do_rej, PHZ.proc.rej.data = sqrt(PHZ.proc.rej.data); end
                 
             case {'^2','square'}
                 transformStr = 'Squared each data point.';
                 PHZ.data = PHZ.data .^ 2;
-                if do_rej, PHZ.rej.data = PHZ.rej.data .^ 2; end
+                if do_rej, PHZ.proc.rej.data = PHZ.proc.rej.data .^ 2; end
                 
             case 'log'
                 if any(PHZ.data < 0), error('Cannot compute logarithm of negative values.'), end
                 transformStr = 'Natural logarithm transformation.';
                 PHZ.data = log(PHZ.data);
+                if do_rej, PHZ.proc.rej.data = log(PHZ.proc.rej.data); end
                 
             case 'log10'
                 if any(PHZ.data < 0), error('Cannot compute logarithm of negative values.'), end
                 transformStr = 'Base 10 logarithm transformation.';
                 PHZ.data = log10(PHZ.data);
+                if do_rej, PHZ.proc.rej.data = log10(PHZ.proc.rej.data); end
                 
             case 'log2'
                 if any(PHZ.data < 0), error('Cannot compute logarithm of negative values.'), end
                 transformStr = 'Base 2 logarithm transformation.';
                 PHZ.data = log2(PHZ.data);
+                if do_rej, PHZ.proc.rej.data = log2(PHZ.proc.rej.data); end
                 
             otherwise, error('Unknown transformation.')
         end
     end
     
-    PHZ = phzUtil_history(PHZ,transformStr,verbose);
+    PHZ = phz_history(PHZ,transformStr,verbose);
 end
+
+PHZ.proc.transform = transform;
 end

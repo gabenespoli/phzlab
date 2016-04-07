@@ -4,22 +4,22 @@ function PHZ = phz_subset(PHZ,subset,verbose)
 % usage:    PHZ = phz_subset(PHZ,SUBSET)
 %           PHZ = phz_subset(PHZ,IND)
 %
-% inputs:   PHZ = PHZLAB data structure.
+% inputs:   PHZ    = PHZLAB data structure.
 %           SUBSET = A cell array of length 2, where the first value is a
-%                 field to restrict by (i.e., 'participant', 'group',
-%                 'session', 'trials', or a PHZ.resp field) and the second
-%                 item is a number, string, or cell array of strings with
-%                 the value(s) of the field to include.
-%           IND = A logcial vector (i.e., 1's & 0's) the same length as
-%                 the number of trials. Positions with a 1 are included,
-%                 positions with a 0 are excluded.
+%                    field to restrict by (i.e., 'participant', 'group',
+%                    'session', 'trials', or a PHZ.resp field) and the 
+%                    second item is a number, string, or cell array of 
+%                    strings with the value(s) of the field to include.
+%           IND    = A logcial vector (i.e., 1's & 0's) the same length as
+%                    the number of trials. Positions with a 1 are included,
+%                    positions with a 0 are excluded.
 %
 % outputs:  The following fields are restricted to the specified subset:
 %               PHZ.(participant/group/session/trials)
 %               PHZ.data
 %               PHZ.resp.*
-%               PHZ.spec.*
-%               PHZ.tags.(participant/group/session/trials)
+%               PHZ.meta.spec.*
+%               PHZ.meta.tags.*
 %
 % examples:
 %   phz_subset(PHZ,{'session' '1'}) >> Only include data from session 1.
@@ -28,8 +28,7 @@ function PHZ = phz_subset(PHZ,subset,verbose)
 %   phz_subset(PHZ,PHZ.resp.q1_rt < 10) >> Only include data from trials
 %                                      with a reaction time less than 10 s.
 %
-% Written by Gabriel A. Nespoli 2016-03-08. Revised 2016-04-01.
-
+% Written by Gabriel A. Nespoli 2016-03-08. Revised 2016-04-07.
 if nargout == 0 && nargin == 0, help phz_subset, return, end
 if isempty(subset), return, end
 if nargin < 3, verbose = true; end
@@ -37,15 +36,15 @@ if nargin < 3, verbose = true; end
 % get indices to keep
 if isnumeric(subset) || islogical(subset)
     indall = subset;
-    if ~ismember('rej',fieldnames(PHZ)) && length(subset) == size(PHZ.data,1) % ok, no rej
+    if ~ismember('rej',fieldnames(PHZ.proc)) && length(subset) == size(PHZ.data,1) % ok, no rej
         inddata = subset;
         indrej = [];
         
-    elseif ismember('rej',fieldnames(PHZ)) && length(subset) == length(PHZ.rej.locs) + length(PHZ.rej.data_locs)
-        inddata = subset(PHZ.rej.data_locs);
-        indrej = subset(PHZ.rej.locs);
-        
-    else error('Index vector is an invalid length.')
+    elseif ismember('rej',fieldnames(PHZ.proc)) && length(subset) == length(PHZ.proc.rej.locs) + length(PHZ.proc.rej.data_locs)
+        inddata = subset(PHZ.proc.rej.data_locs);
+        indrej = subset(PHZ.proc.rej.locs);
+    else
+        error('Index vector is an invalid length.')
     end
     
     subsetStr = 'Restricted data by indices.';
@@ -57,22 +56,23 @@ elseif iscell(subset)
     switch field
         case {'acc1','acc2','acc3','acc4','acc5'},
             indall = ismember(PHZ.resp.(['q',field(4),'_acc']),labels);
-            if ismember('rej',fieldnames(PHZ))
-                indrej = indall(PHZ.rej.locs);
-                inddata = indall(PHZ.rej.data_locs);
-            else indrej = [];
+            if ismember('rej',fieldnames(PHZ.proc))
+                indrej = indall(PHZ.proc.rej.locs);
+                inddata = indall(PHZ.proc.rej.data_locs);
+            else
+                indrej = [];
                 inddata = indall;
             end
             
         case {'participant','group','session','trials'}
-            inddata = ismember(PHZ.tags.(field),labels);
-            if ismember('rej',fieldnames(PHZ))
-                indrej = ismember(PHZ.rej.(field),labels);
-                indall = nan(length(PHZ.rej.locs) + length(PHZ.rej.data_locs),1);
+            inddata = ismember(PHZ.meta.tags.(field),labels);
+            if ismember('rej',fieldnames(PHZ.proc))
+                indrej = ismember(PHZ.proc.rej.(field),labels);
+                indall = nan(length(PHZ.proc.rej.locs) + length(PHZ.proc.rej.data_locs),1);
                 indall(inddata) = inddata;
                 indall(indrej) = indrej;
-                
-            else indrej = [];
+            else
+                indrej = [];
                 indall = inddata;
             end
             
@@ -91,29 +91,28 @@ end
 
 % adjust tags and grouping vars (also rej)
 for i = {'participant','group','session','trials'}, field = i{1};
-    PHZ.tags.(field) = PHZ.tags.(field)(inddata);
-    if ismember('rej',fieldnames(PHZ)), PHZ.rej.(field) = PHZ.rej.(field)(indrej); end
+    PHZ.meta.tags.(field) = PHZ.meta.tags.(field)(inddata);
+    if ismember('rej',fieldnames(PHZ.proc)), PHZ.proc.rej.(field) = PHZ.proc.rej.(field)(indrej); end
 end
 
 % adjust grouping vars
 for i = {'participant','group','session','trials'}, field = i{1};
-    
     if length(PHZ.(field)) ~= length(unique(PHZ.tags.(field)))
-        ind = ismember(PHZ.(field),unique(PHZ.tags.(field)));
+        ind = ismember(PHZ.(field),unique(PHZ.meta.tags.(field)));
         PHZ.(field)      = PHZ.(field)(ind);
-        PHZ.spec.(field) = PHZ.spec.(field)(ind);
+        PHZ.meta.spec.(field) = PHZ.meta.spec.(field)(ind);
     end
 end
 
 % adjust values in data, tags, grouping vars, and rej
 PHZ.data = PHZ.data(inddata,:);
-if ismember('rej',fieldnames(PHZ))
-    PHZ.rej.data = PHZ.rej.data(indrej,:);
+if ismember('rej',fieldnames(PHZ.proc))
+    PHZ.proc.rej.data = PHZ.proc.rej.data(indrej,:);
 end
 
 % adjust values in PHZ.blc
-if ismember('blc',fieldnames(PHZ))
-    PHZ.blc.values = PHZ.blc.values(indall);
+if ismember('blc',fieldnames(PHZ.proc))
+    PHZ.proc.blc.values = PHZ.proc.blc.values(indall);
 end
 
 % adjust values in PHZ.resp
@@ -127,7 +126,7 @@ for i = 1:5
 end
 
 % add to history
-PHZ = phzUtil_history(PHZ,subsetStr,verbose);
+PHZ = phz_history(PHZ,subsetStr,verbose);
 
 end
 
