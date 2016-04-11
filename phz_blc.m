@@ -36,9 +36,10 @@ if do_blc || do_restore
     % restore previously-subtracted baseline
     if do_restore
         
-        if isempty(PHZ.proc.blc.values), error(['The current ',...
-                'baseline-correction is undoable, probably due ',...
-                'to previous preprocessing.'])
+        if phz_proc(PHZ,'blc') ~= 2
+            error(['Other processing has been done since previous ',...
+                'baseline-correction. Undo previous processing first ',...
+                '(if possible).'])
         end
         
         if ismember('rej',fieldnames(PHZ.proc))
@@ -61,10 +62,10 @@ if do_blc || do_restore
         
         if ismember('rej',fieldnames(PHZ.proc))
             PHZ.proc.blc.values = nan(length(PHZ.proc.rej.locs) + length(PHZ.proc.rej.data_locs),1);
-            PHZ.proc.blc.values(PHZ.proc.rej.locs)      = mean(PHZb.proc.rej.data,2);
+            PHZ.proc.blc.values(PHZ.proc.rej.locs) = mean(PHZb.proc.rej.data,2);
             PHZ.proc.blc.values(PHZ.proc.rej.data_locs) = mean(PHZb.data,2);
             PHZ.proc.rej.data = PHZ.proc.rej.data - repmat(PHZ.proc.blc.values(PHZ.proc.rej.locs),[1 size(PHZ.proc.rej.data,2)]);
-            PHZ.data     = PHZ.data - repmat(PHZ.proc.blc.values(PHZ.proc.rej.data_locs),[1 size(PHZ.data,2)]);
+            PHZ.data = PHZ.data - repmat(PHZ.proc.blc.values(PHZ.proc.rej.data_locs),[1 size(PHZ.data,2)]);
         else
             PHZ.proc.blc.values = mean(PHZb.data,2);
             PHZ.data = PHZ.data - repmat(PHZ.proc.blc.values,[1 size(PHZ.data,2)]);

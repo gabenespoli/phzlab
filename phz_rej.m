@@ -57,6 +57,13 @@ if do_rej || do_restore
     
     if do_restore
         
+        % if norm after rej, must undo norm first
+        if phz_proc(PHZ,'rej') ~= 2
+            error(['Other processing has been done since previous ',...
+                'rejection. Undo previous processing first ',...
+                '(if possible).'])
+        end
+        
         % concatenate all locs, data, and grouping vars
         locs        = [PHZ.proc.rej.data_locs;    PHZ.proc.rej.locs];
         data        = [PHZ.data;                  PHZ.proc.rej.data];
