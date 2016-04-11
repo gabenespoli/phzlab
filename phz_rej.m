@@ -13,7 +13,6 @@ function PHZ = phz_rej(PHZ,threshold,varargin)
 %                       to reject a trial if any value exceeds a THRESHOLD 
 %                       number of that trial's standard deviation.
 %                       
-% 
 % outputs:  PHZ.proc.rej.threshold   = The value specified in THRESHOLD.
 %           PHZ.proc.rej.units       = The units of the threshold value.
 %           PHZ.proc.rej.data        = Data of rejected trials.

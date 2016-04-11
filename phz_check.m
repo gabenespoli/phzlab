@@ -145,7 +145,8 @@ for i = {'participant','group','session','trials'}, field = i{1};
         
     end
     
-    if do_resetSpec, PHZ = resetSpec(PHZ,field); end
+    if do_resetSpec
+        PHZ = resetSpec(PHZ,field); end
     
 end
 
@@ -163,10 +164,12 @@ end
 
 PHZ.meta.tags.region = verifyCell(PHZ.meta.tags.region,[name,'.meta.tags.region'],verbose);
 PHZ.meta.tags.region = checkAndFixRow(PHZ.meta.tags.region,[name,'.meta.tags.region'],nargout,verbose);
-if length(PHZ.meta.tags.region) ~= 5, error('There should be 5 region names in PHZ.meta.tags.region.'), end
+if length(PHZ.meta.tags.region) ~= 5
+    error('There should be 5 region names in PHZ.meta.tags.region.'), end
 
 %% resp
-if ~isstruct(PHZ.resp), error([name,'.resp should be a structure.']), end
+if ~isstruct(PHZ.resp)
+    error([name,'.resp should be a structure.']), end
 
 
 %% proc
@@ -183,27 +186,25 @@ if ~isstruct(PHZ.resp), error([name,'.resp should be a structure.']), end
 % rectify
 % -------
 if ismember('rectify',fieldnames(PHZ.proc))
-    verifyChar(PHZ.proc.rectify,[name,'.proc.rectify'],verbose);
-end
+    verifyChar(PHZ.proc.rectify,[name,'.proc.rectify'],verbose); end
 
 % smooth
 % ------
 if ismember('smooth',fieldnames(PHZ.proc))
-    verifyChar(PHZ.proc.smooth,[name,'.proc.smooth'],verbose);
-end
+    verifyChar(PHZ.proc.smooth,[name,'.proc.smooth'],verbose); end
 
 % transform
 % ---------
 if ismember('transform',fieldnames(PHZ.proc))
     if ~ischar(PHZ.proc.transform)
-        verifyCell(PHZ.proc.transform,[name,'.proc.transform'],verbose);
-    end
+        verifyCell(PHZ.proc.transform,[name,'.proc.transform'],verbose); end
 end
 
 % rej
 % ---
 if ismember('rej',fieldnames(PHZ.proc))
-    if ~isstruct(PHZ.proc.rej), error([name,'.proc.rej should be a structure.']), end
+    if ~isstruct(PHZ.proc.rej)
+        error([name,'.proc.rej should be a structure.']), end
     PHZ.proc.rej.threshold   = verifyNumeric(PHZ.proc.rej.threshold, [name,'.proc.rej.threshold'],verbose);
     checkSingleNumber(PHZ.proc.rej.threshold,[name,'.proc.rej.threshold']);
     PHZ.proc.rej.units = verifyChar(PHZ.proc.rej.units,[name,'.proc.rej.units'],verbose);
@@ -231,7 +232,8 @@ end
 % blc
 % ---
 if ismember('blc',fieldnames(PHZ.proc))
-    if ~isstruct(PHZ.blc), error([name,'.blc should be a structure.']), end
+    if ~isstruct(PHZ.proc.blc)
+        error([name,'.blc should be a structure.']), end
     PHZ.proc.blc.region = verifyNumeric(PHZ.proc.blc.region,[name,'.proc.blc.region'],verbose);
     PHZ.proc.blc.region = checkAndFix1x2(PHZ.proc.blc.region,[name,'.proc.blc.region'],nargout,verbose);
     
@@ -239,7 +241,8 @@ if ismember('blc',fieldnames(PHZ.proc))
         PHZ.proc.blc.values = verifyNumeric(PHZ.proc.blc.values,[name,'.proc.blc.values'],verbose);
         PHZ.proc.blc.values = checkAndFixColumn(PHZ.proc.blc.values,[name,'.proc.blc.values'],nargout,verbose);
     else
-        if ~strcmp(PHZ.proc.blc.values,'<collapsed>'), error('Problem with PHZ.proc.blc and/or PHZ.summary.'), end
+        if ~strcmp(PHZ.proc.blc.values,'<collapsed>')
+            error('Problem with PHZ.proc.blc and/or PHZ.summary.'), end
     end
 end
 
@@ -250,12 +253,20 @@ if ismember('norm',fieldnames(PHZ.proc))
     verifyNumeric(PHZ.proc.norm.mean,[name,'.proc.norm.mean'],verbose);
     verifyNumeric(PHZ.proc.norm.stDev,[name,'.proc.norm.stDev'],verbose);
     verifyChar(PHZ.proc.norm.oldUnits,[name,'.proc.norm.oldUnits'],verbose);
-    for i = {'mean','stDev'}, field = i{1};
-        if length(PHZ.proc.norm.(field)) > 1 && length(PHZ.proc.norm.(field)) ~= size(PHZ.data,1)
-            error([name,'.proc.norm.',field,' should either be of ',...
-                'length 1 or the same length as the number of trials.'])
-        end
-    end
+%     for i = {'mean','stDev'}, field = i{1};
+%         if length(PHZ.proc.norm.(field)) == 1, continue, end
+%         
+%         if ismember('rej',fieldnames(PHZ.proc))
+%             if length(PHZ.proc.norm.(field)) ~= size(PHZ.data,1) + size(PHZ.proc.rej.data,1)
+%                 error([name,'.proc.norm.',field,' should either be of ',...
+%                     'length 1 or the same length as the number of trials.'])
+%             end
+%             
+%         elseif length(PHZ.proc.norm.(field)) ~= size(PHZ.data,1)
+%             error([name,'.proc.norm.',field,' should either be of ',...
+%                 'length 1 or the same length as the number of trials.'])
+%         end
+%     end
 end
 
 %% meta (except tags & spec)
