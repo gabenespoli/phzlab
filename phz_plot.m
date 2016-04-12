@@ -82,7 +82,7 @@ end
 for i = 1:2:length(varargin)
     switch lower(varargin{i})
         case 'subset',                  PHZ = phz_subset(PHZ,varargin{i+1},verbose);
-        case {'rect','rectify'},        PHZ = phz_rect(PHZ,varargin{i+1},verbose);
+        case {'rect','rectify'},        PHZ = phz_rectify(PHZ,varargin{i+1},verbose);
         case {'filter','filt'},         PHZ = phz_filter(PHZ,varargin{i+1},verbose);
         case {'smooth','smoothing'},    PHZ = phz_smooth(PHZ,varargin{i+1},verbose);
         case 'transform',               PHZ = phz_transform(PHZ,varargin{i+1},verbose);

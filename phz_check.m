@@ -47,9 +47,9 @@ if ~isstruct(PHZ.meta.spec), error([name,'.meta.spec should be a structure.']), 
 for i = {'participant','group','session','trials'}, field = i{1};
     
     % grouping vars
-    if length(PHZ.(field)) ~= length(unique(PHZ.(field))), error([name,'.',field,' cannot contain repeated values.']), end
     PHZ.(field) = verifyCategorical(PHZ.(field),[name,'.',field],verbose);
     PHZ.(field) = checkAndFixRow(PHZ.(field),[name,'.',field],nargout,verbose);
+    if length(PHZ.(field)) ~= length(unique(PHZ.(field))), error([name,'.',field,' cannot contain repeated values.']), end
     
     % tags
     if ischar(PHZ.meta.tags.(field)) && strcmp(PHZ.meta.tags.(field),'<collapsed>')
@@ -117,7 +117,7 @@ for i = {'participant','group','session','trials'}, field = i{1};
                 PHZ.(field) = cellstr(num2str(PHZ.(field)));
                 PHZ.(field) = strrep(PHZ.(field),' ','');
             end
-            PHZ = phzUtil_history(PHZ,['PHZ.',field,' was reset',resetStr,'.'],verbose,0);
+            PHZ = phz_history(PHZ,['PHZ.',field,' was reset',resetStr,'.'],verbose,0);
         end
     end
 
