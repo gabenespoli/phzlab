@@ -1,9 +1,9 @@
 function PHZ = phz_check(PHZ,verbose)
-% PHZ_CHECK  Verify and fix a PHZ structure.
+% PHZ_CHECK  Verify and fix a PHZLAB data structure.
 % 
 % usage:    PHZ = phz_check(PHZ)
 % 
-% Written by Gabriel A. Nespoli 2016-02-08. Revised 2016-04-04.
+% Written by Gabriel A. Nespoli 2016-02-08. Revised 2016-04-12.
 if nargout == 0 && nargin == 0, help phz_check, end
 if nargin < 2, verbose = true; end
 
@@ -63,23 +63,23 @@ for i = {'participant','group','session','trials'}, field = i{1};
     % grouping vars && tags
     if isempty(PHZ.meta.tags.(field)) || any(isundefined(PHZ.(field)))
         
+        % both are empty, do nothing
         if isempty(PHZ.(field)) || any(isundefined(PHZ.(field)))
-            % do nothing, both are empty
             
+            % only 1 grouping var value, auto-create tags
         elseif length(PHZ.(field)) == 1
-            % auto-create tags if only one type of grouping var
             PHZ.meta.tags.(field) = repmat(PHZ.(field),size(PHZ.data,1));
             
+            % multiple grouping var values; tags remains empty
         elseif length(PHZ.(field)) > 1
             warning(['It is unknown which values of ''',field,''' apply to which trials.'])
-            % tags remains empty despite multiple values in grouping var
             
-        else error(['Problem with PHZ.',field,'.'])
+        else error(['Problem with ',name,'.',field,'.'])
         end
         
-    else % if ~isempty(PHZ.tags.(field))
+    else % if ~isempty(PHZ.meta.tags.(field))
         
-        % make sure tags is same length as trials
+        % make sure tags is same length as number of trials
         if (length(PHZ.meta.tags.(field)) ~= size(PHZ.data,1))
             
             % if only one value, repeat it to the number of trials
@@ -90,36 +90,42 @@ for i = {'participant','group','session','trials'}, field = i{1};
             end
         end
         
-
-            % make ordinal
-    if ~isempty(PHZ.(field))
-        PHZ.(field)      = categorical(PHZ.(field),     cellstr(PHZ.(field)),'Ordinal',true);
-        PHZ.meta.tags.(field) = categorical(PHZ.meta.tags.(field),cellstr(PHZ.(field)),'Ordinal',true);
-    end
-
-        
-        % empty grouping var if there are tags not represented
-        if ~isempty(PHZ.(field)) && ~all(ismember(PHZ.meta.tags.(field),PHZ.(field)))
-            PHZ.(field) = [];
+        % if there are tags not represented, empty grouping var
+        if ~isempty(PHZ.(field)) && ~all(ismember(cellstr(PHZ.meta.tags.(field)),cellstr(PHZ.(field))))
+%             PHZ.(field) = unique(PHZ.meta.tags.(field))';
+PHZ.(field) = [];
             resetStr = ' because it did not represent all trial tags';
         else resetStr = '';
         end
         
+
         % if empty grouping var, reset (auto-create) from tags
         if isempty(PHZ.(field))
             
-            PHZ.(field) = unique(PHZ.meta.tags.(field));
+            PHZ.(field) = unique(PHZ.meta.tags.(field))';
+            PHZ = phz_history(PHZ,[name,'.',field,' was reset',resetStr,'.'],verbose,0);
             
             % if numeric, order numerically
-            if ~any(isnan(str2double(PHZ.(field))))
-                PHZ.(field) = str2double(PHZ.(field));
-                PHZ.(field) = sort(PHZ.(field));
-                PHZ.(field) = cellstr(num2str(PHZ.(field)));
-                PHZ.(field) = strrep(PHZ.(field),' ','');
+            try
+                if ~any(isnan(str2double(PHZ.(field))))
+                    PHZ.(field) = str2double(PHZ.(field));
+                    PHZ.(field) = sort(PHZ.(field));
+                    PHZ.(field) = cellstr(num2str(PHZ.(field)));
+                    PHZ.(field) = strrep(PHZ.(field),' ','');
+                    PHZ = phz_history(PHZ,[name,'.',field,' was ordered numerically.'],verbose,0);
+                end
+            catch
             end
-            PHZ = phz_history(PHZ,['PHZ.',field,' was reset',resetStr,'.'],verbose,0);
+            
+            
         end
     end
+    
+            % make ordinal
+        if ~isempty(PHZ.(field))
+            PHZ.(field)           = categorical(PHZ.(field),          cellstr(PHZ.(field)),'Ordinal',true);
+            PHZ.meta.tags.(field) = categorical(PHZ.meta.tags.(field),cellstr(PHZ.(field)),'Ordinal',true);
+        end
 
     % verify spec
     do_resetSpec = [];

@@ -17,6 +17,6 @@ PHZ.history{end+1} = [datestr(now),' ',caller_function,'>> ',str];
 
 if verbose, disp(str), end
 
-if check, PHZ = phz_check(PHZ,0); end
+if check, PHZ = phz_check(PHZ,verbose); end
 
 end
