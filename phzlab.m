@@ -14,7 +14,7 @@ function phzlab
 %   phz_gather:      Gather many PHZ structures into a single one.
 %   phz_save:        Save a PHZ structure.
 %   phz_load:        Load a PHZ structure.
-% X phz_changefield: Change the fields of a PHZ structure.
+%   phz_field:       Change the fields of a PHZ structure.
 % 
 % PROCESSING
 % X phz_filter:      Butterworth filtering.
