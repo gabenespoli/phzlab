@@ -87,7 +87,9 @@ elseif iscell(subset)
 else error('Invalid input.')
 end
 
-
+inddata = logical(inddata);
+indall = logical(indall);
+indrej = logical(indrej);
 
 % adjust tags and grouping vars (also rej)
 for i = {'participant','group','session','trials'}, field = i{1};
@@ -97,7 +99,7 @@ end
 
 % adjust grouping vars
 for i = {'participant','group','session','trials'}, field = i{1};
-    if length(PHZ.(field)) ~= length(unique(PHZ.tags.(field)))
+    if length(PHZ.(field)) ~= length(unique(PHZ.meta.tags.(field)))
         ind = ismember(PHZ.(field),unique(PHZ.meta.tags.(field)));
         PHZ.(field)      = PHZ.(field)(ind);
         PHZ.meta.spec.(field) = PHZ.meta.spec.(field)(ind);
