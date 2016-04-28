@@ -130,7 +130,7 @@ for i = 1:length(feature)
         else addVars = keepVars;
         end
         
-        d = table(s.tags.(addVars{1}),'VariableNames',addVars(1));
+        d = table(s.meta.tags.(addVars{1}),'VariableNames',addVars(1));
         d.Properties.VariableUnits = {''};
         d.Properties.VariableDescriptions = {''};
         d.Properties.Description = [PHZ.study,' ',upper(PHZ.datatype),' data'];
