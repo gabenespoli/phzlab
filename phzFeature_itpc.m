@@ -1,5 +1,5 @@
-function [pc,f] = phzUtil_getitpc(y,Fs,varargin)
-%PHZUTIL_GETITPC  Intertrial phase coherence
+function [pc,f] = phzFeature_itpc(y,Fs,varargin)
+%PHZFEATURE_ITPC  Intertrial phase coherence
 %   [PC,F] = PHZUTIL_GETITPC(Y,FS) calculates the spectral phase coherence 
 %       amongst trials in dataset DATA with sampling frequency FS. ITPC 
 %       takes the complex FFT of each trial, sets the magnitude of each 
@@ -66,7 +66,7 @@ f = Fs / 2 * linspace(0,1,floor(nfft / 2) + 1); % create frequency vector
 
 % remove itpc of baseline
 if ~isempty(baseline)
-    bpc = phzUtil_getitpc(y(baseline,:),Fs,nfft);
+    bpc = phzFeature_itpc(y(baseline,:),Fs,nfft);
     pc = pc - bpc;
     pc(pc < 0) = 0;
 end

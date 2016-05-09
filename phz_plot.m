@@ -1,10 +1,9 @@
-function phz_plot(PHZ,varargin)
 %PHZ_PLOT  Plot data from PHZ and PHZS structures.
 % 
-% usage:    
-%     PHZ_PLOT(PHZ,'Param1','Value1',etc.)
+% USAGE    
+%     PHZ_PLOT(PHZ,'Param1',Value1,etc.)
 % 
-% input:   
+% INPUT   
 %     PHZ         = PHZLAB data structure
 %     'smooth'    = For line plots, apply a moving point average.
 %     'dispn'     = Display the number of trials or participants included
@@ -40,6 +39,8 @@ function phz_plot(PHZ,varargin)
 %   These are always executed in the order listed here, after the above
 %   processing funtions. See the help of each function for more details.
 %     'region'    = Calls phz_region.
+%     'feature'   = Calls phz_feature and makes bar plots instead of line
+%                   plots (excepting FFT and ITPC).
 %     'summary'   = Calls phz_summary. The default summary is 'all', which 
 %                   averages across all trials. A maximum of 2 summary 
 %                   variables can be specified; the first is plotted as 
@@ -51,6 +52,7 @@ function phz_plot(PHZ,varargin)
 %     plotted, as well as their colour and line style.
 % 
 % Written by Gabriel A. Nespoli 2016-02-16. Revised 2016-04-07.
+function phz_plot(PHZ,varargin)
 if nargout == 0 && nargin == 0, help phz_plot, return, end
 PHZ = phz_check(PHZ);
 
@@ -169,6 +171,15 @@ for p = 1:length(plotOrder)
     
     if ismember(PHZ.feature,{'fft','itfft','itpc'}) % FFT / PC plots
         if isempty(xtitleLoc) || xtitleLoc == p, xlabel('Frequency (Hz)'), end
+        
+        % custom FFT x-axis limits via PHZ.meta.spec.fftlim
+        if ismember('fftlim',fieldnames(PHZ.meta.spec))
+            if isnumeric(PHZ.meta.spec.fftlim) && isvector(PHZ.meta.spec.fftlim) && length(PHZ.meta.spec.fftlim) == 2
+                do_xl = false;
+                xl = PHZ.meta.spec.fftlim;
+            else warning('Problem with PHZ.meta.spec.fftlim. Using defaults.')
+            end
+        end
         
     elseif ismember(PHZ.feature,{'','time'}) % time series plots
         if isempty(xtitleLoc) || xtitleLoc == p, xlabel('Time (s)'), end

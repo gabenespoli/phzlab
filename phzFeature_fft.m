@@ -1,5 +1,5 @@
-function PHZ = phzUtil_getfft(PHZ,varargin)
-%PHZUTIL_GETFFT  Single-sided FFT for PHZ tables with spectrum options.
+function PHZ = phzFeature_fft(PHZ,varargin)
+%PHZFEATURE_FFT  Single-sided FFT for PHZ tables with spectrum options.
 %   [YFFT,F] = GETFFT(Y,FS) computes the fast Fourier transform and
 %       returns the single-sided spectrum YFFT and frequency bin vector
 %       F (in Hz) of signal Y and sampling rate FS. Like FFT, GETFFT
@@ -99,12 +99,12 @@ end
 
 % do baseline
 if ~isempty(baseline)
-    PHZb = phzUtil_getfft(PHZ,baseline,spectrum,nfft,winType); % spectrum of baseline
+    PHZb = phzFeature_fft(PHZ,baseline,spectrum,nfft,winType); % spectrum of baseline
     PHZ.data = PHZ.data-PHZb.data; % subtract baseline spectrum from target spectrum
     PHZ.data(PHZ.data < 0) = 0; % set negative values to zero
 end
 
-PHZ = phzUtil_history(PHZ,['Calculated ',spectrum,' spectrum.'],verbose);
+PHZ = phz_history(PHZ,['Calculated ',spectrum,' spectrum.'],verbose);
 
 % clear out blc values
 if ismember('blc',fieldnames(PHZ))

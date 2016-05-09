@@ -1,9 +1,9 @@
 function PHZ = phz_check(PHZ,verbose)
 % PHZ_CHECK  Verify and fix a PHZLAB data structure.
-% 
-% usage:    
+%
+% usage:
 %     PHZ = phz_check(PHZ)
-% 
+%
 % Written by Gabriel A. Nespoli 2016-02-08. Revised 2016-04-12.
 if nargout == 0 && nargin == 0, help phz_check, end
 if nargin < 2, verbose = true; end
@@ -93,13 +93,13 @@ for i = {'participant','group','session','trials'}, field = i{1};
         
         % if there are tags not represented, empty grouping var
         if ~isempty(PHZ.(field)) && ~all(ismember(cellstr(PHZ.meta.tags.(field)),cellstr(PHZ.(field))))
-%             PHZ.(field) = unique(PHZ.meta.tags.(field))';
-PHZ.(field) = [];
+            %             PHZ.(field) = unique(PHZ.meta.tags.(field))';
+            PHZ.(field) = [];
             resetStr = ' because it did not represent all trial tags';
         else resetStr = '';
         end
         
-
+        
         % if empty grouping var, reset (auto-create) from tags
         if isempty(PHZ.(field))
             
@@ -122,12 +122,12 @@ PHZ.(field) = [];
         end
     end
     
-            % make ordinal
-        if ~isempty(PHZ.(field)) && all(~isundefined(PHZ.(field)))
-            PHZ.(field)           = categorical(PHZ.(field),          cellstr(PHZ.(field)),'Ordinal',true);
-            PHZ.meta.tags.(field) = categorical(PHZ.meta.tags.(field),cellstr(PHZ.(field)),'Ordinal',true);
-        end
-
+    % make ordinal
+    if ~isempty(PHZ.(field)) && all(~isundefined(PHZ.(field)))
+        PHZ.(field)           = categorical(PHZ.(field),          cellstr(PHZ.(field)),'Ordinal',true);
+        PHZ.meta.tags.(field) = categorical(PHZ.meta.tags.(field),cellstr(PHZ.(field)),'Ordinal',true);
+    end
+    
     % verify spec
     do_resetSpec = [];
     if ~isempty(PHZ.(field))
@@ -260,20 +260,20 @@ if ismember('norm',fieldnames(PHZ.proc))
     verifyNumeric(PHZ.proc.norm.mean,[name,'.proc.norm.mean'],verbose);
     verifyNumeric(PHZ.proc.norm.stDev,[name,'.proc.norm.stDev'],verbose);
     verifyChar(PHZ.proc.norm.oldUnits,[name,'.proc.norm.oldUnits'],verbose);
-%     for i = {'mean','stDev'}, field = i{1};
-%         if length(PHZ.proc.norm.(field)) == 1, continue, end
-%         
-%         if ismember('rej',fieldnames(PHZ.proc))
-%             if length(PHZ.proc.norm.(field)) ~= size(PHZ.data,1) + size(PHZ.proc.rej.data,1)
-%                 error([name,'.proc.norm.',field,' should either be of ',...
-%                     'length 1 or the same length as the number of trials.'])
-%             end
-%             
-%         elseif length(PHZ.proc.norm.(field)) ~= size(PHZ.data,1)
-%             error([name,'.proc.norm.',field,' should either be of ',...
-%                 'length 1 or the same length as the number of trials.'])
-%         end
-%     end
+    %     for i = {'mean','stDev'}, field = i{1};
+    %         if length(PHZ.proc.norm.(field)) == 1, continue, end
+    %
+    %         if ismember('rej',fieldnames(PHZ.proc))
+    %             if length(PHZ.proc.norm.(field)) ~= size(PHZ.data,1) + size(PHZ.proc.rej.data,1)
+    %                 error([name,'.proc.norm.',field,' should either be of ',...
+    %                     'length 1 or the same length as the number of trials.'])
+    %             end
+    %
+    %         elseif length(PHZ.proc.norm.(field)) ~= size(PHZ.data,1)
+    %             error([name,'.proc.norm.',field,' should either be of ',...
+    %                 'length 1 or the same length as the number of trials.'])
+    %         end
+    %     end
 end
 
 %% meta (except tags & spec)
@@ -401,7 +401,7 @@ function PHZ = backwardsCompatibility(PHZ,verbose)
 
 % swap grouping and order vars, add tags (older than v0.7.7)
 if ~ismember('tags',fieldnames(PHZ)) && ~ismember('meta',fieldnames(PHZ))
-
+    
     for i = {'participant','group','session','trials'}, field = i{1};
         PHZ.tags.(field) = PHZ.(field);
         PHZ.(field) = PHZ.spec.([field,'_order']);
@@ -412,23 +412,23 @@ if ~ismember('tags',fieldnames(PHZ)) && ~ismember('meta',fieldnames(PHZ))
     PHZ.spec.region = PHZ.spec.region_spec;
     PHZ.spec = rmfield(PHZ.spec,{'region_order','region_spec'});
     PHZ = phz_history(PHZ,'Converted PHZ structure to v0.7.7.',verbose,0);
-
+    
 end
 
 % if ~ismember('meta',fieldnames(PHZ)), PHZ.meta = struct; end
 % if ~ismember('proc',fieldnames(PHZ)), PHZ.proc = struct; end
-% 
+%
 % % change field 'regions' to 'region'
 % if ismember('regions',fieldnames(PHZ))
 %     PHZ.region = PHZ.regions;
 %     PHZ = rmfield(PHZ,'regions');
 % end
-% 
+%
 % if ismember('regions',fieldnames(PHZ.meta.tags))
 %     PHZ.meta.tags.region = PHZ.meta.tags.regions;
 %     PHZ.meta.tags = rmfield(PHZ.meta.tags,'regions');
 % end
-% 
+%
 % if ismember('regions',fieldnames(PHZ.meta.spec))
 %     PHZ.meta.spec.region = PHZ.meta.spec.regions;
 %     PHZ.meta.spec = rmfield(PHZ.meta.spec,'regions');
@@ -506,7 +506,7 @@ mainOrder = {
     'group'
     'session'
     'trials'
-
+    
     'summary'
     'region'
     

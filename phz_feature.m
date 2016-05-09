@@ -1,17 +1,16 @@
-function [PHZ,featureTitle] = phz_feature(PHZ,feature,varargin)
 %PHZ_FEATURE  Calculate the specified feature on each trial.
 % 
-% usage:    
-%     PHZ = phz_feature(PHZ,FEATURE)
-%     PHZ = phz_feature(PHZ,FEATURE,'Param1,'Value1',etc.)
+% USAGE
+%     PHZ = phz_feature(PHZ,feature)
+%     PHZ = phz_feature(PHZ,feature,'Param1,Value1,etc.)
 % 
-% inputs:   
+% INPUT   
 %     PHZ       = PHZLAB data structure.
 % 
-%     FEATURE   = String specifying the desired feature. Possible features
-%                 are listed below.
+%     feature   = [string] Specifies the desired feature. Possible 
+%                 features are listed below.
 % 
-%     'region'  = Calls phz_region to restrict the time or frequency 
+%     'region'  = Calls phz_region.m to restrict the time or frequency 
 %                 region used for feature extration.
 % 
 %     'summary' = Summarizes the resulting features by averaging 
@@ -71,14 +70,16 @@ function [PHZ,featureTitle] = phz_feature(PHZ,feature,varargin)
 %         all trials are included regardless of whether or not 
 %         they are rejected.
 %
-% outputs:  
+% OUTPUT  
 %     PHZ.data    = The data of the extracted feature for each trial.
 %     PHZ.feature = The value specified in FEATURE.
 % 
-% examples:
+% EXAMPLES
 %     PHZ = phz_feature(PHZ,'mean')
 % 
-% Written by Gabriel A. Nespoli 2016-02-15. Revised 2016-04-07.
+% Written by Gabriel A. Nespoli 2016-02-15. Revised 2016-05-09.
+function [PHZ,featureTitle] = phz_feature(PHZ,feature,varargin)
+
 if nargout == 0 && nargin == 0, help phz_feature, return, end
 
 % defaults
@@ -123,7 +124,7 @@ switch lower(feature)
         end
         
         % get fft
-        PHZ = phzUtil_getfft(PHZ,'verbose',verbose);
+        PHZ = phzFeature_fft(PHZ,'verbose',verbose);
         
     case 'itpc'
         % if PHZS has already been summary'd, phzUtil_itpc will have to
@@ -132,6 +133,15 @@ switch lower(feature)
     case 'itrc'
         % if PHZS has already been summary'd, phzUtil_itrc will have to
         %   load each file again to calculate it
+        
+    case 'src'
+        featureTitle = 'Stimulus-Response Correlation';
+        PHZ = phzFeature_src(PHZ,'corr');
+        
+    case 'srclag'
+        featureTitle = 'Stimulus-Response Lag';
+        PHZ = phzFeature_src(PHZ,'lag');
+        PHZ.units = 's';
         
     otherwise % features
         
@@ -175,7 +185,7 @@ switch lower(feature)
                 if strcmp(feature,'rt'), feature = 'rt1'; end
                 PHZ.data = PHZ.resp.(['q',feature(3),'_rt']);
                 PHZ.units = 's';
-            otherwise, error('Unknown feature.')
+            otherwise, error([feature,' is an unknown feature.'])
         end
         
         % convert from indices to times if feature is latency
