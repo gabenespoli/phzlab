@@ -123,7 +123,7 @@ PHZ.(field) = [];
     end
     
             % make ordinal
-        if ~isempty(PHZ.(field)) && ~isundefined(PHZ.(field))
+        if ~isempty(PHZ.(field)) && all(~isundefined(PHZ.(field)))
             PHZ.(field)           = categorical(PHZ.(field),          cellstr(PHZ.(field)),'Ordinal',true);
             PHZ.meta.tags.(field) = categorical(PHZ.meta.tags.(field),cellstr(PHZ.(field)),'Ordinal',true);
         end
