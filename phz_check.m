@@ -123,7 +123,7 @@ PHZ.(field) = [];
     end
     
             % make ordinal
-        if ~isempty(PHZ.(field))
+        if ~isempty(PHZ.(field)) && ~isundefined(PHZ.(field))
             PHZ.(field)           = categorical(PHZ.(field),          cellstr(PHZ.(field)),'Ordinal',true);
             PHZ.meta.tags.(field) = categorical(PHZ.meta.tags.(field),cellstr(PHZ.(field)),'Ordinal',true);
         end
@@ -532,6 +532,7 @@ PHZ = orderfields(PHZ,mainOrder);
 
 % meta structure
 % --------------
+
 metaOrder = {
     'tags'
     'spec'
