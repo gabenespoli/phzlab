@@ -1,55 +1,54 @@
 function phz_plot(PHZ,varargin)
 %PHZ_PLOT  Plot data from PHZ and PHZS structures.
 % 
-% usage:    PHZ_PLOT(PHZ,'Param1','Value1',etc.)
+% usage:    
+%     PHZ_PLOT(PHZ,'Param1','Value1',etc.)
 % 
-% inputs:   PHZ         = PHZLAB data structure
-%           'smooth'    = For line plots, apply a moving point average.
-%           'dispn'     = Display the number of trials or participants 
-%                         included in each line or bar plotted. Enter 
-%                         'participant', 'trials', 'both', or 'none'.
-%           'legend'    = For line plots, specify the location of the
-%                          legend. Enter 'nw' (default) for top-left, etc., 
-%                         or '' (empty) to suppress the legend.
-%           'linewidth' = For line plots, specify the width of the line in
-%                         pixels. Default 2.
-%           'fontsize'  = Specify the font size of titles. Default 14.
-%           'xl'        = For line plots, Specify the x-axis limits in 
-%                         seconds or Hertz for time and frequency plots 
-%                         respectively.
-%           'yl'        = Specify the y-axis limits of plots.
-%           'sameyl'    = Force the positive and negative y-axis limit to 
-%                         be the same. If data are roughly centered on 
-%                         zero, this is applied automatically. Enter 1 
-%                         (true) or 0 (false) to manually use this 
-%                         functionality.
+% input:   
+%     PHZ         = PHZLAB data structure
+%     'smooth'    = For line plots, apply a moving point average.
+%     'dispn'     = Display the number of trials or participants included
+%                   in each line or bar plotted. Enter 'participant', 
+%                   'trials', 'both', or 'none'.
+%     'legend'    = For line plots, specify the location of the legend.
+%                   Enter 'nw' (default) for top-left, etc., or '' (empty) 
+%                   to suppress the legend.
+%     'linewidth' = For line plots, specify the width of the line in
+%                   pixels. Default 2.
+%     'fontsize'  = Specify the font size of titles. Default 14.
+%     'xl'        = For line plots, Specify the x-axis limits in seconds
+%                   or Hertz for time and frequency plots respectively.
+%     'yl'        = Specify the y-axis limits of plots.
+%     'sameyl'    = Force the positive and negative y-axis limit to be the
+%                   same. If data are roughly centered on zero, this is 
+%                   applied automatically. Enter 1 (true) or 0 (false) to 
+%                   manually use this functionality.
+%     'pretty'    = [0|1] Setting this to 1 makes the background white and
+%                   removes the top x-axis and right y-axis.
 %   
-%           The following functions can be called as parameter/value pairs,
-%           and are executed in the same order as they appear in the
-%           function call. See the help of each function for more details.
-%               'subset'    = Calls phz_subset.
-%               'rectify'   = Calls phz_rect.
-%               'filter'    = Calls phz_filter.
-%               'smooth'    = Calls phz_smooth.
-%               'transform' = Calls phz_transform.
-%               'blc'       = Calls phz_blc.
-%               'rej'       = Calls phz_rej.
-%               'norm'      = Calls phz_norm.
+%   These are executed in the order that they appear in the function call. 
+%   See the help of each function for more details.
+%     'subset'    = Calls phz_subset.
+%     'rectify'   = Calls phz_rect.
+%     'filter'    = Calls phz_filter.
+%     'smooth'    = Calls phz_smooth.
+%     'transform' = Calls phz_transform.
+%     'blc'       = Calls phz_blc.
+%     'rej'       = Calls phz_rej.
+%     'norm'      = Calls phz_norm.
 % 
-%           The following functions can be called as parameter/value pairs,
-%           and are always executed in the order listed here, after all of
-%           the processing funtions. See the help of each function for more
-%           details.
-%               'region'    = Calls phz_region.
-%               'summary'   = Calls phz_summary. The default summary is
-%                             'all', which averages across all trials. A
-%                             maximum of 2 summary variables can be
-%                             specified; the first is plotted as separate
-%                             lines/bars, and the second is plotted across
-%                             separate plots.
+%   These are always executed in the order listed here, after the above
+%   processing funtions. See the help of each function for more details.
+%     'region'    = Calls phz_region.
+%     'summary'   = Calls phz_summary. The default summary is 'all', which 
+%                   averages across all trials. A maximum of 2 summary 
+%                   variables can be specified; the first is plotted as 
+%                   separate lines/bars, and the second is plotted across
+%                   separate plots.
 % 
-% outputs:  Use phz_changefield to edit the order in which lines and bars
-%           are plotted, as well as their colour and line style.
+% output:  
+%     Use phz_changefield to edit the order in which lines and bars are
+%     plotted, as well as their colour and line style.
 % 
 % Written by Gabriel A. Nespoli 2016-02-16. Revised 2016-04-07.
 if nargout == 0 && nargin == 0, help phz_plot, return, end
@@ -69,6 +68,7 @@ fontsize = 14;
 yl = [];
 xl = [];
 sameyl = [];
+pretty = false;
 
 verbose = true;
 
@@ -102,6 +102,7 @@ for i = 1:2:length(varargin)
         case {'yl','ylim'},             yl = varargin{i+1};
         case {'xl','xlim'},             xl = varargin{i+1};
         case 'sameyl',                  sameyl = varargin{i+1};
+        case 'pretty',                  pretty = varargin{i+1};
     end
 end
 
@@ -242,8 +243,11 @@ for p = 1:length(plotOrder)
     
     % adjust font size
     set(gca,'FontSize',fontsize)
+    if pretty, set(gca,'box','off'), end
     
 end
+
+if pretty, set(gcf,'color','w'), end
 
 % Done phz_plot
 end

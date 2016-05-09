@@ -80,6 +80,7 @@ end
 loseVars = {'participant','group','session','trials'};
 loseVars(ismember(loseVars,keepVars)) = [];
 for i = loseVars, field = i{1};
+    
     PHZ.meta.tags.(field) = '<collapsed>';
 end
 

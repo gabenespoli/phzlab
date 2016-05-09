@@ -37,7 +37,7 @@ function phzlab
 %   phz_plot:        Visualize data as line or bar graphs.
 %   phz_writetable:  Export features to a MATLAB table or csv file.
 % 
-% Version 0.8.1 dev Written by Gabriel A. Nespoli 2016-04-06.
+% Version 0.8.2 dev Written by Gabriel A. Nespoli 2016-04-06.
 
 help phzlab
 

@@ -20,23 +20,30 @@ switch lower(datatype)
         
         disp('SAMPLE EMG WORKFLOW')
         disp('-------------------')
-        disp('opt 1a. rm mean, rectify, lowpass 5-100 Hz, then mean value.')
-        disp('opt 1b. rm mean, rectify, sliding window average, then mean value.')
-        disp('opt 2.  rm mean, sliding window RMS, then mean value.')
+        disp('1. Rectify: usually full-wave.')
+        disp('2. Smooth: either sliding average, RMS, or lowpass 5-100 Hz.')
+        disp('3. Reject: reject unusual data by threshold.')
+        disp('4. Transform: square root transformation to minimize positive skew.')
+        disp('5. Baseline-correct: ')
+        disp('6. Normalize: minimize inter-participant variability in responsiveness.')
         
-        disp(' ')
-        
-        disp('Likowski et al. 2012: rectify, filter [30 500 50], 125ms moving avg, rej 8µV baseline or 30µV target')
-        disp('Tierney Lindsay et al. 2011: rectify, smooth(?), blc, norm')
-        disp('so... rectify, filter, smooth, rej, blc, norm')
-        
-        disp(' ')
-        
-        disp('phz_filter:    HP 10-50; LP 400-500')
-        disp('phz_rect:      full or half wave rectification')
-        disp('phz_rej:       artifact rejection')
-        disp('phz_transform: square root transformation to minimize positive skew')
-        disp('phz_norm:      minimize inter-participant variability in responsiveness')
+%         disp('opt 1a. rm mean, rectify, lowpass 5-100 Hz, then mean value.')
+%         disp('opt 1b. rm mean, rectify, sliding window average, then mean value.')
+%         disp('opt 2.  rm mean, sliding window RMS, then mean value.')
+%         
+%         disp(' ')
+%         
+%         disp('Likowski et al. 2012: rectify, filter [30 500 50], 125ms moving avg, rej 8µV baseline or 30µV target')
+%         disp('Tierney Lindsay et al. 2011: rectify, smooth(?), blc, norm')
+%         disp('so... rectify, filter, smooth, rej, blc, norm')
+%         
+%         disp(' ')
+%         
+%         disp('phz_filter:    HP 10-50; LP 400-500')
+%         disp('phz_rect:      full or half wave rectification')
+%         disp('phz_rej:       artifact rejection')
+%         disp('phz_transform: square root transformation to minimize positive skew')
+%         disp('phz_norm:      minimize inter-participant variability in responsiveness')
         
     
         

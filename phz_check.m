@@ -1,7 +1,8 @@
 function PHZ = phz_check(PHZ,verbose)
 % PHZ_CHECK  Verify and fix a PHZLAB data structure.
 % 
-% usage:    PHZ = phz_check(PHZ)
+% usage:    
+%     PHZ = phz_check(PHZ)
 % 
 % Written by Gabriel A. Nespoli 2016-02-08. Revised 2016-04-12.
 if nargout == 0 && nargin == 0, help phz_check, end
@@ -281,7 +282,7 @@ end
 if ismember('filename',fieldnames(PHZ.meta))
     verifyChar(PHZ.meta.filename,[name,'.meta.filename'],verbose);
     if ~exist(PHZ.meta.filename,'file')
-        warning('The filename for this PHZ file doesn''t seem to exist...')
+        disp('The filename for this PHZ file doesn''t seem to exist...')
     end
 end
 

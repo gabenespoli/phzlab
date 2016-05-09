@@ -3,14 +3,17 @@ function PHZ = phz_field(PHZ,field,verbose)
 %   PHZ_FIELD opens a dialog with current values of the PHZ structure that
 %   can be edited.
 % 
-% usage:    PHZ = phz_field(PHZ)
-%           PHZ = phz_field(PHZ,FIELD)
+% usage:    
+%     PHZ = phz_field(PHZ)
+%     PHZ = phz_field(PHZ,FIELD)
 % 
-% inputs:   PHZ   = PHZLAB data structure.
-%           FIELD = String specifying the type of fields to change. Options
-%                   are 'basic' (default), 'region'.
+% input:   
+%     PHZ   = PHZLAB data structure.
+%     FIELD = String specifying the type of fields to change. Options are
+%             'basic' (default), 'region'.
 % 
-% outputs:  PHZ = PHZLAB data structure with fields adjusted.
+% output:  
+%     PHZ = PHZLAB data structure with fields adjusted.
 % 
 % Written by Gabriel A. Nespoli 2016-03-24. Revised 2016-04-12.
 if nargin == 0 && nargout == 0, hel phz_field, return, end

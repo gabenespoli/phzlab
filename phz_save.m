@@ -20,7 +20,7 @@ function PHZ = phz_save(PHZ,varargin)
 if nargout == 0 && nargin == 0, help phz_save, return, end
 
 if nargin == 1
-    [filename,pathname] = uiputfile({'*.phz';'*.*'});
+    [filename,pathname] = uiputfile({'*.phz';'*.*'},'Select file to write',[inputname(1),'.phz']);
     filename = fullfile(pathname,filename);
 end
 

@@ -1,33 +1,35 @@
 function PHZ = phz_rej(PHZ,threshold,varargin)
 %PHZ_REJ  Remove trials containing values exceeding a threshold.
 %
-% usage:    PHZ = PHZ_REJ(PHZ,THRESHOLD)
-%           PHZ = PHZ_REJ(PHZ,THRESHOLD,REJTYPE)
+% usage:    
+%     PHZ = PHZ_REJ(PHZ,THRESHOLD)
+%     PHZ = PHZ_REJ(PHZ,THRESHOLD,REJTYPE)
 % 
-% inputs:   PHZ       = PHZLAB data structure.
-%           THRESHOLD = Trials with any value exceeding the value of
-%                       THRESHOLD will be rejected. Enter 0 to unreject
-%                       all trials.
-%           REJTYPE   = The units of THRESHOLD. Default is 'threshold' 
-%                       (i.e., the same units as PHZ.units). Enter 'sd'
-%                       to reject a trial if any value exceeds a THRESHOLD 
-%                       number of that trial's standard deviation.
+% input:   
+%     PHZ         = PHZLAB data structure.
+%     THRESHOLD   = Trials with any value exceeding the value of THRESHOLD
+%                   will be rejected. Enter 0 to unreject all trials.
+%     REJTYPE     = The units of THRESHOLD. Default is 'threshold' (i.e., the
+%                   same units as PHZ.units). Enter 'sd' to reject a trial if
+%                   any value exceeds a THRESHOLD Number of that trial's
+%                   standard deviation.
 %                       
-% outputs:  PHZ.proc.rej.threshold   = The value specified in THRESHOLD.
-%           PHZ.proc.rej.units       = The units of the threshold value.
-%           PHZ.proc.rej.data        = Data of rejected trials.
-%           PHZ.proc.rej.locs        = Indices of rejected trials.
-%           PHZ.proc.rej.data_locs   = Indices of retained trials.
-%           PHZ.proc.rej.participant = Participant tags of rejected trials.
-%           PHZ.proc.rej.group       = Group tags of rejected trials.
-%           PHZ.proc.rej.session     = Session tags of rejected trials.
-%           PHZ.proc.rej.trials      = Trials trags of rejected trials.
+% output:  
+%     PHZ.proc.rej.threshold   = The value specified in THRESHOLD.
+%     PHZ.proc.rej.units       = The units of the threshold value.
+%     PHZ.proc.rej.data        = Data of rejected trials.
+%     PHZ.proc.rej.locs        = Indices of rejected trials.
+%     PHZ.proc.rej.data_locs   = Indices of retained trials.
+%     PHZ.proc.rej.participant = Participant tags of rejected trials.
+%     PHZ.proc.rej.group       = Group tags of rejected trials.
+%     PHZ.proc.rej.session     = Session tags of rejected trials.
+%     PHZ.proc.rej.trials      = Trials trags of rejected trials.
 % 
 % examples:
-%   PHZ = phz_rej(PHZ,20)     >> Reject all trials with a value > 20.
-%   PHZ = phz_rej(PHZ,3,'sd') >> Reject trials with a value > 3 standard
-%                                deviations from the mean of all trials.
-%   PHZ = phz_rej(PHZ,0)      >> Restore all rejected trials.
+%     PHZ = phz_rej(PHZ,20)     >> Reject all trials with a value > 20.
+%     PHZ = phz_rej(PHZ,3,'sd') >> Reject trials with a value > 3 standard
+%                                  deviations from the mean of all trials.
+%     PHZ = phz_rej(PHZ,0)      >> Restore all rejected trials.
 %
 % Written by Gabriel A. Nespoli 2016-01-27. Revised 2016-04-06.
 if nargout == 0 && nargin == 0, help phz_rej, return, end
@@ -47,6 +49,13 @@ for i = 1:length(varargin)
         rejtype = varargin{i};
         
     end
+end
+
+% check input
+if ischar(threshold) && strcmpi(threshold(end-1:end),'sd')
+    rejtype = 'sd';
+    threshold = str2double(threshold(1:end-2));
+elseif ~isnumeric(threshold), error('Problem with THRESHOLD.')
 end
 
 % get indices of artifacts and copy them to PHZ.rej.locs

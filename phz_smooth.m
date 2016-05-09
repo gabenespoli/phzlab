@@ -1,43 +1,42 @@
-function PHZ = phz_smooth(PHZ,win,varargin)
-%PHZ_SMOOTH  Smooth data with a sliding window average or RMS
+function PHZ = phz_smooth(PHZ,win,verbose)
+%PHZ_SMOOTH  Smooth data with a sliding window average or RMS. The mean/RMS
+%   of the window is calculated, and the window is shifted by one sample
+%   until the end of the signal. Note that the smoothed signal will be
+%   shorter than the original signal.
 % 
-% usage:    PHZ = phz_smooth(PHZ)
-%           PHZ = phz_smooth(PHZ,WIN)
-%           PHZ = phz_smooth(PHZ,SMOOTHTYPE)
+% usage:    
+%     PHZ = phz_smooth(PHZ)
+%     PHZ = phz_smooth(PHZ,WIN)
+%     PHZ = phz_smooth(PHZ,SMOOTHTYPE)
 % 
-% inputs:   PHZ =        PHZLAB data structure.
-%           WIN =        Sliding window length in milliseconds (if >= 1)
-%                        or proportion of total epoch length. Default 0.05
-%                        (5% of the total epoch length).
-%           SMOOTHTYPE = String specifying 'mean' or 'rms', and optionally
-%                        the window length (i.e., default is 'mean0.05'; 
-%                        default RMS window is 100 ms).
+% input:   
+%     PHZ         = PHZLAB data structure.
 % 
-% outputs:  PHZ.data = The smoothed data.
+%     WIN         = Sliding window length in milliseconds (if >= 1)
+%                   or proportion of total epoch length. Default 0.05
+%                   (5% of the total epoch length).
+% 
+%     SMOOTHTYPE  = String specifying 'mean' or 'rms', and optionally
+%                   the window length (i.e., default is 'mean0.05'; 
+%                   default RMS window is 100 ms).
+% 
+% output:  
+%     PHZ.data = The smoothed data.
 % 
 % examples:
-%   PHZ = phz_smooth(PHZ,500)      >> 0.5-second sliding window average.
-%   PHZ = phz_smooth(PHZ,0.1)      >> Sliding window length is 10% of total
-%                                     data length; e.g., 1s for 10s signal.
-%   PHZ = phz_smooth(PHZ,'rms')    >> Sliding average of RMS with a 0.1s 
-%                                     sliding window.
-%   PHZ = phz_smooth(PHZ,'rms50') >> Sliding average of RMS with a 0.05s
-%                                     sliding window.
+%     PHZ = phz_smooth(PHZ,500) >> 0.5-second sliding window average.
+%     PHZ = phz_smooth(PHZ,0.1) >> Sliding window length is 10% of total
+%                                  data length; e.g., 1s for 10s signal.
+%     PHZ = phz_smooth(PHZ,'rms') >> Sliding average of RMS with a 0.1s 
+%                                    sliding window.
+%     PHZ = phz_smooth(PHZ,'rms50') >> Sliding average of RMS with a 0.05s
+%                                    sliding window.
 % 
 % Written by Gabriel A. Nespoli 2016-03-14. Revised 2016-04-06.
-if nargout == 0 && nargin == 0, help phz_smooth, end
+if nargout == 0 && nargin == 0, help phz_smooth, return, end
 if nargin == 1, win = 0.05; end
 if nargin > 1 && isempty(win), return, end
-
-% defaults
-verbose = true;
-
-% user-defined
-for i = 1:2:length(varargin)
-    switch lower(varargin{i})
-        case 'verbose', verbose = varargin{i+1};
-    end
-end
+if nargin < 3, verbose = true; end
 
 % parse input
 if ischar(win)

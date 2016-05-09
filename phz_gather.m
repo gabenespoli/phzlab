@@ -1,40 +1,41 @@
 function PHZS = phz_gather(varargin)
 %PHZ_GATHER  Create a PHZS structure of data from many PHZ structures.
 % 
-% usage:    PHZ = phz_gather
-%           PHZ = phz_gather(FOLDER)
-%           PHZ = phz_gather(...,'Param1','Value1',etc.)
+% usage:    
+%     PHZ = phz_gather
+%     PHZ = phz_gather(FOLDER)
+%     PHZ = phz_gather(...,'Param1','Value1',etc.)
 % 
-% inputs:   (none) = Opens a file browser to select files to gather.
-%           FOLDER = Gather all .phz files in this folder.
-%           'save' = Filename and path to save resultant PHZ structure
-%                    as a .phz file.
+% input:   
+%     (none) = Opens a file browser to select files to gather.
+% 
+%     FOLDER = Gather all .phz files in this folder.
+% 
+%     'save' = Filename and path to save PHZ structure as a '.phz' file.
 %           
-%           The following functions can be called as parameter/value pairs,
-%           and are executed in the same order as they appear in the
-%           function call. See the help of each function for more details.
-%               'subset'    = Calls phz_subset.
-%               'rectify'   = Calls phz_rect.
-%               'filter'    = Calls phz_filter.
-%               'smooth'    = Calls phz_smooth.
-%               'transform' = Calls phz_transform.
-%               'blc'       = Calls phz_blc.
-%               'rej'       = Calls phz_rej.
-%               'norm'      = Calls phz_norm.
+%   These are executed in the order that they appear in the function call. 
+%   See the help of each function for more details.
+%     'subset'    = Calls phz_subset.
+%     'rectify'   = Calls phz_rect.
+%     'filter'    = Calls phz_filter.
+%     'smooth'    = Calls phz_smooth.
+%     'transform' = Calls phz_transform.
+%     'blc'       = Calls phz_blc.
+%     'rej'       = Calls phz_rej.
+%     'norm'      = Calls phz_norm.
 % 
-%           The following functions can be called as parameter/value pairs,
-%           and are always executed in the order listed here, after all of
-%           the processing funtions. See the help of each function for more
-%           details.
-%               'region'    = Calls phz_region.
-%               'summary'   = Calls phz_summary.
+%   These are always executed in the order listed here, after the above
+%   processing funtions. See the help of each function for more details.
+%     'region'    = Calls phz_region.
+%     'summary'   = Calls phz_summary.
 % 
-% outputs:  PHZ = Gathered PHZLAB data structure. More-or-less a
-%                 concatnated version of all input PHZ structures.
+% output:  
+%     PHZ = Gathered PHZLAB data structure. More-or-less a concatnated 
+%           version of all input PHZ structures.
 % 
 % examples:
-%   PHZ = phz_gather >> Opens a file browser to select multiple files.
-%   PHZ = phz_gather('myfolder') >> Gathers all .phz files in myfolder.
+%     PHZ = phz_gather >> Opens a file browser to select multiple files.
+%  x  PHZ = phz_gather('myfolder') >> Gathers all .phz files in myfolder.
 %
 % Written by Gabriel A. Nespoli 2016-02-21. Revised 2016-04-04.
 if nargout == 0 && nargin == 0, help phz_gather, return, end

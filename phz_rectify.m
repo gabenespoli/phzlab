@@ -1,18 +1,21 @@
 function PHZ = phz_rectify(PHZ,recttype,verbose)
 %PHZ_RECTIFY  Full- or half-wave rectification.
 % 
-% usage:    PHZ = phz_rectify(PHZ,RECTTYPE)
+% usage:    
+%     PHZ = phz_rectify(PHZ,RECTTYPE)
 % 
-% inputs:   PHZ         = PHZLAB data structure.
-%           RECTTYPE    = Type of rectification to perform. Enter 'full'
-%                         to take the absolute value of each data point,
-%                         or 'half' to set all negative values to 0.
+% input:   
+%     PHZ         = PHZLAB data structure.
+%     RECTTYPE    = Type of rectification to perform. Enter 'full' to take
+%                   the absolute value of each data point, or 'half' to set
+%                   all negative values to 0.
 % 
-% outputs:  PHZ.data    = Rectified data.
+% output:  
+%     PHZ.data    = Rectified data.
 % 
 % examples:
-%   PHZ = phz_rectify(PHZ,'full')  >> Full-wave rectification.
-%   PHZ = phz_rectify(PHZ,'half')  >> Half-wave rectification.
+%     PHZ = phz_rectify(PHZ,'full')  >> Full-wave rectification.
+%     PHZ = phz_rectify(PHZ,'half')  >> Half-wave rectification.
 %
 % Written by Gabriel A. Nespoli 2016-01-27. Revised 2016-04-01.
 if nargout == 0 && nargin == 0, help phz_rectify, return, end
