@@ -1,17 +1,13 @@
-function PHZ = phz_create(filetype,files,varargin)
 %PHZ_CREATE  Create a new PHZ structure.
 % 
 % USAGE
 %     PHZ = phz_create
-%     PHZ = phz_create(filetype)
-%     PHZ = phz_create(filetype,files)
-%     PHZ = phz_create(filetype,folder)
-%     PHZ = phz_create(filetype,...,'Param1','Value1',etc.)
+%     PHZ = phz_create(files)
+%     PHZ = phz_create(folder)
+%     PHZ = phz_create(files,...,'Param1',Value1,etc.)
 % 
 % INPUT   
 %     PHZ         = PHZLAB data structure.
-% 
-%     filetype    = The type of file to import. Options are 'acq'
 % 
 %     files       = String or cell array of strings specifying the file(s) 
 %                   to import. If left empty, a dialog box pops up for you 
@@ -81,12 +77,14 @@ function PHZ = phz_create(filetype,files,varargin)
 %                       on line types.
 %     tags.*          = Grouping-variable tags for each trial.
 %
-% Written by Gabe Nespoli 2016-01-27. Revised 2016-04-01.
+% Written by Gabe Nespoli 2016-01-27. Revised 2016-05-09.
+
+function PHZ = phz_create(files,varargin)
 
 if nargout == 0 && nargin == 0, help phz_create, return
 elseif nargout == 0 && nargin > 0, error('Assign an output argument.')
 end
-if nargin == 0 || isempty(filetype), PHZ = getBlankPHZ(1); return, end
+if nargin == 0, PHZ = getBlankPHZ(1); return, end
 
 % defaults
 study = '';
@@ -97,7 +95,7 @@ study = '';
 channel = 1;
 delimiter = '-';
 
-% filetype = 'acq';
+filetype = 'acq';
 savefolder = 0;
 verbose = true;
 
@@ -137,7 +135,7 @@ for i = 1:2:length(varargin)
         case 'channel',                 channel = varargin{i+1};
         case 'delimiter',               delimiter = varargin{i+1};
         
-%         case 'filetype',                filetype = varargin{i+1};
+        case 'filetype',                filetype = varargin{i+1};
         case {'save','filename'},       savefolder = varargin{i+1};
         case 'verbose',                 verbose = varargin{i+1};
     end
@@ -183,7 +181,7 @@ for i = 1:length(files)
             end
             
             PHZ.data = transpose(s.data(:,channel));
-            PHZ.meta.times = (s.start_sample:1:length(PHZ.data)) / PHZ.srate;
+            PHZ.times = (s.start_sample:1:length(PHZ.data)-1) / PHZ.srate;
             
         otherwise, error('Unknown file type.')
     end
@@ -238,8 +236,8 @@ PHZ.resp.q5_rt = [];
 
 PHZ.proc = struct;
 
-PHZ.meta.srate = []; % sampling frequency in Hz
-PHZ.meta.times = []; % in seconds
+PHZ.srate = []; % sampling frequency in Hz
+PHZ.times = []; % in seconds
 
 PHZ.meta.tags.participant = categorical;
 PHZ.meta.tags.group = categorical;
@@ -258,6 +256,6 @@ PHZ.misc = struct;
 PHZ.history = {};
 
 % add creation date to FFR.history
-PHZ = phzUtil_history(PHZ,'PHZ structure created.',verbose);
+PHZ = phz_history(PHZ,'PHZ structure created.',verbose);
 
 end

@@ -1,7 +1,21 @@
-function PHZ = phz_epoch(PHZ,markerTimes,extractWindow,varargin)
 %PHZ_EPOCH  Split a PHZ structure into trials.
-% 
-% PHZ = PHZ_EPOCH(PHZ,MARKERTIMES,EXTRACTWINDOW) finds epochs in 
+%
+% USAGE
+%   PHZ = phz_epoch(PHZ,times,win)
+%   PHZ = phz_epoch(PHZ,times,win,'Param1',Value1,etc.)
+%
+% INPUTS
+%   PHZ       = [struct] PHZLAB data structure.
+%
+%   times     = [numeric|string] If a vector, the sample numbers from where
+%               to extract epochs. If a string, a filename to load with the
+%               epoch times. Use parameter/value pairs (described below) to
+%               control options for the import.
+%
+%   win       = [numeric] a Vector of length 2 specifying the start and end
+%               times of epochs relative to the values in TIMES.
+%
+%   
 
 %AUDIOEPOCH Finds audio markers/triggers in a data file using a threshold
 %   and epochs the file based on these locations.
@@ -27,7 +41,10 @@ function PHZ = phz_epoch(PHZ,markerTimes,extractWindow,varargin)
 %
 %     'transform'
 %
-% Written by Gabe Nespoli 2013-07-23. Revised for PHZLAB 2016-03-29.
+% Written by Gabe Nespoli 2013-07-23. Revised for PHZLAB 2016-05-09.
+
+function PHZ = phz_epoch(PHZ,times,win,varargin)
+
 if nargin == 0 && nargout == 0, help phz_epoch, return, end
 
 if size(PHZ.data,1) > 1, error('PHZ.data seems to already be epoched...'), end
@@ -48,18 +65,18 @@ for i = 1:2:length(varargin)
     end
 end
 
-[markerTimes,extractWindow] = verifyInput(markerTimes,extractWindow,units);
+[times,win] = verifyInput(times,win,units);
 
 % adjust data before epoching
 PHZ = phzUtil_filter(PHZ,cutoff);
 PHZ = phz_transform(PHZ,transform);
 
 % extract epochs
-PHZ.data = extractEpochs(PHZ.data,markerTimes,extractWindow);
+PHZ.data = extractEpochs(PHZ.data,times,win);
 
 % add info to PHZ structure
-PHZ.misc.markerTimes = markerTimes;
-PHZ.misc.extractWindow = extractWindow;
+PHZ.misc.markerTimes = times;
+PHZ.misc.extractWindow = win;
 
 PHZ = phzUtil_history(PHZ,'Extracted epochs from data.',verbose);
 end

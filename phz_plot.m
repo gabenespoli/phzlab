@@ -184,7 +184,7 @@ for p = 1:length(plotOrder)
     elseif ismember(PHZ.feature,{'','time'}) % time series plots
         if isempty(xtitleLoc) || xtitleLoc == p, xlabel('Time (s)'), end
         
-    else % bar plots of feature values
+    elseif ~isempty(PHZ.summary.stdError) % bar plots of feature values
         set(gca,'XTick',1:length(lineOrder),'XTickLabel',cellstr(lineOrder))    
         errorbar(gca,1:length(lineOrder),PHZ.data(ind),PHZ.summary.stdError(ind),'.k');
     end

@@ -1,82 +1,88 @@
 %PHZ_FEATURE  Calculate the specified feature on each trial.
-% 
+%
 % USAGE
 %     PHZ = phz_feature(PHZ,feature)
-%     PHZ = phz_feature(PHZ,feature,'Param1,Value1,etc.)
-% 
-% INPUT   
+%     PHZ = phz_feature(PHZ,feature,'Param1',Value1,etc.)
+%
+% INPUT
 %     PHZ       = PHZLAB data structure.
-% 
-%     feature   = [string] Specifies the desired feature. Possible 
+%
+%     feature   = [string] Specifies the desired feature. Possible
 %                 features are listed below.
-% 
-%     'region'  = Calls phz_region.m to restrict the time or frequency 
+%
+%     'region'  = Calls phz_region.m to restrict the time or frequency
 %                 region used for feature extration.
-% 
-%     'summary' = Summarizes the resulting features by averaging 
-%                 across grouping variables. For FFT, this averaging 
-%                 is done before calulating the FFT; different 
-%                 participants are kept separate for this averaging. 
+%
+%     'summary' = Summarizes the resulting features by averaging
+%                 across grouping variables. For FFT, this averaging
+%                 is done before calulating the FFT; different
+%                 participants are kept separate for this averaging.
 %                 See phz_summary for more details.
-%     
+%
 %   Time-domain features:
 %     'mean'          = Average value.
-% 
+%
 %     'max','min'     = Maximum or minimum value.
-% 
+%
 %     'maxi','mini'   = Time (latency) of the max or min (in seconds).
-% 
+%
 %     'rms'           = Root-mean-square of the specified region(s).
-% 
+%
 %     'slope'         = The max slope of tangents to each point of the
-%                       data after they are smoothed with a moving point 
+%                       data after they are smoothed with a moving point
 %                       average.
-% 
+%
 %     'slopei'        = Time of maximum slope.
-% 
+%
 %     'area'          = Area under the curve.
-% 
+%
 %     ''              = (blank) returns time-series data.
-% 
+%
 %   Frequency-domain features:
 %     'fft'           = Amplitude spectrum. Trials are averaged together in
 %                       the time domain before calculating.
-% 
+%
 %     'fft100'        = Entering 'fft' followed by a number will calculate
-%                       the value of the FFT at that frequency (e.g., 
+%                       the value of the FFT at that frequency (e.g.,
 %                       'fft100' returns the value of the 100 Hz bin).
-% 
-%     'fft100-1'      = Additionally specifies the number of bins on 
-%                       either side of the specified bin to include in 
+%
+%     'fft100-1'      = Additionally specifies the number of bins on
+%                       either side of the specified bin to include in
 %                       an average (e.g., 'fft100-1' returns the average
 %                       of 3 bins centered on 100 Hz).
-% 
+%
 %     'itfft'         = Intertrial FFT. Whereas the 'fft' feature averages
 %                       trials before caluclating the FFT, 'itfft'
 %                       calculates the FFT on each trial before averaging
 %                       trials together.
-% 
+%
+%     'src','srclag'  = Stimulus-response correlation or lag. Returns the
+%                       r-value or the time in seconds of the maximum
+%                       cross-correlation between each epoch and a stimulus
+%                       vector provided in PHZ.misc.stim. This is usually
+%                       used for FFR data.
+%
 %     'itpc'          = Intertrial phase coherence.
-% 
+%
 %     'itrc'          = Intertrial response consistency (FFR feature).
 %
 %   Behavioural features:
 %     'acc','acc2',...= Accuracy value in PHZ.resp.q1_acc, q2, etc.
-% 
+%
 %     'rt','rt2',...  = Reaction time in PHZ.resp.q1_rt, q2, etc.
-% 
-%   Note: For all features except 'acc' and 'rt', data are 
-%         returned for non-rejected trials. For 'acc' and 'rt', 
-%         all trials are included regardless of whether or not 
+%
+%   Note: For all features except 'acc' and 'rt', data are
+%         returned for non-rejected trials. For 'acc' and 'rt',
+%         all trials are included regardless of whether or not
 %         they are rejected.
 %
-% OUTPUT  
+% OUTPUT
 %     PHZ.data    = The data of the extracted feature for each trial.
 %     PHZ.feature = The value specified in FEATURE.
-% 
+%
 % EXAMPLES
 %     PHZ = phz_feature(PHZ,'mean')
-% 
+%
 % Written by Gabriel A. Nespoli 2016-02-15. Revised 2016-05-09.
 function [PHZ,featureTitle] = phz_feature(PHZ,feature,varargin)
 
@@ -96,124 +102,173 @@ for i = 1:2:length(varargin)
     end
 end
 
-% prepare
+% parse feature input
 [PHZ,feature,val] = parseFeature(PHZ,feature);
+
+% restrict to region
 if isempty(region) && isstruct(PHZ.region), PHZ.region = 'whole epoch';
 else PHZ = phz_region(PHZ,region,verbose);
 end
 
-% make container table and get time-series data or features
-% ---------------------------------------------------------
+% calculate feature
+%   each case MUST set a featureTitle, and will usually adjust
+%       PHZ.data and PHZ.units.
 switch lower(feature)
     
-    case {'time'}
-        featureTitle = '';
+    case 'time', featureTitle = '';
         
-    case {'itfft'}
-        featureTitle = 'Intertrial FFT';
-        PHZ = phzUtil_getfft(PHZ,'verbose',verbose);
+    case 'mean', featureTitle = 'Mean';
+        PHZ.data  = mean(PHZ.data,2);
         
-    case 'fft' % first summaryType (getdata), then getfft (& binmean)
-        featureTitle = 'FFT';
+    case 'max', featureTitle = 'Max';
+        PHZ.data  = max(PHZ.data,[],2);
         
-        % summarize data first
-        if any(ismember({'participant','all','none'},keepVars))
-            PHZ = phz_summary(PHZ,keepVars);
-        else % add 'participant' to summaryType if not already
-            PHZ = phz_summary(PHZ,[{'participant'} keepVars]);
-        end
+    case 'min', featureTitle = 'Min';
+        PHZ.data  = min(PHZ.data,[],2);
         
-        % get fft
-        PHZ = phzFeature_fft(PHZ,'verbose',verbose);
-        
-    case 'itpc'
-        % if PHZS has already been summary'd, phzUtil_itpc will have to
-        %   load each file again to calculate it
-        
-    case 'itrc'
-        % if PHZS has already been summary'd, phzUtil_itrc will have to
-        %   load each file again to calculate it
-        
-    case 'src'
-        featureTitle = 'Stimulus-Response Correlation';
-        PHZ = phzFeature_src(PHZ,'corr');
-        
-    case 'srclag'
-        featureTitle = 'Stimulus-Response Lag';
-        PHZ = phzFeature_src(PHZ,'lag');
+    case 'maxi', featureTitle = 'Max Latency';
+        [~,ind] = max(PHZ.data,[],2);
+        PHZ.data = PHZ.times(ind)';
         PHZ.units = 's';
         
-    otherwise % features
+    case 'mini', featureTitle = 'Min Latency';
+        [~,ind] = min(PHZ.data,[],2);
+        PHZ.data = PHZ.times(ind)';
+        PHZ.units = 's';
         
-        % if resp data, include all trials
-        if ismember(feature,{'acc','acc1','acc2','acc3','acc4','acc5',...
-                'rt', 'rt1', 'rt2', 'rt3', 'rt4', 'rt5'})
-            PHZ = phz_rej(PHZ,0,0); % restore all metadata
+    case 'slope', featureTitle = 'Max Slope';
+        PHZ = phz_smooth(PHZ,'mean0.05');
+        maxSlope = nan(size(PHZ.data,1),1);
+        for i = 1:size(PHZ.data,1), maxSlope(i) = max(gradient(PHZ.data(i,:))); end
+        PHZ.data = maxSlope;
+        PHZ.units = '';
+        
+    case 'slopei', featureTitle = 'Max Slope Latency';
+        PHZ = phz_smooth(PHZ,'mean0.05');
+        ind = nan(size(PHZ.data,1),1);
+        for i = 1:size(PHZ.data,1), [~,ind(i)] = max(gradient(PHZ.data(i,:))); end
+        PHZ.data = PHZ.times(ind)';
+        PHZ.units = 's';
+        
+    case {'rms'}, featureTitle = 'RMS';
+        PHZ.data  = rms(PHZ.data,2);
+        
+    case {'area'}, featureTitle = 'Area Under Curve';
+        PHZ.data  = trapz(PHZ.data,2);
+        PHZ.units = [PHZ.units,'^2'];
+        
+    case {'acc','acc1','acc2','acc3','acc4','acc5'}, featureTitle = 'Accuracy';
+        PHZ = phz_rej(PHZ,0,0); % restore all metadata
+        if strcmp(feature,'acc'), feature = 'acc1'; end
+        PHZ.data = PHZ.resp.(['q',feature(4),'_acc']);
+        if all(ismember(PHZ.data,[0 1]))
+            PHZ.data = PHZ.data * 100;
+            PHZ.units = '%';
+        else PHZ.units = '';
         end
         
-        % calculate feature
-        switch lower(feature)
-            case {'mean'}, featureTitle = 'Mean';                        PHZ.data  = mean(PHZ.data,2);
-            case {'max'}, featureTitle = 'Max';                          PHZ.data  = max(PHZ.data,[],2);
-            case {'min'}, featureTitle = 'Min';                          PHZ.data  = min(PHZ.data,[],2);
-            case {'maxi','maxlatency'}, featureTitle = 'Max Latency'; [~,PHZ.data] = max(PHZ.data,[],2);
-            case {'mini','minlatency'}, featureTitle = 'Min Latency'; [~,PHZ.data] = min(PHZ.data,[],2);
-            case {'rms'}, featureTitle = 'RMS';                          PHZ.data  = rms(PHZ.data,2);
-            case {'area'}, featureTitle = 'Area Under Curve';            PHZ.data  = trapz(PHZ.data,2);   
-            case {'slope','slopei','slopelatency'} % find maximum slope
-                PHZ = phz_smooth(PHZ,'mean0.05');
-                temp = nan(size(PHZ.data,1),2);
-                for i = 1:size(PHZ.data,1)
-                    [temp(i,1),temp(i,2)] = max(gradient(PHZ.data(i,:)));
-                end
-                switch feature
-                    case 'slope', featureTitle = 'Max Slope';                           temp(:,2) = [];
-                    case {'slopei','slopelatency'}, featureTitle = 'Max Slope Latency'; temp(:,1) = [];
-                end
-                PHZ.data = temp; 
-            case {'acc','acc1','acc2','acc3','acc4','acc5'}
-                featureTitle = 'Accuracy';
-                if strcmp(feature,'acc'), feature = 'acc1'; end
-                PHZ.data = PHZ.resp.(['q',feature(4),'_acc']);
-                if all(ismember(PHZ.data,[0 1]))
-                    PHZ.data = PHZ.data * 100;
-                    PHZ.units = '%';
-                else PHZ.units = '';
-                end
-            case {'rt', 'rt1', 'rt2', 'rt3', 'rt4', 'rt5'}
-                featureTitle = 'Reaction Time';
-                if strcmp(feature,'rt'), feature = 'rt1'; end
-                PHZ.data = PHZ.resp.(['q',feature(3),'_rt']);
-                PHZ.units = 's';
-            otherwise, error([feature,' is an unknown feature.'])
-        end
+    case {'rt', 'rt1', 'rt2', 'rt3', 'rt4', 'rt5'}, featureTitle = 'Reaction Time';
+        PHZ.units = 's';
+        PHZ = phz_rej(PHZ,0,0); % restore all metadata
+        if strcmp(feature,'rt'), feature = 'rt1'; end
+        PHZ.data = PHZ.resp.(['q',feature(3),'_rt']);
         
-        % convert from indices to times if feature is latency
-        switch feature
-            case {'maxi','mini','latency','maxlatency','minlatency','slopelatency'}
-                PHZ.data = PHZ.times(PHZ.data)';
-                PHZ.units = 's';
-            case {'auc','area'}
-                PHZ.units = [PHZ.units,'^2'];
-        end
+    case 'itfft'
+        % get fft of each trial
+        [PHZ.data,PHZ.freqs,PHZ.units,featureTitle] = phzFeature_fft(PHZ.data,PHZ.srate,PHZ.units);
+        PHZ = rmfield(PHZ,'times');
+        featureTitle = ['Intertrial ',featureTitle];
         
-        % cleanup PHZ
-        if ismember('times',fieldnames(PHZ)), indField = 'times';
-        elseif ismember('freqs',fieldnames(PHZ)), indField = 'freqs';
-        end
-        PHZ = rmfield(PHZ,indField);
+    case 'fft'
+        % summarize in time domain (adding 'participant' to summary if it isn't already)
+        if any(ismember({'participant','all','none'},keepVars)), PHZ = phz_summary(PHZ,keepVars);
+        else PHZ = phz_summary(PHZ,[{'participant'} keepVars]); end
         
+        % get fft of each summary
+        [PHZ.data,PHZ.freqs,PHZ.units,featureTitle] = phzFeature_fft(PHZ.data,PHZ.srate,PHZ.units);
+        PHZ = rmfield(PHZ,'times');
+        
+    case 'itpc', featureTitle = 'Intertrial Phase Coherence';
+        % Method adapted from Tierney & Kraus, 2013, Journal of Neuroscience.
+        
+        % get complex fft
+        [PHZ.data,PHZ.freqs,PHZ.units,~] = phzFeature_fft(PHZ.data,PHZ.srate,PHZ.units,'spectrum','complex');
+        PHZ = rmfield(PHZ,'times');
+        
+        % transform each vector to a unit vector (magnitude of 1)
+        PHZ.data = PHZ.data ./ abs(PHZ.data);
+        
+        % summarize (adding 'participant' to summary if it isn't already)
+        if any(ismember({'participant','all','none'},keepVars)), PHZ = phz_summary(PHZ,keepVars);
+        else PHZ = phz_summary(PHZ,[{'participant'} keepVars]); end
+        
+        % magnitude of resultant vector is the measure of phase coherence
+        PHZ.data = abs(PHZ.data);
+        
+        % if PHZS has already been summary'd, phzFeature_itpc will have to
+        %   load each file again to calculate it
+        
+    case 'itrc', featureTitle = 'Intertrial Phase Consistency';
+        % Method adapted from Tierney & Kraus, 2013, Journal of Neuroscience.
+        
+        % if PHZS has already been summary'd, phzFeature_itrc will have to
+        %   load each file again to calculate it
+        
+        % calls phz_summary, which calls phzFeature_itrc
+
+        
+        
+        
+        
+        
+        
+        
+
+    case 'src', featureTitle = 'Stimulus-Response Correlation';
+        PHZ.units = '';
+        PHZ.data = phzFeature_src(PHZ.data,PHZ.misc.stim,PHZ.srate,val);
+        
+        % note: SRC will operate on each row of PHZ.data (i.e. each trial).
+        %   If you are dealing with FFR responses, you don't want each
+        %   trial to actually be a single trial, but rather the averaged
+        %   response of many trials from a single participant or condition.
+        %   This comment also applies to 'srclag'.
+        
+    case 'srclag', featureTitle = 'Stimulus-Response Lag';
+        PHZ.units = 's';
+        [~,PHZ.data] = phzFeature_src(PHZ.data,PHZ.misc.stim,PHZ.srate,val);
+
+
+
+        
+    otherwise, error([feature,' is an unknown feature.'])
 end
 
-% if isempty(PHZ.region), PHZ.region = 'epoch'; end
-if ~strcmp(PHZ.feature,'time')
-    PHZ = phz_history(PHZ,['Extracted feature ''',feature,'''.'],verbose);
+
+% adjust PHZ and PHZ.proc fields
+if size(PHZ.data,2) == 1
+    if ismember('times',fieldnames(PHZ)), PHZ = rmfield(PHZ,'times'); end
+    if ismember('freqs',fieldnames(PHZ)), PHZ = rmfield(PHZ,'freqs'); end
 end
+
+if ismember('rej',fieldnames(PHZ.proc))
+    PHZ.proc.rej.data = []; end
+
+if ismember('blc',fieldnames(PHZ.proc))
+    PHZ.proc.blc.values = []; end
+
+if ismember('norm',fieldnames(PHZ.proc))
+    PHZ.proc.norm.mean = []; PHZ.proc.norm.stDev = []; end
+
+if ~strcmp(PHZ.feature,'time')
+    PHZ = phz_history(PHZ,['Extracted feature ''',feature,'''.'],verbose); end
+
 
 % apply summary
+% ************* don't do summary for fft features? ****************
 PHZ = phz_summary(PHZ,keepVars,verbose);
 
-% binmean
+% binmean for spectral features
 if ~isempty(val)
     featureTitle = [featureTitle,' at ',num2str(val(1)),' Hz'];
     PHZ = phzUtil_binmean(PHZ,val(1),val(2));
@@ -245,7 +300,7 @@ elseif length(feature) >= 4 && strcmp(feature(1:4),'itrc')
     feature = 'itrc';
 end
 
-% convert val(s) to numeric ([freq binWidth]
+% convert val(s) to numeric ([freq binWidth])
 if ~isempty(val)
     ind = strfind(val,'-');
     if ind, val = [str2double(val(1:ind - 1)) str2double(val(ind + 1:end))];

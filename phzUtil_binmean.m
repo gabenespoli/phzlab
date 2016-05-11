@@ -79,6 +79,6 @@ for i = 1:length(ind)
 end
 
 PHZ.data = s;
-PHZ = phzUtil_history(PHZ,['Averaged ',num2str(width * 2 + 1),' bins centered on ',num2str(bins),' ',units,'.'],verbose);
+PHZ = phz_history(PHZ,['Averaged ',num2str(width * 2 + 1),' bins centered on ',num2str(bins),' ',units,'.'],verbose);
 
 end

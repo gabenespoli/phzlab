@@ -1,5 +1,3 @@
-function markerInd = phzUtil_findAudioMarkers(markerData,threshold,varargin)
-
 %PHZ_EPOCH  Split a PHZ structure into trials.
 % PHZ = PHZ_EPOCH(PHZ,TIMES,WINDOW) finds epochs in 
 
@@ -43,6 +41,7 @@ function markerInd = phzUtil_findAudioMarkers(markerData,threshold,varargin)
 %
 % Written by Gabe Nespoli 2013-07-23. Revised for PHZLAB 2016-03-24.
 
+function markerInd = phzUtil_findAudioMarkers(markerData,threshold,varargin)
 
 % verify input
 if nargin < 2, error('Not enough input arguments.'), end
