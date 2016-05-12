@@ -1,15 +1,14 @@
-function PHZS = phz_gather(varargin)
 %PHZ_GATHER  Create a PHZS structure of data from many PHZ structures.
 % 
-% usage:    
+% USAGE    
 %     PHZ = phz_gather
-%     PHZ = phz_gather(FOLDER)
+%     PHZ = phz_gather(folder)
 %     PHZ = phz_gather(...,'Param1','Value1',etc.)
 % 
-% input:   
+% INPUT   
 %     (none) = Opens a file browser to select files to gather.
 % 
-%     FOLDER = Gather all .phz files in this folder.
+%     folder = Gather all .phz files in this folder.
 % 
 %     'save' = Filename and path to save PHZ structure as a '.phz' file.
 %           
@@ -29,15 +28,18 @@ function PHZS = phz_gather(varargin)
 %     'region'    = Calls phz_region.
 %     'summary'   = Calls phz_summary.
 % 
-% output:  
+% OUTPUT  
 %     PHZ = Gathered PHZLAB data structure. More-or-less a concatnated 
 %           version of all input PHZ structures.
 % 
-% examples:
+% EXAMPLES
 %     PHZ = phz_gather >> Opens a file browser to select multiple files.
 %  x  PHZ = phz_gather('myfolder') >> Gathers all .phz files in myfolder.
 %
-% Written by Gabriel A. Nespoli 2016-02-21. Revised 2016-04-04.
+% Written by Gabriel A. Nespoli 2016-02-21. Revised 2016-05-11.
+
+function PHZS = phz_gather(varargin)
+
 if nargout == 0 && nargin == 0, help phz_gather, return, end
 
 % defaults
@@ -74,6 +76,7 @@ end
 resetFields = {};
 
 % loop through files
+% ------------------
 if verbose, disp(' '), disp('Gathering PHZ data...'), end
 w = waitbar(0,'Gathering PHZ data...');
 for j = 1:length(files)
@@ -83,20 +86,20 @@ for j = 1:length(files)
     % load data
     if verbose, disp(['Loading data from file ',fileProgress]), end
     
-    PHZS.meta.files{j} = fullfile(folder,files{j});
-    PHZ = phz_load(PHZS.meta.files{j},verbose); % runs phz_check.m
+    currentFile = fullfile(folder,files{j});
+    PHZ = phz_load(currentFile,verbose); % runs phz_check.m
     
     % do user-defined preprocessing
     for i = 1:2:length(processing)
         switch lower(processing{i})
-            case 'subset',                  PHZ = phz_subset(PHZ,varargin{i+1},verbose);
-            case {'rect','rectify'},        PHZ = phz_rect(PHZ,varargin{i+1},verbose);
-            case {'filter','filt'},         PHZ = phz_filter(PHZ,varargin{i+1},verbose);
-            case {'smooth','smoothing'},    PHZ = phz_smooth(PHZ,varargin{i+1},verbose);
-            case 'transform',               PHZ = phz_transform(PHZ,varargin{i+1},verbose);
-            case {'blc','baselinecorrect'}, PHZ = phz_blc(PHZ,varargin{i+1},verbose);
-            case {'rej','reject'},          PHZ = phz_rej(PHZ,varargin{i+1},verbose);
-            case {'norm','normtype'},       PHZ = phz_norm(PHZ,varargin{i+1},verbose);
+            case 'subset',                  PHZ = phz_subset(PHZ,processing{i+1},verbose);
+            case {'rect','rectify'},        PHZ = phz_rect(PHZ,processing{i+1},verbose);
+            case {'filter','filt'},         PHZ = phz_filter(PHZ,processing{i+1},verbose);
+            case {'smooth','smoothing'},    PHZ = phz_smooth(PHZ,processing{i+1},verbose);
+            case 'transform',               PHZ = phz_transform(PHZ,processing{i+1},verbose);
+            case {'blc','baselinecorrect'}, PHZ = phz_blc(PHZ,processing{i+1},verbose);
+            case {'rej','reject'},          PHZ = phz_rej(PHZ,processing{i+1},verbose);
+            case {'norm','normtype'},       PHZ = phz_norm(PHZ,processing{i+1},verbose);
         end
     end
     
@@ -107,17 +110,19 @@ for j = 1:length(files)
     % -----------
     if j == 1
         PHZS = PHZ;
+        
+        % reset history field
         PHZS.history = {};
         PHZS = phz_history(PHZS,'Gathered PHZ structure created.',verbose);
-        PHZS = phz_history(PHZS,['Preprocessing: ',strjoin(processing)],verbose);
+        PHZS = phz_history(PHZS,['Preprocessing: ',strnumjoin(processing)],verbose);
+        PHZS.meta.files{j} = currentFile;
         
-        % (soon these will be tucked into PHZ.proc)
-        if ismember('rej',fieldnames(PHZS.proc)), PHZS.proc = rmfield(PHZS.proc,'rej'); end
-        if ismember('blc',fieldnames(PHZS.proc)), PHZS.proc = rmfield(PHZS.proc,'blc'); end
-        if ismember('norm',fieldnames(PHZS.proc)), PHZS.proc = rmfield(PHZS.proc,'norm'); end
+        % reset proc field
+        PHZS.proc = [];
+        PHZS.proc.pre = processing;
         
         continue
-    end
+    end    
     
     % make sure data length is compatible
     if size(PHZS.data,2) ~= size(PHZ.data,2)
@@ -132,24 +137,27 @@ for j = 1:length(files)
     end
     
     % basic fields (strings)
+    PHZS.meta.files{j} = currentFile;
     for i = {'study','datatype','units'}, field = i{1};
         if ~strcmp(PHZ.(field),PHZS.(field))
             PHZS = phz_history(PHZS,['NOTE: The ''',field,''' field of ''',files{j},''' is different: ''',PHZ.(field),'''.'],verbose,0);
         end
     end
 
-    
     % grouping variables & tags
     % if different, reset to include unique values of tags after looping
     for i = {'participant','group','session','trials'}, field = i{1};
-        
-        if ~all(ismember(cellstr(PHZ.(field)),cellstr(PHZS.(field))))
-            if ~ismember(field,resetFields), resetFields{end+1} = field; end
+        if ~strcmp(PHZ.meta.tags.(field),'<collapsed>')
+            
+            if ~all(ismember(cellstr(PHZ.(field)),cellstr(PHZS.(field))))
+                if ~ismember(field,resetFields), resetFields{end+1} = field; end
+            end
+            
+            PHZ.meta.tags.(field) = categorical(PHZ.meta.tags.(field),'Ordinal',false);
+            PHZS.meta.tags.(field) = categorical(PHZS.meta.tags.(field),'Ordinal',false);
+            PHZS.meta.tags.(field) = [PHZS.meta.tags.(field); PHZ.meta.tags.(field)];
+            
         end
-        
-        PHZ.meta.tags.(field) = categorical(PHZ.meta.tags.(field),'Ordinal',false);
-        PHZS.meta.tags.(field) = categorical(PHZS.meta.tags.(field),'Ordinal',false);
-        PHZS.meta.tags.(field) = [PHZS.meta.tags.(field); PHZ.meta.tags.(field)];
     end
     
     % data
@@ -207,14 +215,6 @@ end
 
 end
 
-% function x = collapseIfOneValue(x)
-% if length(unique(x)) == 1
-%     x = unique(x);
-%     if iscell(x), x = x{1}; end
-% else warning(['Folder contains files with differing values for ',inputname,'.'])
-% end
-% end
-
 function PHZS = verifyFieldsThatShouldBeTheSame(PHZS,PHZ,i)
 if i == 1
     
@@ -251,46 +251,17 @@ else
 end
 end
 
-% function PHZS = verifySpec(PHZS,PHZ,spec)
-% 
-% if ~isempty(spec.participant_order),  PHZS.spec.participant_order  = spec.participant_order;
-% else                                  PHZS.spec.participant_order  = PHZ.spec.participant_order;
-% end
-% if ~isempty(spec.participant_spec),   PHZS.spec.participant_spec   = spec.participant_spec;
-% else                                  PHZS.spec.participant_spec   = PHZ.spec.participant_spec;
-% end
-% 
-% if ~isempty(spec.group_order),   PHZS.spec.group_order   = spec.group_order;
-% else                             PHZS.spec.group_order   = PHZ.spec.group_order;
-% end
-% if ~isempty(spec.group_spec),    PHZS.spec.group_spec    = spec.group_spec;
-% else                             PHZS.spec.group_spec    = PHZ.spec.group_spec;
-% end
-% 
-% if ~isempty(spec.session_order), PHZS.spec.session_order = spec.session_order;
-% else                             PHZS.spec.session_order = PHZ.spec.session_order;
-% end
-% if ~isempty(spec.session_spec),  PHZS.spec.session_spec  = spec.session_spec;
-% else                             PHZS.spec.session_spec  = PHZ.spec.session_spec;
-% end
-% 
-% if ~isempty(spec.trials_order),  PHZS.spec.trials_order  = spec.trials_order;
-% else                             PHZS.spec.trials_order  = PHZ.spec.trials_order;
-% end
-% if ~isempty(spec.trials_spec),   PHZS.spec.trials_spec   = spec.trials_spec;
-% else                             PHZS.spec.trials_spec   = PHZ.spec.trials_spec;
-% end
-% 
-% if ~isempty(spec.region_order),  PHZS.spec.region_order  = spec.region_order;
-% else                             PHZS.spec.region_order  = PHZ.spec.region_order;
-% end
-% if ~isempty(spec.region_spec),   PHZS.spec.region_spec   = spec.region_spec;
-% else                             PHZS.spec.region_spec   = PHZ.spec.region_spec;
-% end
-% 
-% end
-
 function C = addToCell(C,a)
 if ischar(a), a = {a}; end
 C = [C a];
+end
+
+function s = strnumjoin(C)
+if ~iscell(C), return, end
+for i = 1:length(C)
+    if isnumeric(C{i}), C{i} = num2str(C{i});
+    elseif ~ischar(C{i}), error('Problem with strnumjoin function.')
+    end
+end
+s = strjoin(C);
 end

@@ -191,6 +191,11 @@ switch lower(feature)
     case 'itpc', featureTitle = 'Intertrial Phase Coherence';
         % Method adapted from Tierney & Kraus, 2013, Journal of Neuroscience.
         
+        % if PHZS has already been summary'd, phzFeature_itpc will have to
+        %   load each file again to calculate it
+        if ismember('summary',fieldnames(PHZ))
+        end
+        
         % get complex fft
         [PHZ.data,PHZ.freqs,PHZ.units,~] = phzFeature_fft(PHZ.data,PHZ.srate,PHZ.units,'spectrum','complex');
         PHZ = rmfield(PHZ,'times');
@@ -205,8 +210,7 @@ switch lower(feature)
         % magnitude of resultant vector is the measure of phase coherence
         PHZ.data = abs(PHZ.data);
         
-        % if PHZS has already been summary'd, phzFeature_itpc will have to
-        %   load each file again to calculate it
+
         
     case 'itrc', featureTitle = 'Intertrial Phase Consistency';
         % Method adapted from Tierney & Kraus, 2013, Journal of Neuroscience.
@@ -216,13 +220,6 @@ switch lower(feature)
         
         % calls phz_summary, which calls phzFeature_itrc
 
-        
-        
-        
-        
-        
-        
-        
 
     case 'src', featureTitle = 'Stimulus-Response Correlation';
         PHZ.units = '';
@@ -238,9 +235,6 @@ switch lower(feature)
         PHZ.units = 's';
         [~,PHZ.data] = phzFeature_src(PHZ.data,PHZ.misc.stim,PHZ.srate,val);
 
-
-
-        
     otherwise, error([feature,' is an unknown feature.'])
 end
 
@@ -263,9 +257,7 @@ if ismember('norm',fieldnames(PHZ.proc))
 if ~strcmp(PHZ.feature,'time')
     PHZ = phz_history(PHZ,['Extracted feature ''',feature,'''.'],verbose); end
 
-
 % apply summary
-% ************* don't do summary for fft features? ****************
 PHZ = phz_summary(PHZ,keepVars,verbose);
 
 % binmean for spectral features
