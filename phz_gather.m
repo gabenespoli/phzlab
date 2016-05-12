@@ -1,16 +1,16 @@
 %PHZ_GATHER  Create a PHZS structure of data from many PHZ structures.
 % 
 % USAGE    
-%     PHZ = phz_gather
-%     PHZ = phz_gather(folder)
-%     PHZ = phz_gather(...,'Param1','Value1',etc.)
+%   PHZ = phz_gather
+%   PHZ = phz_gather(folder)
+%   PHZ = phz_gather(...,'Param1',Value1,etc.)
 % 
 % INPUT   
-%     (none) = Opens a file browser to select files to gather.
+%   (none) = Opens a file browser to select files to gather.
 % 
-%     folder = Gather all .phz files in this folder.
+%   folder = Gather all .phz files in this folder.
 % 
-%     'save' = Filename and path to save PHZ structure as a '.phz' file.
+%   'save' = Filename and path to save PHZ structure as a '.phz' file.
 %           
 %   These are executed in the order that they appear in the function call. 
 %   See the help of each function for more details.
@@ -26,15 +26,16 @@
 %   These are always executed in the order listed here, after the above
 %   processing funtions. See the help of each function for more details.
 %     'region'    = Calls phz_region.
-%     'summary'   = Calls phz_summary.
+%     'summary'   = Calls phz_summary. Note that this will summarize each
+%                   file individually.
 % 
 % OUTPUT  
-%     PHZ = Gathered PHZLAB data structure. More-or-less a concatnated 
-%           version of all input PHZ structures.
+%   PHZ = Gathered PHZLAB data structure. More-or-less a concatnated 
+%         version of all input PHZ structures.
 % 
 % EXAMPLES
-%     PHZ = phz_gather >> Opens a file browser to select multiple files.
-%  x  PHZ = phz_gather('myfolder') >> Gathers all .phz files in myfolder.
+%   PHZ = phz_gather >> Opens a file browser to select multiple files.
+%   PHZ = phz_gather('myfolder') >> Gathers all .phz files in myfolder.
 %
 % Written by Gabriel A. Nespoli 2016-02-21. Revised 2016-05-11.
 

@@ -191,26 +191,34 @@ switch lower(feature)
     case 'itpc', featureTitle = 'Intertrial Phase Coherence';
         % Method adapted from Tierney & Kraus, 2013, Journal of Neuroscience.
         
-        % if PHZS has already been summary'd, phzFeature_itpc will have to
-        %   load each file again to calculate it
-        if ismember('summary',fieldnames(PHZ))
+        if ~ismember('summary',fieldnames(PHZ))
+            
+            % summarize (adding 'participant' to summary if it isn't already)
+            if any(ismember({'participant','all','none'},keepVars)), PHZ = phz_summary(PHZ,keepVars);
+            else PHZ = phz_summary(PHZ,[{'participant'} keepVars]); end
+            
+            PHZ = getitpc(PHZ,keepVars);
+            
+        else
+            
+            % if PHZS has already been summary'd, phzFeature_itpc will have to
+            %   load each file again to calculate it
+            newData = [];
+            trialsPerFile = size(PHZ.data,1) / length(PHZ.meta.files);
+            
+            for i = 1:length(PHZ.meta.files)
+                TMP = phz_load(PHZ.meta.files{i});
+                TMP = phz_proc(TMP,PHZ.proc.pre{:});
+                TMP = getitpc(TMP,PHZ.summary.keepVars);
+                
+                j = 1 + (i-1) * trialsPerFile;
+                newData(j:j+trialsPerFile-1,:) = TMP.data;
+            end
+            PHZ.data = newData;
+            PHZ.freqs = TMP.freqs;
+            PHZ = rmfield(PHZ,'times');
+%             PHZ.feature = TMP.feature;
         end
-        
-        % get complex fft
-        [PHZ.data,PHZ.freqs,PHZ.units,~] = phzFeature_fft(PHZ.data,PHZ.srate,PHZ.units,'spectrum','complex');
-        PHZ = rmfield(PHZ,'times');
-        
-        % transform each vector to a unit vector (magnitude of 1)
-        PHZ.data = PHZ.data ./ abs(PHZ.data);
-        
-        % summarize (adding 'participant' to summary if it isn't already)
-        if any(ismember({'participant','all','none'},keepVars)), PHZ = phz_summary(PHZ,keepVars);
-        else PHZ = phz_summary(PHZ,[{'participant'} keepVars]); end
-        
-        % magnitude of resultant vector is the measure of phase coherence
-        PHZ.data = abs(PHZ.data);
-        
-
         
     case 'itrc', featureTitle = 'Intertrial Phase Consistency';
         % Method adapted from Tierney & Kraus, 2013, Journal of Neuroscience.
@@ -299,4 +307,13 @@ if ~isempty(val)
     else val = [str2double(val) 0];
     end
 end
+end
+
+function PHZ = getitpc(PHZ,keepVars)
+% get complex fft
+[PHZ.data,PHZ.freqs,PHZ.units,~] = phzFeature_fft(PHZ.data,PHZ.srate,PHZ.units,'spectrum','complex');
+PHZ = rmfield(PHZ,'times');
+PHZ.data = PHZ.data ./ abs(PHZ.data); % transform each vector to a unit vector (magnitude of 1)
+PHZ = phz_summary(PHZ,keepVars); % average trials
+PHZ.data = abs(PHZ.data); % magnitude of resultant vector is the measure of phase coherence
 end

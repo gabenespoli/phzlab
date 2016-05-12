@@ -1,50 +1,74 @@
-function varargout = phz_proc(PHZ,procType)
-%PHZ_PROC  Display processing history.
+%PHZ_PROC  Use many processing functions with a single function call.
 % 
-% usage:    
-%     phz_proc(PHZ) > display processing history in command window.
-%     PROCLIST = phz_proc(PHZ)
-%     PROCLIST = phz_proc(PHZ,PROCTYPE)
+% USAGE
+%   phz_proc(PHZ,'Param1',Value1,etc.)
 % 
-% input:   
-%     PHZ         = PHZLAB data structure.
-%     PROCTYPE    = Specifying a PROCTYPE instead returns 0 if this
-%                   function has not been run, 1 if is has, and 2 if it
-%                   was the last function run. PROCTYPE is a string with
-%                   an abbreviated function name (i.e. the field that
-%                   would show up in PHZ.proc).
+% INPUT
+%   PHZ         = PHZLAB data structure.
 % 
-% output:  
-%     PROCLIST    = A cell array of a chronological list of abbreviated
-%                   function names.
+%   These are executed in the order that they appear in the function call. 
+%   See the help of each function for more details.
+%     'subset'    = Calls phz_subset.
+%     'rectify'   = Calls phz_rect.
+%     'filter'    = Calls phz_filter.
+%     'smooth'    = Calls phz_smooth.
+%     'transform' = Calls phz_transform.
+%     'blc'       = Calls phz_blc.
+%     'rej'       = Calls phz_rej.
+%     'norm'      = Calls phz_norm.
+% 
+%   These are always executed in the order listed here, after the above
+%   processing funtions. See the help of each function for more details.
+%     'region'    = Calls phz_region.
+%     'feature'   = Calls phz_feature and makes bar plots instead of line
+%                   plots (excepting FFT and ITPC).
+%     'summary'   = Calls phz_summary. The default summary is 'all', which 
+%                   averages across all trials. A maximum of 2 summary 
+%                   variables can be specified; the first is plotted as 
+%                   separate lines/bars, and the second is plotted across
+%                   separate plots.
+% 
+% OUTPUT
+%   PHZ   = Processed PHZLAB data structure.
 % 
 % Written by Gabriel A. Nespoli 2016-04-11.
+
+function PHZ = phz_proc(PHZ,varargin)
+
 if nargin == 0 && nargout == 0, help phz_proc, return, end
-if nargin < 2, procType = []; end
 
-% get chronological list of functions
-procList = fieldnames(PHZ.proc);
-for i = 1:length(procList)
-    switch procList{i}
-        case 'rej',  procList{i,2} = PHZ.proc.rej.threshold;
-        case 'blc',  procList{i,2} = PHZ.proc.blc.region;
-        case 'norm', procList{i,2} = PHZ.proc.norm.type;
-        otherwise,   procList{i,2} = (PHZ.proc.(procList{i}));
+% defaults
+region = [];
+feature = [];
+keepVars = [];
+
+verbose = true;
+
+% user-defined
+if any(strcmp(varargin(1:2:end),'verbose'))
+    i = find(strcmp(varargin(1:2:end),'verbose')) * 2 - 1;
+    verbose = varargin{i+1};
+    varargin([i,i+1]) = [];
+end
+
+for i = 1:2:length(varargin)
+    switch lower(varargin{i})
+        case 'subset',                  PHZ = phz_subset(PHZ,varargin{i+1},verbose);
+        case {'rect','rectify'},        PHZ = phz_rectify(PHZ,varargin{i+1},verbose);
+        case {'filter','filt'},         PHZ = phz_filter(PHZ,varargin{i+1},verbose);
+        case {'smooth','smoothing'},    PHZ = phz_smooth(PHZ,varargin{i+1},verbose);
+        case 'transform',               PHZ = phz_transform(PHZ,varargin{i+1},verbose);
+        case {'blc','baselinecorrect'}, PHZ = phz_blc(PHZ,varargin{i+1},verbose);
+        case {'rej','reject'},          PHZ = phz_rej(PHZ,varargin{i+1},verbose);
+        case {'norm','normtype'},       PHZ = phz_norm(PHZ,varargin{i+1},verbose);
+        
+        case 'region',                  region = varargin{i+1};
+        case 'feature',                 feature = varargin{i+1};
+        case {'summary','keepvars'},    keepVars = varargin{i+1};
     end
 end
 
-% query if a function has been run
-if ~isempty(procType)
-    ind = find(ismember(procList(:,1),procType));
-    if isempty(ind), ind = 0;
-    elseif ind <  size(procList,1), ind = 1;
-    elseif ind == size(procList,1), ind = 2;
-    end
-    varargout{1} = ind;
-    
-elseif nargout == 0
-    disp(procList)
-    
-else varargout{1} = procList;
-end
+if ~isempty(feature) && ~strcmp(feature,'time'), PHZ = phz_region(PHZ,region,verbose); end
+PHZ = phz_feature(PHZ,feature,'summary',keepVars,'verbose',verbose);
+
 end

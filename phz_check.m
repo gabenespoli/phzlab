@@ -295,6 +295,9 @@ end
 if ismember('files',fieldnames(PHZ.meta))
     PHZ.meta.files = verifyCell(PHZ.meta.files,[name,'.meta.files'],verbose);
     PHZ.meta.files = checkAndFixColumn(PHZ.meta.files,[name,'.meta.files'],nargout,verbose);
+%     if mod(size(PHZ.data,1) / length(PHZ.meta.files),1)
+%         error('The number of filenames in PHZ.meta.files does not divide evenly into the number of trials in PHZ.data.')
+%     end
 end
 
 %% history
@@ -507,9 +510,7 @@ mainOrder = {
     'session'
     'trials'
     
-    'summary'
     'region'
-    
     'times'
     'freqs'
     
@@ -518,6 +519,7 @@ mainOrder = {
     'units'
     'srate'
     
+    'summary'
     'resp'
     'proc'
     'meta'

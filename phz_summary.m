@@ -30,31 +30,24 @@
 %
 % Written by Gabriel A. Nespoli 2016-03-17. Revised 2016-05-11.
 
-function PHZ = phz_summary(PHZ,keepVars,verbose,summaryType)
+function PHZ = phz_summary(PHZ,keepVars,verbose)
 
 if nargout == 0 && nargin == 0, help phz_summary, return, end
 if isempty(keepVars), return, end
 if nargin < 3, verbose = true; end
-if nargin < 4, summaryType = 'mean'; end
 
-PHZ = phz_check(PHZ); % (make ordinal if there are new orders)
+PHZ = phz_check(PHZ); % (make ordinal if there are new manually-made orders i.e., not using phz_field.m)
+
 keepVars = verifyKeepVars(keepVars);
-if ismember(keepVars{1},{'all'}), return, end
+if ismember(keepVars,{'all'}), return, end
 PHZ.summary.keepVars = keepVars;
 
 if ismember(keepVars{1},{'none'})
     PHZ.summary.nParticipant = length(PHZ.participant);
     PHZ.summary.nTrials = size(PHZ.data,1);
-    switch lower(summaryType)
-        case 'mean'
-            PHZ.summary.stdError = ste(PHZ.data);
-            PHZ.data = mean(PHZ.data,1);
-        case {'itrc','rc'}
-            PHZ = phzFeature_itrc(PHZ);
-    end
+    PHZ.summary.stdError = ste(PHZ.data);
+    PHZ.data = mean(PHZ.data,1);
 
-    
-    
 else
     % get categories to collapse across
     for i = 1:length(keepVars)
@@ -66,7 +59,7 @@ else
     
     % loop categories and average
     newData = nan(length(varTypes),size(PHZ.data,2));
-    if strcmp(summaryType,'mean'), PHZ.summary.stdError = nan(size(newData)); end
+    PHZ.summary.stdError = nan(size(newData));
     PHZ.summary.nParticipant = nan(length(varTypes),1);
     PHZ.summary.nTrials = nan(length(varTypes),1);
     
@@ -75,14 +68,8 @@ else
         TMP.data = PHZ.data(varInd == varTypes(i),:);
         PHZ.summary.nParticipant(i) = length(unique(PHZ.meta.tags.participant(varInd == varTypes(i))));
         PHZ.summary.nTrials(i) = size(TMP.data,1);
-        
-        switch lower(summaryType)
-            case 'mean'
-                PHZ.summary.stdError(i,:) = ste(TMP.data);
-                newData(i,:) = mean(TMP.data,1);
-            case {'itrc','rc'}
-                
-        end
+        PHZ.summary.stdError(i,:) = ste(TMP.data);
+        newData(i,:) = mean(TMP.data,1);
         
     end
     PHZ.data = newData;
@@ -102,7 +89,11 @@ end
 loseVars = {'participant','group','session','trials'};
 loseVars(ismember(loseVars,keepVars)) = [];
 for i = loseVars, field = i{1};
-    PHZ.meta.tags.(field) = '<collapsed>';
+    if length(unique(PHZ.meta.tags.(field))) == 1
+        PHZ.meta.tags.(field) = PHZ.meta.tags.(field)(1:size(PHZ.data,1));
+    else
+        PHZ.meta.tags.(field) = '<collapsed>';
+    end
 end
 
 if ismember('blc',fieldnames(PHZ.proc))
