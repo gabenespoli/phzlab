@@ -1,21 +1,23 @@
-function PHZ = phz_field(PHZ,field,verbose)
 %PHZ_FIELD  Change the value and/or order of fields in a PHZ structure.
 %   PHZ_FIELD opens a dialog with current values of the PHZ structure that
 %   can be edited.
 % 
-% usage:    
-%     PHZ = phz_field(PHZ)
-%     PHZ = phz_field(PHZ,FIELD)
+% USAGE    
+%   PHZ = phz_field(PHZ)
+%   PHZ = phz_field(PHZ,FIELD)
 % 
-% input:   
-%     PHZ   = PHZLAB data structure.
-%     FIELD = String specifying the type of fields to change. Options are
-%             'basic' (default), 'region'.
+% INPUT   
+%   PHZ   = [struct] PHZLAB data structure.
+%   FIELD = [string] String specifying the type of fields to change.
+%           Options are 'basic' (default), 'region'.
 % 
-% output:  
-%     PHZ = PHZLAB data structure with fields adjusted.
+% OUTPUT
+%   PHZ = [struct] PHZLAB data structure with fields adjusted.
 % 
-% Written by Gabriel A. Nespoli 2016-03-24. Revised 2016-04-12.
+% Written by Gabriel A. Nespoli 2016-03-24. Revised 2016-05-19.
+
+function PHZ = phz_field(PHZ,field,verbose)
+
 if nargin == 0 && nargout == 0, hel phz_field, return, end
 if nargin < 2, field = 'basic'; end
 if nargin < 3, verbose = true; end
@@ -71,13 +73,11 @@ switch lower(field)
         end
         
     case {'region','regions'}
-        % have region order at top
-        % then have two columns, one for names, one for endpoints
-        
-        
+                
         prompt = PHZ.meta.tags.region;
         
         old = cell(size(prompt));
+        
         for i = 1:length(old)
             old{i} = num2str(PHZ.region.(prompt{i}));
         end
@@ -86,12 +86,31 @@ switch lower(field)
         
         for i = 1:length(new)
             if ~strcmp(new{i},old{i})
-                PHZ.region.(prompt{i}) = eval(new{i});
+                PHZ.region.(prompt{i}) = eval(['[',new{i},']']);
                 
                 PHZ = phz_history(PHZ,['Changed ',prompt{i},' region',...
                     ' from [',old{i},'] to [',new{i},'].'],verbose);
             end
         end
+        
+    case {'regionnames','regionname'}
+        
+        prompt = {'' '' '' '' ''};
+        
+        old = PHZ.meta.tags.region;
+        
+        new = inputdlg(prompt,dlg_title,numlines,old,'on');
+        
+        for i = 1:length(new)
+            if ~strcmp(new{i},old{i})
+                PHZ.meta.tags.region{i} = new{i};
+                
+                PHZ = phz_history(PHZ,['Changed region name ',old{i},...
+                    ' to ',new{i},'.'],verbose);
+            end
+        end
+        
+        
 end
 
 end

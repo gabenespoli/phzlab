@@ -1,10 +1,12 @@
-function PHZ = phz_check(PHZ,verbose)
 % PHZ_CHECK  Verify and fix a PHZLAB data structure.
 %
-% usage:
-%     PHZ = phz_check(PHZ)
+% USAGE
+%  PHZ = phz_check(PHZ)
 %
 % Written by Gabriel A. Nespoli 2016-02-08. Revised 2016-04-12.
+
+function PHZ = phz_check(PHZ,verbose)
+
 if nargout == 0 && nargin == 0, help phz_check, end
 if nargin < 2, verbose = true; end
 
@@ -159,11 +161,22 @@ end
 
 %% region
 if isstruct(PHZ.region)
+    if length(unique(PHZ.meta.tags.region)) < length(PHZ.meta.tags.region), error('All region fields must have unique names.'), end
+    
     rname = fieldnames(PHZ.region);
+    
     for i = 1:length(rname)
-        PHZ.region.(rname{i}) = verifyNumeric(PHZ.region.(rname{i}),[name,'.region.(rname{i})'],verbose);
-        PHZ.region.(rname{i})   = checkAndFix1x2(PHZ.region.(rname{i}),[name,'.region.(rname{i})'],nargout,verbose);
+        PHZ.region.(rname{i}) = verifyNumeric(PHZ.region.(rname{i}),[name,'.region.',(rname{i})],verbose);
+        PHZ.region.(rname{i}) = checkAndFix1x2(PHZ.region.(rname{i}),[name,'.region.',(rname{i})],nargout,verbose);
+        
+        % rename the region if there is a new name in PHZ.meta.tags.region
+        if ~strcmp(rname{i},PHZ.meta.tags.region{i})
+            PHZ.region.(PHZ.meta.tags.region{i}) = PHZ.region.(rname{i});
+            PHZ.region = rmfield(PHZ.region,rname{i});
+        end
     end
+    
+    PHZ.region = orderfields(PHZ.region,PHZ.meta.tags.region);
     
 elseif isnumeric(PHZ.region)
     PHZ.region = checkAndFix1x2(PHZ.region,[name,'.region'],nargout,verbose);
@@ -414,28 +427,9 @@ if ~ismember('tags',fieldnames(PHZ)) && ~ismember('meta',fieldnames(PHZ))
     PHZ.tags.region = PHZ.spec.region_order;
     PHZ.spec.region = PHZ.spec.region_spec;
     PHZ.spec = rmfield(PHZ.spec,{'region_order','region_spec'});
-    PHZ = phz_history(PHZ,'Converted PHZ structure to v0.7.7.',verbose,0);
+    PHZ = phz_history(PHZ,'Updated PHZ structure to v0.7.7.',verbose,0);
     
 end
-
-% if ~ismember('meta',fieldnames(PHZ)), PHZ.meta = struct; end
-% if ~ismember('proc',fieldnames(PHZ)), PHZ.proc = struct; end
-%
-% % change field 'regions' to 'region'
-% if ismember('regions',fieldnames(PHZ))
-%     PHZ.region = PHZ.regions;
-%     PHZ = rmfield(PHZ,'regions');
-% end
-%
-% if ismember('regions',fieldnames(PHZ.meta.tags))
-%     PHZ.meta.tags.region = PHZ.meta.tags.regions;
-%     PHZ.meta.tags = rmfield(PHZ.meta.tags,'regions');
-% end
-%
-% if ismember('regions',fieldnames(PHZ.meta.spec))
-%     PHZ.meta.spec.region = PHZ.meta.spec.regions;
-%     PHZ.meta.spec = rmfield(PHZ.meta.spec,'regions');
-% end
 
 % move stuff to meta and create proc (older than v0.8)
 if ~all(ismember({'proc','meta'},fieldnames(PHZ))) && any(ismember({'rej','blc','norm'},fieldnames(PHZ)))
@@ -452,13 +446,6 @@ if ~all(ismember({'proc','meta'},fieldnames(PHZ))) && any(ismember({'rej','blc',
     end
 end
 
-% if ismember('times',fieldnames(PHZ))
-%     PHZ.meta.times = PHZ.times;
-%     PHZ = rmfield(PHZ,'times');
-% elseif ismember('freqs',fieldnames(PHZ))
-%     PHZ.meta.freqs = PHZ.freqs;
-%     PHZ = rmfield(PHZ,'freqs');
-% end
 updateTo8 = false;
 
 for i = {'tags','spec'}, field = i{1};
@@ -480,8 +467,13 @@ end
 
 if updateTo8
     PHZ.proc = struct;
-    PHZ = phz_history(PHZ,'Converted PHZ structure to v0.8.',verbose,0);
+    PHZ = phz_history(PHZ,'Updated PHZ structure to v0.8.',verbose,0);
 end
+
+% add 'condition' as a grouping variable (v0.8.3)
+if ~ismember('condition',fieldnames(PHZ))
+end
+
 end
 
 function PHZ = orderPHZfields(PHZ)
