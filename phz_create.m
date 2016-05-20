@@ -1,84 +1,130 @@
 %PHZ_CREATE  Create a new PHZ structure.
 % 
 % USAGE
-%     PHZ = phz_create
-%     PHZ = phz_create(files)
-%     PHZ = phz_create(folder)
-%     PHZ = phz_create(files,...,'Param1',Value1,etc.)
+%   PHZ = phz_create
+%   PHZ = phz_create(files)
+%   PHZ = phz_create(folder)
+%   PHZ = phz_create(files,...,'Param1',Value1,etc.)
 % 
 % INPUT   
-%     PHZ         = PHZLAB data structure.
+%   PHZ           = PHZLAB data structure.
 % 
-%     files       = String or cell array of strings specifying the file(s) 
+%   files         = String or cell array of strings specifying the file(s) 
 %                   to import. If left empty, a dialog box pops up for you 
 %                   to select a file or files.
 % 
-%     folder      = A folder of files from which to create PHZ files.
+%   folder        = A folder of files from which to create PHZ files.
 %                   Specify a save folder to save each one.
 % 
-%     'channel'   = If the data file contains multiple channels, you must
-%                   specify which channel to extract. CHANNEL can be a 
-%                   number or a string. If it is a string, there must be a 
-%                   labels (or similar) variable in the data file indexing 
-%                   the channels in the data variable.
+%   'filetype'    = [string] The type of file that is being loaded. All
+%                   files must be saved as matlab files (i.e., .mat), on
+%                   whichever software they came from. Default is 'acq' for
+%                   a Biopac AcqKnowledge file that has been saved as a
+%                   MATLAB .mat file.
 % 
-%     'delimiter' = Specifies the delimiter in the filename for separating
-%                   'participant, 'group', and 'session' information
+%   'channel'     = [numeric|string] Specify which channel of data to
+%                   import. Default is the first channel of data. For
+%                   Biopac data, 'channel' can be a string specfying the
+%                   name of the channel.
 % 
-%  X  'namestr'   = Specifies the file naming convention. NAMESTR must
-%                   contain at least one of 'participant', 'group', and 
-%                   'session', and each must be separated by a delimiter. 
-%                   Other options are 'study' and 'datatype'. The default 
-%                   NAMESTR is 'participant-group-session'.
+%   'namestr'     = [string] Specifies the file naming convention in order 
+%                   to read values for certain fields directly from the 
+%                   filename. NAMESTR should contain any of the following 
+%                   keywords: 'study', 'datatype', 'participant', 'group',
+%                   'condition', or 'session'. Each must be separated 
+%                   by a delimiter (e.g., 'datatype-participant_group').
+%                   If NAMESTR is empty, no values are read from the 
+%                   filename. If any value is specified with it's
+%                   own parameter/value pair (i.e., 
+%                   phz_create(...,'participant',1,...)), it will 
+%                   overwrite the value obtained via NAMESTR.
 % 
-%     'study'     = Fills the 'study' field of the PHZ structure.
+%   'study'       = Fills the 'study' field of the PHZ structure.
+%   'datatype'    = Fills the 'datatype' field of the PHZ structure.
+%   'participant' = Fills the 'participant' field of the PHZ structure.
+%   'group'       = Fills the 'group' field of the PHZ structure.
+%   'condition'   = Fills the 'condition' field of the PHZ structure.
+%   'session'     = Fills the 'session' field of the PHZ structure.
 % 
-%     'datatype'  = Fills the 'datatype' field of the PHZ structure.
-% 
-%     'savefolder'= The folder where the new PHZ file should be saved.
-%                   SAVEFOLDER must be specified if multiple PHZ files are 
-%                   being created. Specify the empty string ('') to use the
-%                   same folder as where the data files are saved. Default 
-%                   is not to save the new PHZ structure. Files are saved 
-%                   using the phz_save function, the file will have the 
-%                   '.phz' extension, and should be loaded using the 
-%                   phz_load function.
-% 
-%   X  = This functionality isn't working yet.
+%   'savefolder'  = [string] The folder where the new PHZ file should be 
+%                   saved. SAVEFOLDER must be specified if multiple PHZ 
+%                   files are being created. Specify the empty string ('') 
+%                   to use the same folder as where the data files are 
+%                   saved. Default is not to save the new PHZ structure. 
+%                   Files are saved using the phz_save function, the file
+%                   will have the '.phz' extension, and should be loaded 
+%                   using the phz_load function.
 % 
 % OUTPUT  
-%     PHZ structure with the following fields.
+%   PHZ structure with the following fields.
 % 
-%     study           = 'string'
-%     datatype        = 'string', type of data in PHZ.data.
-%     participant     = 'string' or [numeric].
-%     group           = (same as participant)
-%     condition
-%     session         = (same as participant)
-%     trials          = 'string', {'1D cell array of strings'}, 
-%                       or [numeric]. Must be same length as size(data,1).
-%     times           = [numeric], vector of times for each sample
-%                       (in s). Must be same length as size(data,2).
-%     data            = [numeric], 2D array TRIALS-by-TIME.
-%     units           = 'string', units of data in PHZ.data.
-%     srate           = [numeric], sampling frequency.
-%     region.region   = [numeric], endpoints of region (in s). 
-%                       Default available regions are 'baseline', 'target',
-%                       'target2', 'target3', and 'target4'.
-%     resp.q1         = {'1D cell array of strings'}, behavioural 
-%                       responses to each trial. Also available are 
-%                       q2, q3, q4, and q5.
-%     resp.q1_acc     = [numeric], column of accuracy values.
-%     resp.q1_rt      = [numeric], column of reaction times.
-%     spec.*          = {'1D cell array of strings'} specifies the lineSpec
-%                       property (incl. colour) for plotting. Must be the 
-%                       same length as the corresponding grouping variable 
-%                       (i.e., participant, group, session, or trials. See
-%                       the help for the plot.m function for more details
-%                       on line types.
-%     tags.*          = Grouping-variable tags for each trial.
+%   study         = [string] Specifies the name of the study.
+% 
+%   datatype      = [string] Specifies the type of data in PHZ.data. Used
+%                   for labelling plots.
+% 
+%   participant   = [categorical|string|numeric]
+%   group         = (same as participant)
+%   condition     = (same as participant)
+%   session       = (same as participant)
+%   trials        = (same as participant)
+% 
+%   region.(name) = [numeric] specifying endpoints of time regions of 
+%                   interest (in s). Enter in the form [start end].
+%                   Default region names are 'baseline', 'target',
+%                   'target2', 'target3', and 'target4'. Region times and 
+%                   names can be modified using the phz_field function with
+%                   the keywords 'region' and 'regionnames', respectively.
+% 
+%   times         = [numeric] Vector of times for each sample (in s). 
+%                   Must be same length as size(data,2).
+% 
+%   data          = [numeric] 2D array TRIALS-by-TIME.
+% 
+%   units         = [string] Units of data in PHZ.data.
+% 
+%   srate         = [numeric] Sampling frequency.
+% 
+%   resp.q1       = [cell] Behavioural responses to each trial. Must be a 
+%                   column the same length as size(data,1). Also available
+%                   are q2, q3, q4, and q5.
+% 
+%   resp.q1_acc   = [numeric] Column of accuracy values.
+% 
+%   resp.q1_rt    = [numeric] Column of reaction times.
+% 
+%   proc          = [struct] This field is auto-filled with info from
+%                   processing functions that are used on this file. 
+%                   Fields are inserted in chronological order and keep 
+%                   the relevent values for recreating the analysis with
+%                   another file. See phz_proc for more uses.
+% 
+%   meta.tags.*   = [categorical|cell] Specifies grouping variable labels
+%                   for each row in PHZ.data. PHZ.meta.tags.(grpvar) are
+%                   stored as categoricals and must be the same length as 
+%                   the number of rows in data (i.e., number of epochs).
+%                   PHZ.meta.tags.region is stored as a cell and must be
+%                   the same length as the number of regions in PHZ.region.
+%                   Regions can be added using phz_field.
+% 
+%   meta.spec.*   = [cell] Specifies the lineSpec property (incl. colour) 
+%                   for plotting. Must be the same length as the 
+%                   corresponding grouping variable (i.e., participant, 
+%                   group, condition, session, or trials. See the help for
+%                   the plot.m function for more details on lineSpec. These
+%                   values can be changed using the phz_field function.
+% 
+%   misc          = [struct] Empty structure for user to store data of any
+%                   type. There are some PHZLAB functions that access 
+%                   certain fields from PHZ.misc (e.g., FFR
+%                   stimulus-response correlation), but in general you can 
+%                   do whatever you want here.
+% 
+%   history       = [cell] Every time a PHZLAB function is called on this
+%                   file, a new row is added to PHZ.history (using the
+%                   phz_history function) specifying what happened.
 %
-% Written by Gabe Nespoli 2016-01-27. Revised 2016-05-09.
+% Written by Gabe Nespoli 2016-01-27. Revised 2016-05-20.
 
 function PHZ = phz_create(files,varargin)
 
@@ -88,13 +134,16 @@ end
 if nargin == 0, PHZ = getBlankPHZ(1); return, end
 
 % defaults
-study = '';
-% participant = '';
-% group = '';
-% session = '';
+namestr = '';
+
+study = ''; %#ok<NASGU>
+datatype = ''; %#ok<NASGU>
+participant = ''; %#ok<NASGU>
+group = ''; %#ok<NASGU>
+condition = ''; %#ok<NASGU>
+session = ''; %#ok<NASGU>
 
 channel = 1;
-delimiter = '-';
 
 filetype = 'acq';
 savefolder = 0;
@@ -128,14 +177,16 @@ end
 % user-defined
 for i = 1:2:length(varargin)
     switch lower(varargin{i})
-        case 'study',                   study = varargin{i+1};
-%         case 'participant',             participant = varargin{i+1};
-%         case 'group',                   group = varargin{i+1};
-%         case 'session',                 session = varargin{i+1};
-
         case 'channel',                 channel = varargin{i+1};
-        case 'delimiter',               delimiter = varargin{i+1};
+        case 'namestr',                 namestr = varargin{i+1};
         
+        case 'study',                   study = varargin{i+1}; %#ok<NASGU>
+        case 'datatype',                datatype = varargin{i+1}; %#ok<NASGU>
+        case 'participant',             participant = varargin{i+1}; %#ok<NASGU>
+        case 'group',                   group = varargin{i+1}; %#ok<NASGU>
+        case 'condition',               condition = varargin{i+1}; %#ok<NASGU>
+        case 'session',                 session = varargin{i+1}; %#ok<NASGU>
+
         case 'filetype',                filetype = varargin{i+1};
         case {'save','filename'},       savefolder = varargin{i+1};
         case 'verbose',                 verbose = varargin{i+1};
@@ -144,8 +195,7 @@ end
 
 % check things before starting
 if ~ischar(savefolder) && length(files) > 1
-    error('When creating more than one PHZ file, specify a folder where they should be saved.')
-end
+    error('When creating more than one PHZ file, specify a folder where they should be saved.'), end
 
 % loop files
 if verbose, disp(' '), disp('Creating PHZ file(s) from data file(s)...'), end
@@ -157,16 +207,14 @@ for i = 1:length(files)
     % load data
     if verbose, disp(['Loading data from file ',fileProgress]), end
     PHZ = getBlankPHZ(verbose); % get new blank PHZ structure
-    PHZ.study = study;
-    PHZ.meta.datafile = fullfile(folder,files{i});
-    s = load(PHZ.meta.datafile,'-mat');
+    PHZ.proc.create.datafile = fullfile(folder,files{i});
+    s = load(PHZ.proc.create.datafile,'-mat');
     
-    % get grouping vars from filename ('participant-group-session.mat')
-    [~,name] = fileparts(files{i});
-    name = regexp(name,delimiter,'split');
-    PHZ.participant = name{1};
-    if length(name) > 1, PHZ.group = name{2}; end
-    if length(name) > 2, PHZ.session = name{3}; end
+    % get grouping vars from filename or parameter/value pairs
+    PHZ = readFilename(PHZ,namestr);
+    for j = {'study','datatype','participant','group','condition','session'}; field = j{1};
+        if ~isempty(eval(field)), PHZ.(field) = eval(field); end
+    end
     
     % get data
     switch lower(filetype)
@@ -200,16 +248,84 @@ close(w)
 
 end
 
+function PHZ = readFilename(PHZ,namestr)
+
+% find out which grpvars are in namestr & their order & their start/ends
+vars = {'study','datatype','participant','group','condition','session'};
+varsbeg = sort(cell2mat(regexp(namestr,vars,'start')));
+varsend = sort(cell2mat(regexp(namestr,vars,'end')));
+grpvars = cell(size(varsbeg));
+for i = 1:length(grpvars), grpvars{i} = namestr(varsbeg(i):varsend(i)); end
+
+% use start/ends to get delimstr that occur before & after each grpvar
+% i.e., length(delimstr) = length(grpvars) + 1
+delimstr = cell(1,length(grpvars) + 1);
+for i = 1:length(delimstr)
+    switch i
+        
+        case 1
+            if varsbeg(i) == 1
+                delimstr{i} = '';
+                
+            else
+                delimstr{i} = namestr(1:varsbeg(i) - 1);
+            end
+            
+        case length(delimstr)
+            if varsend(i-1) == length(grpvars)
+                delimstr{i} = '';
+                
+            else
+                delimstr{i} = namestr(varsend(i-1) + 1:end);
+            end
+            
+        otherwise
+            delimstr{i} = namestr(varsend(i-1) + 1:varsbeg(i) - 1);
+    end
+end
+
+if any(cellfun(@isempty,delimstr(2:end-1)))
+    error('There must be some delimiter between grouping variables in the filename.'), end
+
+
+[~,name,~] = fileparts(PHZ.proc.create.datafile);
+
+% move cursor past leading delimiter
+if isempty(delimstr{1}), cursor = 1;
+elseif strcmp(delimstr{1},name(1:length(delimstr{1})))
+    cursor = 1 + length(delimstr{1});
+else error(['Filename ''',name,''' doesn''t match the namestr.'])
+end
+delimstr(1) = []; % delimstr now holds delims that follow each grpvar
+
+
+% loop through grpvars and get their vals from the filename
+for i = 1:length(grpvars)
+    
+    if i == length(grpvars) && isempty(delimstr{i})
+        PHZ.(grpvars{i}) = name(cursor:end);
+        
+    else
+        
+        strend = min(strfind(name(cursor:end),delimstr{i}));
+        PHZ.(grpvars{i}) = name(cursor:cursor + strend - 2);
+        cursor = cursor + strend + length(delimstr{i}) - 1;
+    end
+end
+
+PHZ.proc.create.namestr = namestr;
+end
+
 function PHZ = getBlankPHZ(verbose)
 
 PHZ.study = '';
 PHZ.datatype = ''; % i.e. 'scl', 'zyg', 'ffr', etc.
 
-PHZ.participant = '';
-PHZ.group = ''; % aka between-subjects variable
-PHZ.condition = '';
-PHZ.session = ''; % aka within-subjects variable
-PHZ.trials = ''; % trialtype label for each trial (i.e., trial order)
+PHZ.participant = categorical;
+PHZ.group = categorical; % aka between-subjects variable
+PHZ.condition = categorical;
+PHZ.session = categorical; % aka within-subjects variable
+PHZ.trials = categorical; % trialtype label for each trial (i.e., trial order)
 
 PHZ.region.baseline = []; % baseline region if data are baseline-corrected
 PHZ.region.target = [];

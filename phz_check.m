@@ -184,8 +184,8 @@ end
 
 PHZ.meta.tags.region = verifyCell(PHZ.meta.tags.region,[name,'.meta.tags.region'],verbose);
 PHZ.meta.tags.region = checkAndFixRow(PHZ.meta.tags.region,[name,'.meta.tags.region'],nargout,verbose);
-if length(PHZ.meta.tags.region) ~= 5
-    error('There should be 5 region names in PHZ.meta.tags.region.'), end
+% if length(PHZ.meta.tags.region) ~= 5
+%     error('There should be 5 region names in PHZ.meta.tags.region.'), end
 
 %% resp
 if ~isstruct(PHZ.resp)
@@ -472,7 +472,7 @@ end
 
 % add 'condition' as a grouping variable (v0.8.4)
 if ~ismember('condition',fieldnames(PHZ))
-    PHZ.condition = '';
+    PHZ.condition = categorical;
     PHZ.meta.tags.condition = categorical;
     PHZ.meta.spec.condition = {};
 end
@@ -545,4 +545,42 @@ if ~all(ismember(fieldnames(PHZ.meta),metaOrder))
 end
 metaOrder = metaOrder(ismember(metaOrder,fieldnames(PHZ.meta)));
 PHZ.meta = orderfields(PHZ.meta,metaOrder);
+
+
+% meta.tags structure
+% -------------------
+
+metaTagsOrder = {
+    'participant'
+    'group'
+    'condition'
+    'session'
+    'trials'
+    'region'
+    };
+if ~all(ismember(fieldnames(PHZ.meta.tags),metaTagsOrder))
+    error(['Invalid fields present in PHZ.meta.tags structure. ',...
+        'Use PHZ.misc to store miscellaneous data.'])
+end
+metaTagsOrder = metaTagsOrder(ismember(metaTagsOrder,fieldnames(PHZ.meta.tags)));
+PHZ.meta.tags = orderfields(PHZ.meta.tags,metaTagsOrder);
+
+% meta.spec structure
+% -------------------
+
+metaSpecOrder = {
+    'participant'
+    'group'
+    'condition'
+    'session'
+    'trials'
+    'region'
+    };
+if ~all(ismember(fieldnames(PHZ.meta.spec),metaSpecOrder))
+    error(['Invalid fields present in PHZ.meta.spec structure. ',...
+        'Use PHZ.misc to store miscellaneous data.'])
+end
+metaSpecOrder = metaSpecOrder(ismember(metaSpecOrder,fieldnames(PHZ.meta.spec)));
+PHZ.meta.spec = orderfields(PHZ.meta.spec,metaSpecOrder);
+
 end
