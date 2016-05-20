@@ -1,34 +1,41 @@
-function PHZ = phz_subset(PHZ,subset,verbose)
 %PHZ_SUBSET  Extract a subset of data from a PHZ or PHZS structure.
 %
-% usage:    PHZ = phz_subset(PHZ,SUBSET)
-%           PHZ = phz_subset(PHZ,IND)
+% USAGE    
+%   PHZ = phz_subset(PHZ,subset)
+%   PHZ = phz_subset(PHZ,ind)
 %
-% inputs:   PHZ    = PHZLAB data structure.
-%           SUBSET = A cell array of length 2, where the first value is a
-%                    field to restrict by (i.e., 'participant', 'group',
-%                    'session', 'trials', or a PHZ.resp field) and the 
-%                    second item is a number, string, or cell array of 
-%                    strings with the value(s) of the field to include.
-%           IND    = A logcial vector (i.e., 1's & 0's) the same length as
-%                    the number of trials. Positions with a 1 are included,
-%                    positions with a 0 are excluded.
+% INPUT
+%   PHZ       = [struct] PHZLAB data structure.
+% 
+%   subset    = {'string' value} A cell array of length 2, where the first
+%               value is a field to restrict by (i.e., 'participant', 
+%               'group', 'condition', 'session', 'trials', or a PHZ.resp 
+%               field) and the second item is a number, string, or cell
+%               array of strings with the value(s) of the field to include.
+% 
+%   ind       = A logcial vector (i.e., 1's & 0's) the same length as the
+%               number of trials. Positions with a 1 are included,
+%               positions with a 0 are excluded.
 %
-% outputs:  The following fields are restricted to the specified subset:
-%               PHZ.(participant/group/session/trials)
-%               PHZ.data
-%               PHZ.resp.*
-%               PHZ.meta.spec.*
-%               PHZ.meta.tags.*
+% OUTPUT
+%   The following fields are restricted to the specified subset:
+%       PHZ.(participant/group/condition/session/trials)
+%       PHZ.data
+%       PHZ.resp.*
+%       PHZ.meta.spec.*
+%       PHZ.meta.tags.*
 %
-% examples:
+% EXAMPLES
 %   phz_subset(PHZ,{'session' '1'}) >> Only include data from session 1.
 %   phz_subset(PHZ,{'acc' '1'})     >> Only include data from trials with
 %                                      an accurate response.
 %   phz_subset(PHZ,PHZ.resp.q1_rt < 10) >> Only include data from trials
 %                                      with a reaction time less than 10 s.
 %
-% Written by Gabriel A. Nespoli 2016-03-08. Revised 2016-04-07.
+% Written by Gabriel A. Nespoli 2016-03-08. Revised 2016-05-19.
+
+function PHZ = phz_subset(PHZ,subset,verbose)
+
 if nargout == 0 && nargin == 0, help phz_subset, return, end
 if isempty(subset), return, end
 if nargin < 3, verbose = true; end
@@ -64,7 +71,7 @@ elseif iscell(subset)
                 inddata = indall;
             end
             
-        case {'participant','group','session','trials'}
+        case {'participant','group','condition','session','trials'}
             inddata = ismember(PHZ.meta.tags.(field),labels);
             if ismember('rej',fieldnames(PHZ.proc))
                 indrej = ismember(PHZ.proc.rej.(field),labels);
@@ -92,13 +99,13 @@ indall = logical(indall);
 indrej = logical(indrej);
 
 % adjust tags and grouping vars (also rej)
-for i = {'participant','group','session','trials'}, field = i{1};
+for i = {'participant','group','condition','session','trials'}, field = i{1};
     PHZ.meta.tags.(field) = PHZ.meta.tags.(field)(inddata);
     if ismember('rej',fieldnames(PHZ.proc)), PHZ.proc.rej.(field) = PHZ.proc.rej.(field)(indrej); end
 end
 
 % adjust grouping vars
-for i = {'participant','group','session','trials'}, field = i{1};
+for i = {'participant','group','condition','session','trials'}, field = i{1};
     if length(PHZ.(field)) ~= length(unique(PHZ.meta.tags.(field)))
         ind = ismember(PHZ.(field),unique(PHZ.meta.tags.(field)));
         PHZ.(field)      = PHZ.(field)(ind);

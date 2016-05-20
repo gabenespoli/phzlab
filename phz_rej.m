@@ -1,37 +1,40 @@
-function PHZ = phz_rej(PHZ,threshold,varargin)
 %PHZ_REJ  Remove trials containing values exceeding a threshold.
 %
-% usage:    
-%     PHZ = PHZ_REJ(PHZ,THRESHOLD)
-%     PHZ = PHZ_REJ(PHZ,THRESHOLD,REJTYPE)
+% USAGE    
+%   PHZ = PHZ_REJ(PHZ,threshold)
+%   PHZ = PHZ_REJ(PHZ,threshold,rejtype)
 % 
-% input:   
-%     PHZ         = PHZLAB data structure.
-%     THRESHOLD   = Trials with any value exceeding the value of THRESHOLD
-%                   will be rejected. Enter 0 to unreject all trials.
-%     REJTYPE     = The units of THRESHOLD. Default is 'threshold' (i.e., the
-%                   same units as PHZ.units). Enter 'sd' to reject a trial if
-%                   any value exceeds a THRESHOLD Number of that trial's
-%                   standard deviation.
+% INPUT   
+%   PHZ         = [struct] PHZLAB data structure.
+%   THRESHOLD   = Trials with any value exceeding the value of THRESHOLD
+%                 will be rejected. Enter 0 to unreject all trials.
+%   REJTYPE     = The units of THRESHOLD. Default is 'threshold' (i.e., the
+%                 same units as PHZ.units). Enter 'sd' to reject a trial if
+%                 any value exceeds a THRESHOLD Number of that trial's
+%                 standard deviation.
 %                       
-% output:  
-%     PHZ.proc.rej.threshold   = The value specified in THRESHOLD.
-%     PHZ.proc.rej.units       = The units of the threshold value.
-%     PHZ.proc.rej.data        = Data of rejected trials.
-%     PHZ.proc.rej.locs        = Indices of rejected trials.
-%     PHZ.proc.rej.data_locs   = Indices of retained trials.
-%     PHZ.proc.rej.participant = Participant tags of rejected trials.
-%     PHZ.proc.rej.group       = Group tags of rejected trials.
-%     PHZ.proc.rej.session     = Session tags of rejected trials.
-%     PHZ.proc.rej.trials      = Trials trags of rejected trials.
+% OUTPUT  
+%   PHZ.proc.rej.threshold   = The value specified in THRESHOLD.
+%   PHZ.proc.rej.units       = The units of the threshold value.
+%   PHZ.proc.rej.data        = Data of rejected trials.
+%   PHZ.proc.rej.locs        = Indices of rejected trials.
+%   PHZ.proc.rej.data_locs   = Indices of retained trials.
+%   PHZ.proc.rej.participant = Participant tags of rejected trials.
+%   PHZ.proc.rej.group       = Group tags of rejected trials.
+%   PHZ.proc.rej.condition   = Condition tags of rejected trials.
+%   PHZ.proc.rej.session     = Session tags of rejected trials.
+%   PHZ.proc.rej.trials      = Trials trags of rejected trials.
 % 
-% examples:
-%     PHZ = phz_rej(PHZ,20)     >> Reject all trials with a value > 20.
-%     PHZ = phz_rej(PHZ,3,'sd') >> Reject trials with a value > 3 standard
-%                                  deviations from the mean of all trials.
-%     PHZ = phz_rej(PHZ,0)      >> Restore all rejected trials.
+% EXAMPLES
+%   PHZ = phz_rej(PHZ,20)     >> Reject all trials with a value > 20.
+%   PHZ = phz_rej(PHZ,3,'sd') >> Reject trials with a value > 3 standard
+%                                deviations from the mean of all trials.
+%   PHZ = phz_rej(PHZ,0)      >> Restore all rejected trials.
 %
-% Written by Gabriel A. Nespoli 2016-01-27. Revised 2016-04-06.
+% Written by Gabriel A. Nespoli 2016-01-27. Revised 2016-05-19.
+
+function PHZ = phz_rej(PHZ,threshold,varargin)
+
 if nargout == 0 && nargin == 0, help phz_rej, return, end
 if nargin > 1 && isempty(threshold), return, end
 
@@ -76,6 +79,7 @@ if do_rej || do_restore
         locs        = [PHZ.proc.rej.data_locs;    PHZ.proc.rej.locs];
         data        = [PHZ.data;                  PHZ.proc.rej.data];
         participant = [PHZ.meta.tags.participant; PHZ.proc.rej.participant];
+        condition   = [PHZ.meta.tags.condition;   PHZ.proc.rej.condition];
         group       = [PHZ.meta.tags.group;       PHZ.proc.rej.group];
         session     = [PHZ.meta.tags.session;     PHZ.proc.rej.session];
         trials      = [PHZ.meta.tags.trials;      PHZ.proc.rej.trials];
@@ -84,6 +88,7 @@ if do_rej || do_restore
         [~,ind]                   = sort(locs);
         PHZ.data                  = data(ind,:);
         PHZ.meta.tags.participant = participant(ind);
+        PHZ.meta.tags.condition   = condition(ind);
         PHZ.meta.tags.group       = group(ind);
         PHZ.meta.tags.session     = session(ind);
         PHZ.meta.tags.trials      = trials(ind);
@@ -217,6 +222,7 @@ PHZ.proc.rej.data = [];
 PHZ.proc.rej.locs = [];
 PHZ.proc.rej.data_locs = transpose(1:size(PHZ.data,1));
 PHZ.proc.rej.participant = categorical;
+PHZ.proc.rej.condition = categorical;
 PHZ.proc.rej.group = categorical;
 PHZ.proc.rej.session = categorical;
 PHZ.proc.rej.trials = categorical;

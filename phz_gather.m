@@ -37,7 +37,7 @@
 %   PHZ = phz_gather >> Opens a file browser to select multiple files.
 %   PHZ = phz_gather('myfolder') >> Gathers all .phz files in myfolder.
 %
-% Written by Gabriel A. Nespoli 2016-02-21. Revised 2016-05-11.
+% Written by Gabriel A. Nespoli 2016-02-21. Revised 2016-05-19.
 
 function PHZS = phz_gather(varargin)
 
@@ -147,7 +147,7 @@ for j = 1:length(files)
 
     % grouping variables & tags
     % if different, reset to include unique values of tags after looping
-    for i = {'participant','group','session','trials'}, field = i{1};
+    for i = {'participant','group','condition','session','trials'}, field = i{1};
         if ~strcmp(PHZ.meta.tags.(field),'<collapsed>')
             
             if ~all(ismember(cellstr(PHZ.(field)),cellstr(PHZS.(field))))

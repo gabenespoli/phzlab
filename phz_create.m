@@ -53,6 +53,7 @@
 %     datatype        = 'string', type of data in PHZ.data.
 %     participant     = 'string' or [numeric].
 %     group           = (same as participant)
+%     condition
 %     session         = (same as participant)
 %     trials          = 'string', {'1D cell array of strings'}, 
 %                       or [numeric]. Must be same length as size(data,1).
@@ -206,6 +207,7 @@ PHZ.datatype = ''; % i.e. 'scl', 'zyg', 'ffr', etc.
 
 PHZ.participant = '';
 PHZ.group = ''; % aka between-subjects variable
+PHZ.condition = '';
 PHZ.session = ''; % aka within-subjects variable
 PHZ.trials = ''; % trialtype label for each trial (i.e., trial order)
 
@@ -241,12 +243,14 @@ PHZ.times = []; % in seconds
 
 PHZ.meta.tags.participant = categorical;
 PHZ.meta.tags.group = categorical;
+PHZ.meta.tags.condition = categorical;
 PHZ.meta.tags.session = categorical;
 PHZ.meta.tags.trials = categorical;
 PHZ.meta.tags.region = {'baseline','target','target2','target3','target4'};
 
 PHZ.meta.spec.participant = {};
 PHZ.meta.spec.group = {};
+PHZ.meta.spec.condition = {};
 PHZ.meta.spec.session = {};
 PHZ.meta.spec.trials = {};
 PHZ.meta.spec.region = {'k','b','g','y','r'};

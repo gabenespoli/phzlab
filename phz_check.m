@@ -3,7 +3,7 @@
 % USAGE
 %  PHZ = phz_check(PHZ)
 %
-% Written by Gabriel A. Nespoli 2016-02-08. Revised 2016-04-12.
+% Written by Gabriel A. Nespoli 2016-02-08. Revised 2016-05-19.
 
 function PHZ = phz_check(PHZ,verbose)
 
@@ -47,7 +47,7 @@ end
 if ~isstruct(PHZ.meta.tags), error([name,'.meta.tags should be a structure.']), end
 if ~isstruct(PHZ.meta.spec), error([name,'.meta.spec should be a structure.']), end
 
-for i = {'participant','group','session','trials'}, field = i{1};
+for i = {'participant','group','condition','session','trials'}, field = i{1};
     
     % grouping vars
     PHZ.(field) = verifyCategorical(PHZ.(field),[name,'.',field],verbose);
@@ -470,8 +470,11 @@ if updateTo8
     PHZ = phz_history(PHZ,'Updated PHZ structure to v0.8.',verbose,0);
 end
 
-% add 'condition' as a grouping variable (v0.8.3)
+% add 'condition' as a grouping variable (v0.8.4)
 if ~ismember('condition',fieldnames(PHZ))
+    PHZ.condition = '';
+    PHZ.meta.tags.condition = categorical;
+    PHZ.meta.spec.condition = {};
 end
 
 end
@@ -499,6 +502,7 @@ mainOrder = {
     
     'participant'
     'group'
+    'condition'
     'session'
     'trials'
     

@@ -28,7 +28,7 @@
 %   PHZ = phz_summary(PHZ,{'trials','group') >> For each unique combination
 %         of PHZ.trials and PHZ.group, average those trials together.
 %
-% Written by Gabriel A. Nespoli 2016-03-17. Revised 2016-05-11.
+% Written by Gabriel A. Nespoli 2016-03-17. Revised 2016-05-19.
 
 function PHZ = phz_summary(PHZ,keepVars,verbose)
 
@@ -86,7 +86,7 @@ else
 end
 
 % cleanup
-loseVars = {'participant','group','session','trials'};
+loseVars = {'participant','group','condition','session','trials'};
 loseVars(ismember(loseVars,keepVars)) = [];
 for i = loseVars, field = i{1};
     if length(unique(PHZ.meta.tags.(field))) == 1
@@ -105,6 +105,7 @@ if ismember('rej',fieldnames(PHZ.proc))
     PHZ.proc.rej.data = '<collapsed>';
     PHZ.proc.rej.data_locs = '<collapsed>';
     PHZ.proc.rej.participant = '<collapsed>';
+    PHZ.proc.rej.condition = '<collapsed>';
     PHZ.proc.rej.group = '<collapsed>';
     PHZ.proc.rej.session = '<collapsed>';
     PHZ.proc.rej.trials = '<collapsed>';
@@ -123,7 +124,7 @@ end
 function keepVars = verifyKeepVars(keepVars)
 if ~iscell(keepVars), keepVars = cellstr(keepVars); end
 if ~isempty(keepVars)
-    if ~all(ismember(keepVars,{'trials','session','group','participant','all','',' ','none'}))
+    if ~all(ismember(keepVars,{'trials','session','condition','group','participant','all','',' ','none'}))
         error('Invalid summaryType.'), end
     if any(ismember({'all','',' ','none'},keepVars)) && length(keepVars) > 1
         error('A value in summaryType must be used on its own, but is being used with other summaryTypes.'), end
