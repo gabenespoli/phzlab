@@ -1,23 +1,28 @@
-function PHZ = phz_transform(PHZ,transform,verbose)
 %PHZ_TRANSFORM  Apply a transformation to the data.
 %
-% usage:    PHZ = PHZ_TRANSFORM(PHZ,TRANSFORM)
+% USAGE
+%   PHZ = phz_transform(PHZ,transform)
 % 
-% inputs:   PHZ       = PHZLAB data structure.
-%           TRANSFORM = Type of transformation to apply to the data. See
-%                       below for a list of possible transformations.
+% INPUT
+%   PHZ       = PHZLAB data structure.
+%   transform = [string|numeric] Type of transformation to apply to the 
+%               data. See below for a list of possible transformations.
 % 
-%           'sqrt'    = Take square root of every data point.
-%                       Data cannot be negative.
-%           '^2'      = Square every data point.
-%           'log'     = Natural logarithm.
-%           'log10'   = Base 10 logarithm.
-%           'log2'    = Base 2 logarithm.
-%           [numeric] = Multiply each data point by this number.
+%       'sqrt'    = Take square root of every data point.
+%                   Data cannot be negative.
+%       '^2'      = Square every data point.
+%       'log'     = Natural logarithm.
+%       'log10'   = Base 10 logarithm.
+%       'log2'    = Base 2 logarithm.
+%       [numeric] = Multiply each data point by this number.
 % 
-% outputs:  PHZ.data  = The transformed data.
+% OUTPUT
+%   PHZ.data  = The transformed data.
 %
 % Written by Gabriel A. Nespoli 2016-03-26. Revised 2016-04-04.
+
+function PHZ = phz_transform(PHZ,transform,verbose)
+
 if nargout == 0 && nargin == 0, help phz_transform, return, end
 if isempty(transform), return, end
 

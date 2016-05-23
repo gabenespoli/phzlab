@@ -1,23 +1,37 @@
-function PHZ = phzUtil_binmean(PHZ,bins,width,varargin)
-%PHZUTIL_BINMEAN  Averages specified bins in a vector.
-%   S = PHZUTIL_BINMEAN(Y,X,BINS,WIDTH) finds the indices of the values 
-%       BINS in vector X, finds these bins in each row of Y, and returns
-%       the average of a WIDTH number of bins on either side of the center
-%       bin. A common use is when Y is fft data and X is the corresponding
-%       frequency vector, and BINS is the frequencies of interest. For
-%       matrices, BINMEAN operates on the first non-singleton dimension.
-%
-%   S = PHZUTIL_BINMEAN(...,TYPE) specifies one of the following things:
-%       1 = specified bin and bins on either side are included (default)
-%       0 = specified bin is excluded, bins are either side only are used
-%
-%   S = PHZUTIL_BINMEAN(...,0,BINSAWAY) If TYPE is 0 (do not include 
-%       specified bin), BINSAWAY specifies the desired width of the center 
-%       bin to ignore. BINMEAN will count a BINSAWAY number of bins on 
-%       either side of the center bin before averaging a WIDTH number of
-%       bins.
+%PHZUTIL_BINMEAN  Averages specified bins in a vector. Usually used with
+%   FFT data to find averages of a certain numer of frequency bins around
+%   a frequency of interest.
+% 
+% USAGE
+%   PHZ = phzUtil_binmean(PHZ,bins,width)
+%   PHZ = phzUtil_binmean(PHZ,bins,width,'Param1',Value1,etc.)
+% 
+% INPUT
+%   PHZ           = [struct] PHZLAB data structure.
+% 
+%   bins          = [numeric] Values in the TIMES or FREQS field to serve
+%                   as center bins when averaging.
+% 
+%   width         = [numeric] The number of bins on either side of the
+%                   center bin to average together. e.g., a width of 2
+%                   would average a total of 5 bins (the center bin and 
+%                   two bins on either side.
+% 
+%   'bintype'     = [1|0] Enter 0 to exclude the center bin from the
+%                   average. Default 1.
+% 
+%   'binsaway'    = [numeric] If BINTYPE is 0 (exclude center bin), 
+%                   BINSAWAY specifies the desired width of the center bin
+%                   to ignore. BINMEAN will count a BINSAWAY number of bins
+%                   on either side of the center bin before averaging a 
+%                   WIDTH number of bins. Default 1.
+% 
+% OUTPUT
+%   PHZ.data = [numeric] Means of specified bins.
 %
 % Written by Gabe Nespoli 2015-03-10. Revised for PHYZLAB 2016-03-19.
+
+function PHZ = phzUtil_binmean(PHZ,bins,width,varargin)
 
 if nargout == 0 && nargin == 0, help phzUtil_binmean, end
 

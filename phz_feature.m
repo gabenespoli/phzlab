@@ -1,89 +1,88 @@
 %PHZ_FEATURE  Calculate the specified feature on each trial.
 %
 % USAGE
-%     PHZ = phz_feature(PHZ,feature)
-%     PHZ = phz_feature(PHZ,feature,'Param1',Value1,etc.)
+%   PHZ = phz_feature(PHZ,feature)
+%   PHZ = phz_feature(PHZ,feature,'Param1',Value1,etc.)
 %
 % INPUT
-%     PHZ       = PHZLAB data structure.
+%   PHZ       = PHZLAB data structure.
 %
-%     feature   = [string] Specifies the desired feature. Possible
-%                 features are listed below.
+%   feature   = [string] Specifies the desired feature. Possible
+%               features are listed below.
 %
-%     'region'  = Calls phz_region.m to restrict the time or frequency
-%                 region used for feature extration.
+%   'region'  = Calls phz_region.m to restrict the time or frequency
+%               region used for feature extration.
 %
-%     'summary' = Summarizes the resulting features by averaging
-%                 across grouping variables. For FFT, this averaging
-%                 is done before calulating the FFT; different
-%                 participants are kept separate for this averaging.
-%                 See phz_summary for more details.
+%   'summary' = Summarizes the resulting features by averaging
+%               across grouping variables. For FFT, this averaging
+%               is done before calulating the FFT; different
+%               participants are kept separate for this averaging.
+%               See phz_summary for more details.
 %
 %   Time-domain features:
-%     'mean'          = Average value.
+%   'mean'        = Average value.
 %
-%     'max','min'     = Maximum or minimum value.
+%   'max','min'   = Maximum or minimum value.
 %
-%     'maxi','mini'   = Time (latency) of the max or min (in seconds).
+%   'maxi','mini' = Time (latency) of the max or min (in seconds).
 %
-%     'rms'           = Root-mean-square of the specified region(s).
+%   'rms'         = Root-mean-square of the specified region(s).
 %
-%     'slope'         = The max slope of tangents to each point of the
-%                       data after they are smoothed with a moving point
-%                       average.
+%   'slope'       = The max slope of tangents to each point of the
+%                   data after they are smoothed with a moving point
+%                   average.
 %
-%     'slopei'        = Time of maximum slope.
+%   'slopei'      = Time of maximum slope.
 %
-%     'area'          = Area under the curve.
+%   'area'        = Area under the curve.
 %
-%     ''              = (blank) returns time-series data.
+%   ''            = (blank) returns time-series data.
 %
 %   Frequency-domain features:
-%     'fft'           = Amplitude spectrum. Trials are averaged together in
-%                       the time domain before calculating.
+%   'fft'         = Amplitude spectrum. Trials are averaged together in
+%                   the time domain before calculating.
 %
-%     'fft100'        = Entering 'fft' followed by a number will calculate
-%                       the value of the FFT at that frequency (e.g.,
-%                       'fft100' returns the value of the 100 Hz bin).
+%   'fft100'      = Entering 'fft' followed by a number will calculate
+%                   the value of the FFT at that frequency (e.g.,
+%                   'fft100' returns the value of the 100 Hz bin).
 %
-%     'fft100-1'      = Additionally specifies the number of bins on
-%                       either side of the specified bin to include in
-%                       an average (e.g., 'fft100-1' returns the average
-%                       of 3 bins centered on 100 Hz).
+%   'fft100-1'    = Additionally specifies the number of bins on
+%                   either side of the specified bin to include in
+%                   an average (e.g., 'fft100-1' returns the average
+%                   of 3 bins centered on 100 Hz).
 %
-%     'itfft'         = Intertrial FFT. Whereas the 'fft' feature averages
-%                       trials before caluclating the FFT, 'itfft'
-%                       calculates the FFT on each trial before averaging
-%                       trials together.
+%   'itfft'       = Intertrial FFT. Whereas the 'fft' feature averages
+%                   trials before caluclating the FFT, 'itfft' calculates
+%                   the FFT on each trial before averaging trials together.
 %
-%     'src','srclag'  = Stimulus-response correlation or lag. Returns the
-%                       r-value or the time in seconds of the maximum
-%                       cross-correlation between each epoch and a stimulus
-%                       vector provided in PHZ.misc.stim. This is usually
-%                       used for FFR data.
+%   'itpc'        = Intertrial phase coherence.
+% 
+%   'src','srclag'= Stimulus-response correlation or lag. Returns the
+%                   r-value or the time in seconds of the maximum
+%                   cross-correlation between each epoch and a stimulus
+%                   vector provided in PHZ.misc.stim. This is usually
+%                   used for FFR data.
 %
-%     'itpc'          = Intertrial phase coherence.
-%
-%     'itrc'          = Intertrial response consistency (FFR feature).
+%   'itrc'        = Intertrial response consistency (FFR feature).
 %
 %   Behavioural features:
-%     'acc','acc2',...= Accuracy value in PHZ.resp.q1_acc, q2, etc.
+%   'acc','acc2',...  = Accuracy value in PHZ.resp.q1_acc, q2, etc.
 %
-%     'rt','rt2',...  = Reaction time in PHZ.resp.q1_rt, q2, etc.
+%   'rt','rt2',...    = Reaction time in PHZ.resp.q1_rt, q2, etc.
 %
-%   Note: For all features except 'acc' and 'rt', data are
-%         returned for non-rejected trials. For 'acc' and 'rt',
-%         all trials are included regardless of whether or not
-%         they are rejected.
+%   Note: For all features except 'acc' and 'rt', data are returned for
+%         non-rejected trials. For 'acc' and 'rt', all trials are included
+%         regardless of whether or not they are rejected.
 %
 % OUTPUT
-%     PHZ.data    = The data of the extracted feature for each trial.
-%     PHZ.feature = The value specified in FEATURE.
+%   PHZ.data      = The data of the extracted feature for each trial.
+%   PHZ.feature   = The value specified in FEATURE.
 %
 % EXAMPLES
-%     PHZ = phz_feature(PHZ,'mean')
+%   PHZ = phz_feature(PHZ,'mean')
 %
 % Written by Gabriel A. Nespoli 2016-02-15. Revised 2016-05-09.
+
 function [PHZ,featureTitle] = phz_feature(PHZ,feature,varargin)
 
 if nargout == 0 && nargin == 0, help phz_feature, return, end

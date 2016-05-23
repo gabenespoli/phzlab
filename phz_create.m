@@ -3,29 +3,27 @@
 % USAGE
 %   PHZ = phz_create
 %   PHZ = phz_create(files)
-%   PHZ = phz_create(folder)
 %   PHZ = phz_create(files,...,'Param1',Value1,etc.)
 % 
 % INPUT   
 %   PHZ           = PHZLAB data structure.
 % 
-%   files         = String or cell array of strings specifying the file(s) 
-%                   to import. If left empty, a dialog box pops up for you 
-%                   to select a file or files.
-% 
-%   folder        = A folder of files from which to create PHZ files.
-%                   Specify a save folder to save each one.
+%   files         = [string|cell of strings] Specifies the file(s) to
+%                   import. If left empty, a dialog box pops up for you 
+%                   to select a file or files. If FILES is a folder, all
+%                   .mat files are used.
 % 
 %   'filetype'    = [string] The type of file that is being loaded. All
 %                   files must be saved as matlab files (i.e., .mat), on
-%                   whichever software they came from. Default is 'acq' for
-%                   a Biopac AcqKnowledge file that has been saved as a
-%                   MATLAB .mat file.
+%                   whichever software they came from. Default is 'acq'
+%                   for a Biopac AcqKnowledge file that has been saved
+%                   a MATLAB .mat file.
 % 
 %   'channel'     = [numeric|string] Specify which channel of data to
 %                   import. Default is the first channel of data. For
-%                   Biopac data, 'channel' can be a string specfying the
-%                   name of the channel.
+%                   Biopac data, 'channel' can be a string specfying 
+%                   the name of the channel as specified in the 'labels'
+%                   variable that is exported from Biopac.
 % 
 %   'namestr'     = [string] Specifies the file naming convention in order 
 %                   to read values for certain fields directly from the 
@@ -56,7 +54,7 @@
 %                   using the phz_load function.
 % 
 % OUTPUT  
-%   PHZ structure with the following fields.
+%   PHZ           = [struct] PHZ data structure with the following fields:
 % 
 %   study         = [string] Specifies the name of the study.
 % 
@@ -64,10 +62,10 @@
 %                   for labelling plots.
 % 
 %   participant   = [categorical|string|numeric]
-%   group         = (same as participant)
-%   condition     = (same as participant)
-%   session       = (same as participant)
-%   trials        = (same as participant)
+%   group         = [categorical|string|numeric]
+%   condition     = [categorical|string|numeric]
+%   session       = [categorical|string|numeric]
+%   trials        = [categorical|string|numeric]
 % 
 %   region.(name) = [numeric] specifying endpoints of time regions of 
 %                   interest (in s). Enter in the form [start end].
@@ -147,7 +145,7 @@ channel = 1;
 
 filetype = 'acq';
 savefolder = 0;
-verbose = true;
+verbose = false;
 
 folder = '';
 
@@ -240,7 +238,7 @@ for i = 1:length(files)
         [pathstr,name] = fileparts(PHZ.meta.datafile);
         if isempty(savefolder), savefolder = pathstr; end
         PHZ = phz_save(PHZ,fullfile(savefolder,[name,'.phz']));
-    else PHZ = phz_check(PHZ);
+    else PHZ = phz_check(PHZ,verbose);
     end
      
 end

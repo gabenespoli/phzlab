@@ -1,40 +1,45 @@
-function PHZ = phz_norm(PHZ,normtype,verbose)
 %PHZ_NORM  Convert data to z-scores.
 %
-% usage:    
-%     PHZ = PHZ_NORM(PHZ)
-%     PHZ = PHZ_NORM(PHZ,NORMTYPE)
+% USAGE    
+%   PHZ = PHZ_NORM(PHZ)
+%   PHZ = PHZ_NORM(PHZ,NORMTYPE)
 % 
-% input:   
-%     PHZ         = PHZLAB data structure.
+% INPUT
+%   PHZ       = [struct] PHZLAB data structure.
 % 
-%     NORMTYPE    = String specifying the grouping variable within which
-%                   to normalize. For each group of trials representing a
-%                   unique value of this grouping variable, each data point
-%                   has the mean subtracted and is divided by the standard
-%                   deviation. Entering 0 undoes normalization. Default
-%                   is to normalize by 'participant'.
+%   NORMTYPE  = [string] Specifies the grouping variable within which
+%               to normalize. For each group of trials representing a
+%               unique value of this grouping variable, each data point
+%               has the mean subtracted and is divided by the standard
+%               deviation. Entering 0 undoes normalization. Default
+%               is to normalize by 'participant'.
 % 
-% output:  
-%     PHZ.norm.type   = The grouping variable used for normalization.
+% OUTPUT
+%   PHZ.norm.type     = [string] The grouping variable used in NORMTYPE.
 %                             
-%     PHZ.norm.mean   = If there is only one unique value of NORMTYPE, this
-%                       is the mean value of all trials. Otherwise it is a 
-%                       vector the same length as the number of trials, 
-%                       specifying the mean used for each trial.
+%   PHZ.norm.mean     = [numeric] If there is only one unique value of 
+%                       NORMTYPE this is the mean value of all trials. 
+%                       Otherwise it is a vector the same length as the 
+%                       number of trials, specifying the mean used for 
+%                       each trial.
 % 
-%     PHZ.norm.stDev    = Same as above for standard deviation.
+%   PHZ.norm.stDev    = [numeric] Same as above for standard deviation.
 % 
-%     PHZ.norm.oldUnits = Units of data before conversion to z-scores.
+%   PHZ.norm.oldUnits = [string] Units before normalization (new units
+%                       after normalization is 'z-score'.
 %                         
 % 
-% examples:
-%     PHZ = phz_norm(PHZ,'participant') >> For each participant, find the
-%           mean and standard deviation of all trials, and use these values
-%           normalize data.
-%     PHZ = phz_norm(PHZ,0) >> Undo normalization.
+% EXAMPLES
+%   PHZ = phz_norm(PHZ,'participant') >> For each participant, find the
+%         mean and standard deviation of all trials, and use these values
+%         normalize data.
+% 
+%   PHZ = phz_norm(PHZ,0) >> Undo normalization.
 %
 % Written by Gabriel A. Nespoli 2016-03-27. Revised 2016-04-06.
+
+function PHZ = phz_norm(PHZ,normtype,verbose)
+
 if nargin == 0 && nargout == 0; help phz_norm, return, end
 if nargin > 1 && isempty(normtype), return, end
 if nargin < 2, normtype = 'participant'; end

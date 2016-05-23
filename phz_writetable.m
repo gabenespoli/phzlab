@@ -1,46 +1,48 @@
-function varargout = phz_writetable(PHZ,varargin)
 %PHZ_WRITETABLE  Write grouping variables and features to a table.
 % 
-% usage:    PHZ = PHZ_WRITETABLE(PHZ,'feature',FEATURE)
-%           PHZ = PHZ_WRITETABLE(PHZ,'Param1','Value1',etc.)
+% USAGE    
+%   PHZ = phz_writetable(PHZ,'feature',feature)
+%   PHZ = phz_writetable(PHZ,'Param1','Value1',etc.)
 % 
-% inputs:   PHZ       = PHZLAB data structure.
-%           FEATURE   = A 'string' or {'cell' 'array' 'of' 'strings'}
-%                       specfying the feature(s) to calculate. FEATURE is
-%                       entered as a paramter/value pair so that the input
-%                       format is the same as phz_plot.
-%           'unstack' = Rearranges the table so that columns for grouping
-%                       variables are "unstacked" across columns. Enter a
-%                       maximum of 2 columns that should be unstacked. See
-%                       examples for more details.
-%           'save'    = Filename and path to save resultant table as either
-%                       a MATLAB file (.mat) or text file of comma-
-%                       separated values (.csv). The file extension
-%                       determines the type of file.
+% INPUT
+%   PHZ       = [struct] PHZLAB data structure.
+% 
+%   feature   = [string|cell of strings] Specifies the feature(s) to 
+%               calculate. FEATURE is specified as a paramter/value pair 
+%               so that the input format is the same as phz_plot.
+% 
+%   'unstack' = Rearranges the table so that columns for grouping
+%               variables are "unstacked" across columns. Enter a maximum
+%               of 2 columns that should be unstacked. See examples for 
+%               more details.
+% 
+%   'filename'= Filename and path to save resultant table as either a
+%               MATLAB file (.mat) or text file of comma-separated values
+%               (.csv). The file extension determines the type of file.
 %   
-%           The following functions can be called as parameter/value pairs,
-%           and are executed in the same order as they appear in the
-%           function call. See the help of each function for more details.
-%               'subset'    = Calls phz_subset.
-%               'rectify'   = Calls phz_rect.
-%               'filter'    = Calls phz_filter.
-%               'smooth'    = Calls phz_smooth.
-%               'transform' = Calls phz_transform.
-%               'blc'       = Calls phz_blc.
-%               'rej'       = Calls phz_rej.
-%               'norm'      = Calls phz_norm.
+%   The following functions can be called as parameter/value pairs,
+%   and are executed in the same order as they appear in the
+%   function call. See the help of each function for more details.
+%   'subset'    = Calls phz_subset.
+%   'rectify'   = Calls phz_rect.
+%   'filter'    = Calls phz_filter.
+%   'smooth'    = Calls phz_smooth.
+%   'transform' = Calls phz_transform.
+%   'blc'       = Calls phz_blc.
+%   'rej'       = Calls phz_rej.
+%   'norm'      = Calls phz_norm.
 % 
-%           The following functions can be called as parameter/value pairs,
-%           and are always executed in the order listed here, after all of
-%           the processing funtions. See the help of each function for more
-%           details.
-%               'region'    = Calls phz_region.
-%               'summary'   = Calls phz_summary. The default summary is
-%                             'none', which returns all trials.
+%   The following functions can be called as parameter/value pairs, and
+%   are always executed in the order listed here, after all of the
+%   processing funtions. See the help of each function for more details.
+%   'region'    = Calls phz_region.
+%   'summary'   = Calls phz_summary. The default summary is
+%                 'none', which returns all trials.
 % 
-% outputs:  d = MATLAB table.
+% OUTPUT
+%   d = [table] MATLAB table.
 % 
-% examples:
+% EXAMPLES
 %   d = phz_writetable(PHZ,'feature',{'mean','max'},'save','myfile.csv')
 %       >> Finds the mean and max of each trial, and writes a .csv file
 %          where each trial is a row, and all grouping variable headings
@@ -58,6 +60,9 @@ function varargout = phz_writetable(PHZ,varargin)
 %          mean_trialtype2, etc.
 %           
 % Written by Gabriel A. Nespoli 2016-03-07. Revised 2016-04-07.
+
+function varargout = phz_writetable(PHZ,varargin)
+
 if nargout == 0 && nargin == 0, help phz_writetable, return, end
 if isempty(PHZ), PHZ = phz_gather; else PHZ = phz_check(PHZ); end
 
@@ -229,7 +234,7 @@ end
 function checkForEmptyCells(d)
 rm = [];
 for i = 1:width(d)
-    if ~isnumeric(d{:,i}), rm = [rm i]; end
+    if ~isnumeric(d{:,i}), rm = [rm i]; end %#ok<AGROW>
 end
 temp = d;
 temp(:,rm) = [];

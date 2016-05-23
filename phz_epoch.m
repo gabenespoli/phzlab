@@ -1,57 +1,42 @@
 %PHZ_EPOCH  Split a PHZ structure into trials.
 %
 % USAGE
-%   PHZ = phz_epoch(PHZ,times,win)
-%   PHZ = phz_epoch(PHZ,times,win,'Param1',Value1,etc.)
+%   PHZ = phz_epoch(PHZ,win,times)
+%   PHZ = phz_epoch(PHZ,win,times,'Param1',Value1,etc.)
 %
 % INPUTS
 %   PHZ       = [struct] PHZLAB data structure.
 %
-%   times     = [numeric|string] If a vector, the sample numbers from where
-%               to extract epochs. If a string, a filename to load with the
-%               epoch times. Use parameter/value pairs (described below) to
-%               control options for the import.
+%   win       = [numeric] A vector of length 2 specifying the window around
+%               each epoch time to extract. Enter in the form [start end]
+%               in samples relative to the marker. e.g. [-1 2] (one second 
+%               before and two seconds after the marker).
 %
-%   win       = [numeric] a Vector of length 2 specifying the start and end
-%               times of epochs relative to the values in TIMES.
-%
-%   
-
-% 
-% USAGE
-%   PHZ = PHZ_EPOCH(PHZ,times,win)
-%   PHZ = PHZ_EPOCH(PHZ,times,win,'Param1',Value1,etc.)
-% 
-% INPUT
-%   PHZ   = PHZLAB data structure.
-% 
-%   times = [numeric|string] If numeric, a vector of times in seconds. Use
-%           the 'units' parameter for different time units. If a string, it
-%           specifies a filename containing the epoch times.
-% 
-%   win   = [numeric] A vector of length 2 specifying the window around
-%           each epoch time to extract. Enter in the form [start end] in 
-%           samples relative to the marker. e.g. [-1 2]*Fs (one second 
-%           before and two seconds after the marker).
+%   times     = [numeric|string] If a vector, TIMES is the indices (sample 
+%               numbers from where the epochs should be extracted.
+%               If a string, TIMES is a filename of a csv file containing
+%               the epoch times. Use parameter/value pairs (described 
+%               below) to control the import of these times.
 % 
 %   'units'   = [string] Specifies the units of the specified times.
 %               Options are 'samples', 's'/'seconds', 'ms'/'milliseconds',
 %               'min'/'minutes'. Default 'seconds';
 % 
-% x 'labels'  = [numeric|cell] Specifies labels to use for each epoch. Must
-%               have the same number of elements as times.
+% x 'labels'  = [any] Specifies labels to use for each epoch. Must
+%               have the same number of elements as times. If LABELS is a
+%               string, it specifies the filename containing the labels.
 % 
 % OUTPUT
-%   PHZ.data              = Epoched data. Each row is a different epoch.
-%   PHZ.proc.epoch.times  = The marker times that were used.
-%   PHZ.proc.epoch.win    = The extract window used.
+%   PHZ.data             = Epoched data. Each row is a different epoch.
+%   PHZ.proc.epoch.win   = The extract window used.
+%   PHZ.proc.epoch.times = The marker times that were used.
+%   PHZ.proc.epoch.units = The units of the values in PHZ.proc.epoch.times.
 % 
-% Written by Gabe Nespoli 2013-07-23. Revised for PHZLAB 2016-05-11.
+% Written by Gabe Nespoli 2013-07-23. Revised for PHZLAB 2016-05-20.
 
 function PHZ = phz_epoch(PHZ,times,win,varargin)
 
 if nargin == 0 && nargout == 0, help phz_epoch, return, end
-
 if size(PHZ.data,1) > 1, error('PHZ.data seems to already be epoched...'), end
 
 % defaults
@@ -92,7 +77,7 @@ for i = 1:length(times) % loop through trials
     if (times(i) + win(1) < 1) || (times(i) + win(2) > size(data,2))
         warning(['Removing trial ',num2str(i),' because it is too close to ',...
             'edge of the datafile for the requested extraction window.'])
-        rminds = [rminds i];
+        rminds = [rminds i]; %#ok<AGROW>
         continue
     end
     

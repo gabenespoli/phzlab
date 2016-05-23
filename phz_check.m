@@ -530,7 +530,6 @@ PHZ = orderfields(PHZ,mainOrder);
 
 % meta structure
 % --------------
-
 metaOrder = {
     'tags'
     'spec'
@@ -546,10 +545,8 @@ end
 metaOrder = metaOrder(ismember(metaOrder,fieldnames(PHZ.meta)));
 PHZ.meta = orderfields(PHZ.meta,metaOrder);
 
-
 % meta.tags structure
 % -------------------
-
 metaTagsOrder = {
     'participant'
     'group'
@@ -567,7 +564,6 @@ PHZ.meta.tags = orderfields(PHZ.meta.tags,metaTagsOrder);
 
 % meta.spec structure
 % -------------------
-
 metaSpecOrder = {
     'participant'
     'group'

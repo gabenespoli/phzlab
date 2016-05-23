@@ -1,20 +1,19 @@
 function PHZ = phz_filter(PHZ,cutoff,verbose)
 %PHZ_FILTER  Apply a zero-phase shift filter to the data.
 %
-% usage:    
-%     PHZ = phz_filter(PHZ,CUTOFF)
+% USAGE  
+%   PHZ = phz_filter(PHZ,CUTOFF)
 %
-% input:   
-%     PHZ     = PHZLAB data structure.
-%     CUTOFF  = Cutoff frequencies for filtering in Hertz, in the form 
+% INPUT
+%   PHZ       = PHZLAB data structure.
+%   CUTOFF    = Cutoff frequencies for filtering in Hertz, in the form 
 %               [locut hicut notch order]. Default is a 3rd-order
 %               Butterworth filter.
 %               
+% OUTPUT
+%   PHZ.data  = The filtered data.
 %
-% output:  
-%     PHZ.data  = The filtered data.
-%
-% examples:
+% EXAMPLES
 %   PHZ = phz_filter(PHZ,1)        >> 1 Hz high pass Butterworth filter
 %   PHZ = phz_filter(PHZ,[0 10])   >> 10 Hz low pass Butterworth filter
 %   PHZ = phz_filter(PHZ,[1 10])   >> 1-10 Hz band pass Butterworth filter

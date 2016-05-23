@@ -1,26 +1,30 @@
-function PHZ = phz_load(varargin)
 %PHZ_LOAD  Load a PHZ structure (.phz or .mat file).
 % 
-% usage:    
-%     PHZ = PHZ_LOAD
-%     PHZ = PHZ_LOAD(FILENAME)
+% USAGE
+%   PHZ = PHZ_LOAD
+%   PHZ = PHZ_LOAD(FILENAME)
 % 
-% input:   
-%     (none)   = A file browser will popup to select a file.
+% INPUT
+%   (none)    = A file browser will popup to select a file.
 % 
-%     FILENAME = Filename (and path) of file to load.
+%   FILENAME  = [string] Filename (and path) of file to load.
 % 
-% output:  
-%     PHZ = PHZLAB data structure.
+% OUTPUT
+%   PHZ       = [struct] PHZLAB data structure.
 % 
-% examples:
-%     PHZ = phz_load >> Browse computer to select a file to load.
-%     PHZ = phz_load('myfile.phz') >> Loads the file 'myfile.phz' from the
-%           current directory.
-%     PHZ = phz_load('myfolder/myfile.phz') >> Loads the file 'myfile.phz'
-%           from the folder 'myfolder'.
+% EXAMPLES
+%   PHZ = phz_load >> Browse computer to select a file to load.
+% 
+%   PHZ = phz_load('myfile.phz') >> Loads the file 'myfile.phz' from the
+%         current directory.
+% 
+%   PHZ = phz_load('myfolder/myfile.phz') >> Loads the file 'myfile.phz'
+%         from the folder 'myfolder'.
 %
 % Written by Gabriel A. Nespoli 2016-03-07. Revised 2016-04-04.
+
+function PHZ = phz_load(varargin)
+
 if nargout == 0 && nargin == 0, help phz_load, return, end
 
 % get filename if none given
@@ -45,12 +49,12 @@ name = fieldnames(S);
 i = 1;
 badFile = true;
 while badFile
-    if i > length(name), rethrow(me), end
+    if i > length(name), rethrow(me), end %#ok<NODEF>
     try 
         PHZ = S.(name{i});
         PHZ = phz_check(PHZ,verbose);
         badFile = false;
-    catch me
+    catch me %#ok<NASGU>
         i = i + 1;
     end
 end

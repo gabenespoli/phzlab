@@ -5,13 +5,18 @@
 %   PHZ = PHZ_REJ(PHZ,threshold,rejtype)
 % 
 % INPUT   
-%   PHZ         = [struct] PHZLAB data structure.
-%   THRESHOLD   = Trials with any value exceeding the value of THRESHOLD
-%                 will be rejected. Enter 0 to unreject all trials.
-%   REJTYPE     = The units of THRESHOLD. Default is 'threshold' (i.e., the
-%                 same units as PHZ.units). Enter 'sd' to reject a trial if
-%                 any value exceeds a THRESHOLD Number of that trial's
-%                 standard deviation.
+%   PHZ       = [struct] PHZLAB data structure.
+% 
+%   threshold = [numeric|string] Trials with any value exceeding this 
+%               value of THRESHOLD will be rejected. Enter 0 to unreject 
+%               all trials. THRESHOLD can be a string as a shorthand for
+%               setting REJTYPE to 'sd'. In this case the string must be a
+%               number followed by 'sd' (e.g., '0.05sd').
+% 
+%   rejtype   = ['value'|'sd'] The units of THRESHOLD. Default is 'value' 
+%               (i.e., the same units as PHZ.units). Enter 'sd' to reject 
+%               a trial if any value exceeds a THRESHOLD Number of that 
+%               trial's standard deviation.
 %                       
 % OUTPUT  
 %   PHZ.proc.rej.threshold   = The value specified in THRESHOLD.
@@ -27,8 +32,13 @@
 % 
 % EXAMPLES
 %   PHZ = phz_rej(PHZ,20)     >> Reject all trials with a value > 20.
+% 
 %   PHZ = phz_rej(PHZ,3,'sd') >> Reject trials with a value > 3 standard
 %                                deviations from the mean of all trials.
+% 
+%   PHZ = phz_rej(PHZ,'3sd')  >> Reject trials with a value > 3 standard
+%                                deviations from the mean of all trials.
+% 
 %   PHZ = phz_rej(PHZ,0)      >> Restore all rejected trials.
 %
 % Written by Gabriel A. Nespoli 2016-01-27. Revised 2016-05-19.
