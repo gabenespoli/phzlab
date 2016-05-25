@@ -21,7 +21,7 @@
 %   PHZ = phz_save('myfolder/myfile.phz') >> Saves the PHZ structure 'PHZ'
 %         to the file 'myfile.phz' in the folder 'myfolder'.
 %
-% Written by Gabriel A. Nespoli 2016-03-07. Revised 2016-05-25..
+% Written by Gabriel A. Nespoli 2016-03-07. Revised 2016-05-25.
 
 function PHZ = phz_save(PHZ,varargin)
 
