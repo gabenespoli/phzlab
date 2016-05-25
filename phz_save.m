@@ -21,21 +21,36 @@
 %   PHZ = phz_save('myfolder/myfile.phz') >> Saves the PHZ structure 'PHZ'
 %         to the file 'myfile.phz' in the folder 'myfolder'.
 %
-% Written by Gabriel A. Nespoli 2016-03-07. Revised 2016-04-04.
+% Written by Gabriel A. Nespoli 2016-03-07. Revised 2016-05-25..
 
 function PHZ = phz_save(PHZ,varargin)
 
 if nargout == 0 && nargin == 0, help phz_save, return, end
 
+% get filename with dialog box
 if nargin == 1
     [filename,pathname] = uiputfile({'*.phz';'*.*'},'Select file to write',[inputname(1),'.phz']);
     filename = fullfile(pathname,filename);
 end
 
+% use filename from input argument
 if nargin > 1
     [pathname,filename,ext] = fileparts(varargin{1});
     if isempty(ext) || ~ismember(ext,{'.phz','.mat'}), ext = '.phz'; end
     filename = fullfile(pathname,[filename,ext]);
+end
+
+% ask about overwriting an existing filename
+if exist(filename,'file')
+	goodInput = false;
+	while goodInput == false
+		s = input('File already exists. Overwrite? [y/n]: ','s');
+		switch lower(s)
+			case 'y', goodInput = true;
+			case 'n', disp('Aborting...'), return
+			otherwise, disp('Invalid input.')
+		end
+	end
 end
 
 if nargin > 2
