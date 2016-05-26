@@ -35,8 +35,8 @@
 %   PHZ.data              = Epoched data. Each row is a different epoch.
 %   PHZ.proc.epoch.times  = The marker times that were used.
 %   PHZ.proc.epoch.win    = The extract window used.
-%   PHZ.proc.epoch.tUnits = The units of the values in PHZ.proc.epoch.times.
-%   PHZ.proc.epoch.wUnits
+%   PHZ.proc.epoch.tUnits = The units of the marker times.
+%   PHZ.proc.epoch.wUnits = The units of the extract window.
 % 
 % Written by Gabe Nespoli 2013-07-23. Revised for PHZLAB 2016-05-26.
 
