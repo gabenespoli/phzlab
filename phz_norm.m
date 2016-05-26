@@ -27,7 +27,6 @@
 % 
 %   PHZ.norm.oldUnits = [string] Units before normalization (new units
 %                       after normalization is 'z-score'.
-%                         
 % 
 % EXAMPLES
 %   PHZ = phz_norm(PHZ,'participant') >> For each participant, find the
@@ -59,10 +58,11 @@ if do_norm || do_restore
     
     if do_restore
         
-        if phz_proc(PHZ,'norm') ~= 2
-            error(['Other processing has been done since previous ',...
-                'normalization. Undo previous processing first ',...
-                '(if possible).'])
+        % check that no other processing has been done since phz_norm
+        names = fieldnames(PHZ.proc);
+        if ~strcmp(names{end},'norm')
+            error(['Other processing has been done since',...
+                'normalization. Cannot undo normalization.'])
         end
         
         if length(PHZ.proc.norm.mean) == 1
@@ -76,7 +76,6 @@ if do_norm || do_restore
         PHZ.proc = rmfield(PHZ.proc,'norm');
         PHZ = phz_history(PHZ,'Normalization has been undone.',verbose);
     end
-    
     
     if do_norm
         

@@ -14,7 +14,7 @@ function phzlab
 %   phz_gather:      Gather many PHZ structures into a single one.
 %   phz_save:        Save a PHZ structure.
 %   phz_load:        Load a PHZ structure.
-%   phz_field:       Change the fields of a PHZ structure.
+%   phz_field:       Change the values of certain PHZ structure fields.
 % 
 % PROCESSING
 % X phz_filter:      Butterworth filtering.
@@ -23,8 +23,8 @@ function phzlab
 %   phz_rectify:     Full- or half-wave rectification.
 %   phz_smooth:      Sliding window averaging (incl. RMS)
 %   phz_transform:   Transform data (e.g., square root, etc.)
-% * phz_rej:         Remove trials with values exceeding a threshold.
-% * phz_blc:         Subtract mean of baseline region from each trial.
+% * phz_rej:         Remove trials with values exceeding a threshold or SD.
+% * phz_blsub:       Subtract mean of baseline region from each trial.
 % * phz_norm:        Normalize across specified grouping variables.
 % 
 % ANALYSIS
@@ -37,7 +37,7 @@ function phzlab
 %   phz_plot:        Visualize data as line or bar graphs.
 %   phz_writetable:  Export features to a MATLAB table or csv file.
 % 
-% Version 0.8.4 dev Written by Gabriel A. Nespoli 2016-05-22.
+% Version 0.8.4 dev Written by Gabriel A. Nespoli 2016-05-22 .
 
 help phzlab
 

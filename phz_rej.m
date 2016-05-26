@@ -77,12 +77,12 @@ end
 if do_rej || do_restore
     
     if do_restore
-        
-        % if norm after rej, must undo norm first
-        if phz_proc(PHZ,'rej') ~= 2
-            error(['Other processing has been done since previous ',...
-                'rejection. Undo previous processing first ',...
-                '(if possible).'])
+
+        % check that no other processing has been done since phz_rej
+        names = fieldnames(PHZ.proc);
+        if ~strcmp(names{end},'rej')
+            error(['Other processing has been done since threshold ',...
+                'rejection. Cannot undo previous rejections.'])
         end
         
         % concatenate all locs, data, and grouping vars

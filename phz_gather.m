@@ -19,7 +19,7 @@
 %     'filter'    = Calls phz_filter.
 %     'smooth'    = Calls phz_smooth.
 %     'transform' = Calls phz_transform.
-%     'blc'       = Calls phz_blc.
+%     'blsub'     = Calls phz_blsub.
 %     'rej'       = Calls phz_rej.
 %     'norm'      = Calls phz_norm.
 % 
@@ -65,7 +65,7 @@ processing = {};
 for i = 1:2:length(varargin)
     switch lower(varargin{i})
         case {'subset','filter','filt','rect','rectify','smooth','smoothing',...
-                'transform','blc','baselinecorrect','rej','reject','norm','normtype'}
+                'transform','blsub','blc','rej','reject','norm','normtype'}
             processing = [processing varargin(i:i+1)];
         case 'region',                  region = varargin{i+1};
         case {'summary','keepvars'},    keepVars = varargin{i+1};
@@ -98,7 +98,7 @@ for j = 1:length(files)
             case {'filter','filt'},         PHZ = phz_filter(PHZ,processing{i+1},verbose);
             case {'smooth','smoothing'},    PHZ = phz_smooth(PHZ,processing{i+1},verbose);
             case 'transform',               PHZ = phz_transform(PHZ,processing{i+1},verbose);
-            case {'blc','baselinecorrect'}, PHZ = phz_blc(PHZ,processing{i+1},verbose);
+            case 'blsub',                   PHZ = phz_blsub(PHZ,processing{i+1},verbose);
             case {'rej','reject'},          PHZ = phz_rej(PHZ,processing{i+1},verbose);
             case {'norm','normtype'},       PHZ = phz_norm(PHZ,processing{i+1},verbose);
         end
@@ -204,7 +204,7 @@ end
 
 % add preprocessing to PHZ.history
 % if ~isempty(rect), PHZS = phzUtil_history(PHZS,['Pre-gathering rectification: ',rect,'.']); end
-% if ~isempty(blc),     if isnumeric(blc), blc = num2str(blc); end, PHZS = phzUtil_history(PHZS,['Pre-gathering baseline correction: ',blc,'.']); end
+% if ~isempty(blsub),     if isnumeric(blsub), blsub = num2str(blsub); end, PHZS = phzUtil_history(PHZS,['Pre-gathering baseline correction: ',blsub,'.']); end
 % if ~isempty(rej),     PHZS = phzUtil_history(PHZS,['Pre-gathering rejection threshold: ',num2str(rej),' ',PHZS.units,'.']); end
 % if ~ismember(keepVars,{'all'}), PHZS = phzUtil_history(PHZS,['Pre-gathering summary: ',strjoin(keepVars),'.']); end
 
