@@ -20,10 +20,11 @@
 %                   a MATLAB .mat file.
 % 
 %   'channel'     = [numeric|string] Specify which channel of data to
-%                   import. Default is the first channel of data. For
-%                   Biopac data, 'channel' can be a string specfying 
-%                   the name of the channel as specified in the 'labels'
-%                   variable that is exported from Biopac.
+%                   import. For Biopac data, 'channel' can be a string 
+%                   specfying the name of the channel as specified in the 
+%                   'labels' variable that is exported from Biopac. If no
+%                   channel is specified, the user is prompted to enter a
+%                   channel.
 % 
 %   'namestr'     = [string] Specifies the file naming convention in order 
 %                   to read values for certain fields directly from the 
@@ -141,7 +142,7 @@ group = ''; %#ok<NASGU>
 condition = ''; %#ok<NASGU>
 session = ''; %#ok<NASGU>
 
-channel = 1;
+channel = [];
 
 filetype = 'acq';
 savefolder = 0;
@@ -197,16 +198,18 @@ if ~ischar(savefolder) && length(files) > 1
 
 % loop files
 if verbose, disp(' '), disp('Creating PHZ file(s) from data file(s)...'), end
-w = waitbar(0,'Creating PHZ file(s) from data file(s)...');
+% w = waitbar(0,'Creating PHZ file(s) from data file(s)...');
+w = '';
 for i = 1:length(files)
     fileProgress = [num2str(i),'/',num2str(length(files)),': ',files{i}];
-    waitbar((i-1)/length(files),w,['Creating PHZ file from data file ',fileProgress]);
+    if length(files) > 1, w = phzUtil_progressbar(w,i/length(files),fileProgress); end
+%     waitbar((i-1)/length(files),w,['Creating PHZ file from data file ',fileProgress]);
     
     % load data
     if verbose, disp(['Loading data from file ',fileProgress]), end
     PHZ = getBlankPHZ(verbose); % get new blank PHZ structure
     PHZ.proc.create.datafile = fullfile(folder,files{i});
-    s = load(PHZ.proc.create.datafile,'-mat');
+    raw = load(PHZ.proc.create.datafile,'-mat');
     
     % get grouping vars from filename or parameter/value pairs
     PHZ = readFilename(PHZ,namestr);
@@ -217,18 +220,29 @@ for i = 1:length(files)
     % get data
     switch lower(filetype)
         case {'acq','biopac','acqknowledge'}
-            if ischar(channel), channel = find(strcmp(cellstr(s.labels),channel)); end
-            if isempty(channel), error('Specify a valid channel.'), end
-            PHZ.datatype = deblank(s.labels(channel,:));
             
-            PHZ.units = deblank(s.units(channel,:));
-            switch s.isi_units
-                case 'ms', PHZ.srate = s.isi * 1000;
-                case 's',  PHZ.srate = s.isi;
+            if isempty(channel)
+                disp('Which channel would you like to load?')
+                disp('(Enter 0 to abort.)')
+                for j = 1:size(raw.labels,1), disp([num2str(j),'. ',raw.labels(j,:)]), end
+                while isempty(channel) || ~ismember(channel,0:size(raw.labels,1))
+                    channel = input('Enter the channel number: '); commandwindow
+                end
+                if channel == 0, disp('Aborting...'), return, end
             end
             
-            PHZ.data = transpose(s.data(:,channel));
-            PHZ.times = (s.start_sample:1:length(PHZ.data)-1) / PHZ.srate;
+            if ischar(channel), channel = find(strcmp(cellstr(raw.labels),channel)); end
+            
+            PHZ.datatype = deblank(raw.labels(channel,:));
+            PHZ.units = deblank(raw.units(channel,:));
+            
+            switch raw.isi_units
+                case 'ms', PHZ.srate = raw.isi * 1000;
+                case 's',  PHZ.srate = raw.isi;
+            end
+            
+            PHZ.data = transpose(raw.data(:,channel));
+            PHZ.times = (raw.start_sample:1:length(PHZ.data)-1) / PHZ.srate;
             
         otherwise, error('Unknown file type.')
     end
@@ -242,7 +256,7 @@ for i = 1:length(files)
     end
      
 end
-close(w)
+% close(w)
 
 end
 
