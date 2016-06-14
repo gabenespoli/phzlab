@@ -9,9 +9,9 @@ PHZ structures are created for each recording of data, and can be filtered, epoc
 * phz_field:       Change the values of certain PHZ structure fields.
 
 ## Processing
-* phz_filter:      Butterworth filtering. *not ready yet*
-* phz_epoch:       Split a single channel of data into trials. *not ready yet*
-* phz_trials:      Add names to each trial of epoched data. *not ready yet*
+* phz_filter:      Butterworth filtering. **not ready yet**
+* phz_epoch:       Split a single channel of data into trials. **not ready yet**
+* phz_trials:      Add names to each trial of epoched data. **not ready yet**
 * phz_rectify:     Full- or half-wave rectification.
 * phz_smooth:      Sliding window averaging (incl. RMS)
 * phz_transform:   Transform data (e.g., square root, etc.)
