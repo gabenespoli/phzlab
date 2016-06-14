@@ -29,4 +29,5 @@ PHZ structures are created for each recording of data, and can be filtered, epoc
 * phz_plot:        Visualize data as line or bar graphs.
 * phz_writetable:  Export features to a MATLAB table or csv file.
 
-Version 0.8.4 dev Written by Gabriel A. Nespoli 2016-05-22.
+## Version
+Version 0.8.4
