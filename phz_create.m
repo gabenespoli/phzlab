@@ -132,7 +132,6 @@ elseif nargout == 0 && nargin > 0, error('Assign an output argument.')
 end
 if nargin == 0, PHZ = getBlankPHZ(1); return, end
 
-% defaults
 namestr = '';
 
 study = ''; %#ok<NASGU>
@@ -155,10 +154,6 @@ if isdir(files) % load all files from folder
     folder = files;
     files = what(folder);
     files = files.mat;
-    
-% elseif ischar(files) && strcmp(files,'blank')
-%     PHZ = getBlankPHZ(verbose);
-%     return
     
 elseif ischar(files) && exist(files,'file') % load file from filename
     files = {files};
@@ -198,12 +193,10 @@ if ~ischar(savefolder) && length(files) > 1
 
 % loop files
 if verbose, disp(' '), disp('Creating PHZ file(s) from data file(s)...'), end
-% w = waitbar(0,'Creating PHZ file(s) from data file(s)...');
 w = '';
 for i = 1:length(files)
     fileProgress = [num2str(i),'/',num2str(length(files)),': ',files{i}];
     if length(files) > 1, w = phzUtil_progressbar(w,i/length(files),fileProgress); end
-%     waitbar((i-1)/length(files),w,['Creating PHZ file from data file ',fileProgress]);
     
     % load data
     if verbose, disp(['Loading data from file ',fileProgress]), end
@@ -256,11 +249,10 @@ for i = 1:length(files)
     end
      
 end
-% close(w)
-
 end
 
 function PHZ = readFilename(PHZ,namestr)
+if isempty(namestr), return, end
 
 % find out which grpvars are in namestr & their order & their start/ends
 vars = {'study','datatype','participant','group','condition','session'};
@@ -278,15 +270,13 @@ for i = 1:length(delimstr)
         case 1
             if varsbeg(i) == 1
                 delimstr{i} = '';
-                
             else
                 delimstr{i} = namestr(1:varsbeg(i) - 1);
             end
             
         case length(delimstr)
             if varsend(i-1) == length(grpvars)
-                delimstr{i} = '';
-                
+                delimstr{i} = ''; 
             else
                 delimstr{i} = namestr(varsend(i-1) + 1:end);
             end
@@ -299,7 +289,6 @@ end
 if any(cellfun(@isempty,delimstr(2:end-1)))
     error('There must be some delimiter between grouping variables in the filename.'), end
 
-
 [~,name,~] = fileparts(PHZ.proc.create.datafile);
 
 % move cursor past leading delimiter
@@ -310,7 +299,6 @@ else error(['Filename ''',name,''' doesn''t match the namestr.'])
 end
 delimstr(1) = []; % delimstr now holds delims that follow each grpvar
 
-
 % loop through grpvars and get their vals from the filename
 for i = 1:length(grpvars)
     
@@ -318,7 +306,6 @@ for i = 1:length(grpvars)
         PHZ.(grpvars{i}) = name(cursor:end);
         
     else
-        
         strend = min(strfind(name(cursor:end),delimstr{i}));
         PHZ.(grpvars{i}) = name(cursor:cursor + strend - 2);
         cursor = cursor + strend + length(delimstr{i}) - 1;
@@ -331,21 +318,21 @@ end
 function PHZ = getBlankPHZ(verbose)
 
 PHZ.study = '';
-PHZ.datatype = ''; % i.e. 'scl', 'zyg', 'ffr', etc.
+PHZ.datatype = '';
 
 PHZ.participant = categorical;
-PHZ.group = categorical; % aka between-subjects variable
+PHZ.group = categorical;
 PHZ.condition = categorical;
-PHZ.session = categorical; % aka within-subjects variable
-PHZ.trials = categorical; % trialtype label for each trial (i.e., trial order)
+PHZ.session = categorical;
+PHZ.trials = categorical;
 
-PHZ.region.baseline = []; % baseline region if data are baseline-corrected
+PHZ.region.baseline = [];
 PHZ.region.target = [];
 PHZ.region.target2 = [];
 PHZ.region.target3 = [];
 PHZ.region.target4 = [];
 
-PHZ.data = []; % actual data, 2D, trials X time
+PHZ.data = [];
 PHZ.units = '';
 
 PHZ.resp.q1 = {};
@@ -366,8 +353,8 @@ PHZ.resp.q5_rt = [];
 
 PHZ.proc = struct;
 
-PHZ.srate = []; % sampling frequency in Hz
-PHZ.times = []; % in seconds
+PHZ.srate = [];
+PHZ.times = [];
 
 PHZ.meta.tags.participant = categorical;
 PHZ.meta.tags.group = categorical;
@@ -384,10 +371,8 @@ PHZ.meta.spec.trials = {};
 PHZ.meta.spec.region = {'k','b','g','y','r'};
 
 PHZ.misc = struct;
-
 PHZ.history = {};
 
-% add creation date to FFR.history
 PHZ = phz_history(PHZ,'PHZ structure created.',verbose);
 
 end

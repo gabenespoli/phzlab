@@ -53,7 +53,7 @@ if any(strcmp(varargin(1:2:end),'verbose'))
     varargin([i,i+1]) = [];
 end
 
-varargin = convertStructsToParamValuePairs(varargin);
+% varargin = convertStructsToParamValuePairs(varargin);
 
 for i = 1:2:length(varargin)
     switch lower(varargin{i})
@@ -77,28 +77,9 @@ PHZ = phz_feature(PHZ,feature,'summary',keepVars,'verbose',verbose);
 
 end
 
-function opts = convertStructsToParamValuePairs(opts)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-end
+% function opts = convertStructsToParamValuePairs(opts)
+% 
+% 
+% 
+% 
+% end

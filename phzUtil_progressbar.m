@@ -1,4 +1,6 @@
 function w = phzUtil_progressbar(w,val,str)
+%PHZUTIL_PROGRESSBAR  Text progress bar in the command window.
+
 if nargin < 3, str = '';
 elseif length(str) > 25, str = ['\n' str]; end
 
