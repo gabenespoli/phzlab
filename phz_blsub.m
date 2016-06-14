@@ -15,8 +15,8 @@
 %
 % OUTPUT  
 %   PHZ.data              = Baseline-subtracted data.
-%   PHZ.proc.blc.region   = Start and end times of blc region used.
-%   PHZ.proc.blc.values   = Mean of baseline region for each trial.
+%   PHZ.proc.blsub.region   = Start and end times of blsub region used.
+%   PHZ.proc.blsub.values   = Mean of baseline region for each trial.
 %
 % EXAMPLES
 %   PHZ = phz_blsub(PHZ,'baseline') >> Subtract the mean of the baseline
@@ -70,11 +70,11 @@ if do_blsub || do_restore
             PHZ.proc.blsub.values = nan(length(PHZ.proc.rej.locs) + length(PHZ.proc.rej.data_locs),1);
             PHZ.proc.blsub.values(PHZ.proc.rej.locs) = mean(PHZb.proc.rej.data,2);
             PHZ.proc.blsub.values(PHZ.proc.rej.data_locs) = mean(PHZb.data,2);
-            PHZ.proc.rej.data = PHZ.proc.rej.data - repmat(PHZ.proc.blc.values(PHZ.proc.rej.locs),[1 size(PHZ.proc.rej.data,2)]);
+            PHZ.proc.rej.data = PHZ.proc.rej.data - repmat(PHZ.proc.blsub.values(PHZ.proc.rej.locs),[1 size(PHZ.proc.rej.data,2)]);
             PHZ.data = PHZ.data - repmat(PHZ.proc.blsub.values(PHZ.proc.rej.data_locs),[1 size(PHZ.data,2)]);
         else
-            PHZ.proc.blc.values = mean(PHZb.data,2);
-            PHZ.data = PHZ.data - repmat(PHZ.proc.blc.values,[1 size(PHZ.data,2)]);
+            PHZ.proc.blsub.values = mean(PHZb.data,2);
+            PHZ.data = PHZ.data - repmat(PHZ.proc.blsub.values,[1 size(PHZ.data,2)]);
         end
         
         % make region endpoints
@@ -98,7 +98,7 @@ function [PHZ,do_blsub,do_restore] = verifyBLinput(PHZ,region,verbose)
 if length(region) == 1 && region == 0
     
     % newBL == 0, oldBL == 0 (do nothing and return)
-    if ~ismember('blc',fieldnames(PHZ.proc))
+    if ~ismember('blsub',fieldnames(PHZ.proc))
         do_restore = false;
         do_blsub = false;
         if verbose, disp('Baseline is already set to 0.'), end
@@ -111,7 +111,7 @@ if length(region) == 1 && region == 0
     
 else
     % newBL == val, oldBL == val
-    if ismember('blc',fieldnames(PHZ.proc))
+    if ismember('blsub',fieldnames(PHZ.proc))
         do_restore = true;
         do_blsub = true;
         

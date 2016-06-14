@@ -96,8 +96,8 @@ for i = loseVars, field = i{1};
     end
 end
 
-if ismember('blc',fieldnames(PHZ.proc))
-    PHZ.proc.blc.values = '<collapsed>';
+if ismember('blsub',fieldnames(PHZ.proc))
+    PHZ.proc.blsub.values = '<collapsed>';
 end
 
 if ismember('rej',fieldnames(PHZ.proc))

@@ -249,20 +249,20 @@ if ismember('rej',fieldnames(PHZ.proc))
     end
 end
 
-% blc
+% blsub
 % ---
-if ismember('blc',fieldnames(PHZ.proc))
-    if ~isstruct(PHZ.proc.blc)
-        error([name,'.blc should be a structure.']), end
-    PHZ.proc.blc.region = verifyNumeric(PHZ.proc.blc.region,[name,'.proc.blc.region'],verbose);
-    PHZ.proc.blc.region = checkAndFix1x2(PHZ.proc.blc.region,[name,'.proc.blc.region'],nargout,verbose);
+if ismember('blsub',fieldnames(PHZ.proc))
+    if ~isstruct(PHZ.proc.blsub)
+        error([name,'.blsub should be a structure.']), end
+    PHZ.proc.blsub.region = verifyNumeric(PHZ.proc.blsub.region,[name,'.proc.blsub.region'],verbose);
+    PHZ.proc.blsub.region = checkAndFix1x2(PHZ.proc.blsub.region,[name,'.proc.blsub.region'],nargout,verbose);
     
     if ~ismember('summary',fieldnames(PHZ))
-        PHZ.proc.blc.values = verifyNumeric(PHZ.proc.blc.values,[name,'.proc.blc.values'],verbose);
-        PHZ.proc.blc.values = checkAndFixColumn(PHZ.proc.blc.values,[name,'.proc.blc.values'],nargout,verbose);
+        PHZ.proc.blsub.values = verifyNumeric(PHZ.proc.blsub.values,[name,'.proc.blsub.values'],verbose);
+        PHZ.proc.blsub.values = checkAndFixColumn(PHZ.proc.blsub.values,[name,'.proc.blsub.values'],nargout,verbose);
     else
-        if ~strcmp(PHZ.proc.blc.values,'<collapsed>')
-            error('Problem with PHZ.proc.blc and/or PHZ.summary.'), end
+        if ~strcmp(PHZ.proc.blsub.values,'<collapsed>')
+            error('Problem with PHZ.proc.blsub and/or PHZ.summary.'), end
     end
 end
 
@@ -432,8 +432,8 @@ if ~ismember('tags',fieldnames(PHZ)) && ~ismember('meta',fieldnames(PHZ))
 end
 
 % move stuff to meta and create proc (older than v0.8)
-if ~all(ismember({'proc','meta'},fieldnames(PHZ))) && any(ismember({'rej','blc','norm'},fieldnames(PHZ)))
-    warning(['Preprocessing (rej, blc, norm) must be undone ',...
+if ~all(ismember({'proc','meta'},fieldnames(PHZ))) && any(ismember({'rej','blsub','norm'},fieldnames(PHZ)))
+    warning(['Preprocessing (rej, blsub, norm) must be undone ',...
         'before this file can be compatible with this version of ',...
         'PHZLAB.'])
     s = input('Should PHZLAB undo this preprocessing? [y/n]','s');
