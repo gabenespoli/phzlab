@@ -41,7 +41,7 @@ if nargin > 1
 end
 
 % ask about overwriting an existing filename
-if exist(filename,'file')
+if exist(filename,'file') && nargin > 2
 	goodInput = false;
 	while goodInput == false
 		s = input('File already exists. Overwrite? [y/n]: ','s');
