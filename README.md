@@ -30,4 +30,4 @@ PHZ structures are created for each recording of data, and can be filtered, epoc
 * phz_writetable:  Export features to a MATLAB table or csv file.
 
 ## Version
-Version 0.8.4
+Version 0.8.4 dev

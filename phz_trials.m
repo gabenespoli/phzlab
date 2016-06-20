@@ -12,13 +12,13 @@ if nargout == 0 && nargin == 0, help phz_trials, return, end
 numTrials = size(PHZ.data,1);
 
 if ~mod(numTrials,2) % (if FFR.trials is even)
-    PHZ.tags.trials = repmat([1;2],[numTrials/2,1]);
+    PHZ.meta.tags.trials = repmat([1;2],[numTrials/2,1]);
     
 else % (FFR.trials is odd)
-    PHZ.tags.trials = [repmat([1;2],[(numTrials/2)-0.5,1]); 1];
+    PHZ.meta.tags.trials = [repmat([1;2],[(numTrials/2)-0.5,1]); 1];
 
 end
 
-PHZ = phzUtil_history(PHZ,'Added alternating trials.');
+PHZ = phz_history(PHZ,'Added alternating trials.');
 
 end

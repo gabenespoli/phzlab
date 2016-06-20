@@ -100,8 +100,10 @@ indrej = logical(indrej);
 
 % adjust tags and grouping vars (also rej)
 for i = {'participant','group','condition','session','trials'}, field = i{1};
-    PHZ.meta.tags.(field) = PHZ.meta.tags.(field)(inddata);
-    if ismember('rej',fieldnames(PHZ.proc)), PHZ.proc.rej.(field) = PHZ.proc.rej.(field)(indrej); end
+    if ~isempty(PHZ.(field))
+        PHZ.meta.tags.(field) = PHZ.meta.tags.(field)(inddata);
+        if ismember('rej',fieldnames(PHZ.proc)), PHZ.proc.rej.(field) = PHZ.proc.rej.(field)(indrej); end
+    end
 end
 
 % adjust grouping vars

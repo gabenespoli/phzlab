@@ -154,7 +154,8 @@ ytitle = getytitle(PHZ,feature,legendLoc,do_plotsmooth,featureTitle);
 
 % loop plots and plot lines/bars
 % ------------------------------
-figure('units','normalized','outerposition',pos)
+figure('units','normalized','outerposition',pos,...
+    'name',inputname(1),'numbertitle','off');
 for p = 1:length(plotOrder)
     subplot(rows,cols,p)
     

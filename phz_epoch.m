@@ -6,6 +6,12 @@
 %
 % INPUTS
 %   PHZ       = [struct] PHZLAB data structure.
+%
+%   win       = [numeric] A vector of length 2 specifying the window around
+%               each epoch time to extract. Enter in the form [start end]
+%               relative to the marker. Default units is seconds; change
+%               using 'wUnits' parameter. e.g. [-1 2] (one second before
+%               and two seconds after the marker).
 % 
 %   times     = [numeric|string] If a vector, TIMES is the indices (sample 
 %               numbers from where the epochs should be extracted.
@@ -13,12 +19,6 @@
 %               the epoch times. Use parameter/value pairs (described 
 %               below) to control the import of these times. Default units
 %               is samples; change using 'tUnits'.
-%
-%   win       = [numeric] A vector of length 2 specifying the window around
-%               each epoch time to extract. Enter in the form [start end]
-%               relative to the marker. Default units is seconds; change
-%               using 'wUnits' parameter. e.g. [-1 2] (one second before
-%               and two seconds after the marker).
 % 
 %   'tUnits'  = [string] Specifies the units of the values in TIMES.
 %               Options are 'samples', 's'/'seconds', 'ms'/'milliseconds',
