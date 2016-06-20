@@ -230,8 +230,8 @@ for i = 1:length(files)
             PHZ.units = deblank(raw.units(channel,:));
             
             switch raw.isi_units
-                case 'ms', PHZ.srate = raw.isi * 1000;
-                case 's',  PHZ.srate = raw.isi;
+                case 'ms', PHZ.srate = 1 / (raw.isi / 1000);
+                case 's',  PHZ.srate = 1 / raw.isi;
             end
             
             PHZ.data = transpose(raw.data(:,channel));
