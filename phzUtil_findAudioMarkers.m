@@ -52,9 +52,10 @@
 %                       times are still in samples.
 %
 % OUTPUT
-%   times             = [numeric] Indices of start times of markers.
+%   times             = [numeric] Indices of start times of markers
+%                       (i.e., units are samples).
 %
-% Written by Gabe Nespoli 2013-07-23. Revised for PHZLAB 2016-05-26.
+% Written by Gabe Nespoli 2013-07-23. Revised for PHZLAB 2016-06-21.
 
 function times = phzUtil_findAudioMarkers(data,threshold,timeBetween,varargin)
 if nargin == 0 && nargout == 0, help phzUtil_findAudioMarkers, return, end
@@ -97,7 +98,7 @@ while ~foundMarkers
         if ~isempty(aboveThresh) % adjust so only one suprathreshold point per marker
             aboveThreshDiff = diff(aboveThresh); % get time between each suprathreshold point
             diffs = find(aboveThreshDiff > timeBetween)+1; % ignore points too close to their neighbour
-            times = [aboveThresh(1) aboveThresh(diffs)']; % add to container
+            times = [aboveThresh(1) aboveThresh(diffs)]; % add to container
         end
         disp(['- ',num2str(length(times)),' markers found at threshold ',num2str(threshold),'.'])
         foundMarkers = true;
@@ -175,12 +176,14 @@ while askAgain
             
         case 'r'
             rmMarkers = input('  Enter marker number(s) to delete >> ');
+            close(h)
             times(rmMarkers) = [];
             disp([num2str(length(times)),' markers remain.'])
             askAgain = true;
             
         otherwise
             if ~isnan(str2double(resp))
+                close(h)
                 threshold = str2double(resp);
                 times = [];
                 askAgain = false;
@@ -262,8 +265,8 @@ if plotMarkerTimes
     if length(times) > 150
         disp('WARNING: There are more than 150 markers.')
         disp('This may take a long time to plot.')
-        cont = input('Do you want to continue? [y/n] >> ','s');
-        if ~strcmpi(cont,'n')
+        cont = input('Do you want to plot the marker positions? [y/n] >> ','s');
+        if strcmpi(cont,'n')
             plotMarkerTimes = 0;
         end
     end

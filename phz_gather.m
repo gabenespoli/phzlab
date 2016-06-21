@@ -56,7 +56,7 @@ if nargin > 0 && isdir(varargin{1})
     files = files.mat;
     varargin(1) = [];
     
-else [files,folder] = uigetfile('.mat','Select PHZ files to gather...','MultiSelect','on');
+else [files,folder] = uigetfile({'.phz';'.mat'},'Select PHZ files to gather...','MultiSelect','on');
     if isnumeric(files) && files == 0, return, end
     
 end

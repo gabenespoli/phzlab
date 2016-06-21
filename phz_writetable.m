@@ -28,7 +28,7 @@
 %   'filter'    = Calls phz_filter.
 %   'smooth'    = Calls phz_smooth.
 %   'transform' = Calls phz_transform.
-%   'blsub'       = Calls phz_blsub.
+%   'blsub'     = Calls phz_blsub.
 %   'rej'       = Calls phz_rej.
 %   'norm'      = Calls phz_norm.
 % 

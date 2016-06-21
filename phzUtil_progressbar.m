@@ -1,5 +1,20 @@
 function w = phzUtil_progressbar(w,val,str)
 %PHZUTIL_PROGRESSBAR  Text progress bar in the command window.
+% 
+% USAGE
+%   W = phzUtil_progressbar(w,val,str)
+% 
+% INPUT
+%   w     = 
+% 
+%   val   = [numeric] Value between 0 and 1 indicating how much progress
+%           is complete.
+% 
+%   str   = [string] Text to display alongside the progress bar.
+% 
+% OUTPUT
+% 
+%   w     = 
 
 if nargin < 3, str = '';
 elseif length(str) > 25, str = ['\n' str]; end

@@ -60,8 +60,14 @@
 %   'src','srclag'= Stimulus-response correlation or lag. Returns the
 %                   r-value or the time in seconds of the maximum
 %                   cross-correlation between each epoch and a stimulus
-%                   vector provided in PHZ.misc.stim. This is usually
-%                   used for FFR data.
+%                   waveform. The stimulus waveform must be provided in
+%                   PHZ.misc.stim and must be the same length as a single
+%                   trial. SRC is usually used for FFR data. Note that SRC 
+%                   will operate on each row of PHZ.data (i.e. each trial).
+%                   If you are dealing with FFR responses, you don't want 
+%                   each trial to actually be a single trial, but rather 
+%                   the averaged response of many trials from a single 
+%                   participant or condition.
 %
 %   'itrc'        = Intertrial response consistency (FFR feature).
 %

@@ -1,8 +1,8 @@
 %PHZ_SAVE  Save a PHZ or PHZS structure.
 % 
 % USAGE
-%   PHZ = PHZ_LOAD(PHZ)
-%   PHZ = PHZ_LOAD(PHZ,FILENAME)
+%   PHZ = phz_load(PHZ)
+%   PHZ = phz_load(PHZ,filename)
 % 
 % INTPUT
 %   PHZ           = [struct] PHZLAB data structure to save.
