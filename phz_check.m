@@ -294,9 +294,9 @@ end
 % filename
 if ismember('filename',fieldnames(PHZ.meta))
     verifyChar(PHZ.meta.filename,[name,'.meta.filename'],verbose);
-    if ~exist(PHZ.meta.filename,'file')
-        disp('The filename for this PHZ file doesn''t seem to exist...')
-    end
+%     if ~exist(PHZ.meta.filename,'file')
+%         disp('The filename for this PHZ file doesn''t seem to exist...')
+%     end
 end
 
 % datafile
