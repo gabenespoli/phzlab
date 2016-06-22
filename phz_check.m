@@ -466,8 +466,10 @@ if ismember('filename',fieldnames(PHZ.misc)), updateTo8 = true;
 end
 
 if updateTo8
-    PHZ.proc = struct;
-    PHZ = phz_history(PHZ,'Updated PHZ structure to v0.8.',verbose,0);
+    if ~ismember('proc',fieldnames(PHZ)) || ~isstruct(PHZ.proc)
+        PHZ.proc = struct;
+        PHZ = phz_history(PHZ,'Updated PHZ structure to v0.8.',verbose,0);
+    end
 end
 
 % add 'condition' as a grouping variable (v0.8.4)
