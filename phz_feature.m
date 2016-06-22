@@ -70,6 +70,12 @@
 %                   participant or condition.
 %
 %   'itrc'        = Intertrial response consistency (FFR feature).
+% 
+%   'snr'         = Signal-to-Noise Ratio of two given regions. Enter in
+%                   the form 'snr-target-baseline', which will divide the
+%                   mean of the target region by the mean of the baseline
+%                   region for each trial. Note that the regions used for
+%                   SNR must be specified in PHZ.region.
 %
 %   Behavioural features:
 %   'acc','acc2',...  = Accuracy value in PHZ.resp.q1_acc, q2, etc.
@@ -106,12 +112,13 @@ for i = 1:2:length(varargin)
         case 'verbose',              verbose = varargin{i+1};
     end
 end
+if isempty(keepVars), keepVars = ''; end
 
 % parse feature input
 [PHZ,feature,val] = parseFeature(PHZ,feature);
 
 % restrict to region
-if isempty(region) && isstruct(PHZ.region), PHZ.region = 'whole epoch';
+if isempty(region) && isstruct(PHZ.region), % PHZ.region = 'whole epoch';
 else PHZ = phz_region(PHZ,region,verbose);
 end
 
@@ -247,10 +254,21 @@ switch lower(feature)
     case 'srclag', featureTitle = 'Stimulus-Response Lag';
         PHZ.units = 's';
         [~,PHZ.data] = phzFeature_src(PHZ.data,PHZ.misc.stim,PHZ.srate,val);
+        
+    case 'snr', featureTitle = 'Signal-to-Noise Ratio';
+        PHZ.units = 'SNR';
+
+        tg = phz_feature(PHZ,'mean','region',val{1});
+        bl = phz_feature(PHZ,'mean','region',val{2});
+        PHZ.data = tg.data ./ bl.data;
+
+        PHZ.region = [val{1},' / ',val{2}];
+
 
     otherwise, error([feature,' is an unknown feature.'])
 end
 
+if isempty(region) && isstruct(PHZ.region), PHZ.region = 'whole epoch'; end
 
 % adjust PHZ and PHZ.proc fields
 if size(PHZ.data,2) == 1
@@ -274,7 +292,7 @@ if ~strcmp(PHZ.feature,'time')
 PHZ = phz_summary(PHZ,keepVars,verbose);
 
 % binmean for spectral features
-if ~isempty(val)
+if ~isempty(val) && isnumeric(val)
     featureTitle = [featureTitle,' at ',num2str(val(1)),' Hz'];
     PHZ = phzUtil_binmean(PHZ,val(1),val(2));
 end
@@ -303,14 +321,24 @@ elseif length(feature) >= 4 && strcmp(feature(1:4),'itpc')
 elseif length(feature) >= 4 && strcmp(feature(1:4),'itrc')
     if length(feature) > 4, val = feature(5:end); end
     feature = 'itrc';
+    
+elseif length(feature) >= 4 && strcmp(feature(1:4),'snr-')
+    if length(feature) > 4, val = feature(5:end); end
+    feature = 'snr';
 end
 
-% convert val(s) to numeric ([freq binWidth])
+% convert val(s) to numeric ([freq binWidth]) or cell ({baseline target})
 if ~isempty(val)
     ind = strfind(val,'-');
-    if ind, val = [str2double(val(1:ind - 1)) str2double(val(ind + 1:end))];
-    else val = [str2double(val) 0];
+    if ind, val = {val(1:ind - 1) val(ind + 1:end)};
+    else val = {val 0};
     end
+    
+    % convert to numeric if possible
+    try val = cellfun(@eval,val);
+    catch
+    end
+    
 end
 end
 
