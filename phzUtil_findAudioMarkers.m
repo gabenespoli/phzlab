@@ -16,11 +16,11 @@
 %                       sub-threshold points) between the end of a marker
 %                       and the beginning of the next. In samples.
 %
-%   'markerMaxRegion' = [numeric] A 1-by-2 vector specifying the region
+%   'maxRegion'       = [numeric] A 1-by-2 vector specifying the region
 %                       around each marker to search for a maximum and set
 %                       that point as the marker instead. In samples.
 %
-%   'markerWaveform'  = [numeric] Vector of the waveform of the audio
+%   'saveform'        = [numeric] Vector of the waveform of the audio
 %                       stimulus. 'markerWindow' must also be specified.
 %                       After the marker time is found, a cross-correlation
 %                       is calculated between DATA and MARKERWAVEFORM,
@@ -28,9 +28,9 @@
 %                       adjusted to the location of the maximum
 %                       cross-correlation.
 %
-%   'markerWindow'    = [numeric] A 1-by-2 vector specifying the times
+%   'window'          = [numeric] A 1-by-2 vector specifying the times
 %                       around the marker time with which to calculate the
-%                       cross-correlation.
+%                       cross-correlation. In samples.
 %
 %   'numMarkers'      = [numeric] Expected number of markers to find. Enter
 %                       empty ([]) if unknown.
@@ -82,6 +82,8 @@ for i = 1:2:length(varargin)
         case 'plotmarkers',         plotMarkers = varargin{i+1};
             
         case 'srate',               srate = varargin{i+1};
+        
+        otherwise, warning(['Unknown parameter ''',varargin{i},'''.'])
     end
 end
 
@@ -100,7 +102,7 @@ while ~foundMarkers
             diffs = find(aboveThreshDiff > timeBetween)+1; % ignore points too close to their neighbour
             times = [aboveThresh(1) aboveThresh(diffs)]; % add to container
         end
-        disp(['- ',num2str(length(times)),' markers found at threshold ',num2str(threshold),'.'])
+        disp(['',num2str(length(times)),' markers found at threshold ',num2str(threshold),'.'])
         foundMarkers = true;
     else
         disp([num2str(length(times)),' markers specified.'])
@@ -201,7 +203,7 @@ for i = 1:length(times)
     str = phzUtil_progressbar(str,i/length(times));
     
     % skip trials for which the epoch window is too large for the datafile
-    if (times(i) + win(1) < 1) || (times(i) + win(2) > size(data,1))
+    if (times(i) + win(1) < 1) || (times(i) + win(2) > size(data,2))
         warning(['Skipping trial ',num2str(i),' because it is too close to ',...
             'edge of the datafile for the requested window.'])
         continue
@@ -230,7 +232,7 @@ disp('Adjusting markers to max instead of onset...')
 if times(1) + maxRegion(1) < 1, times(1) = [];
     warning('maxRegion too long for first marker. First marker removed.'), end
 
-if times(end) + maxRegion(2) > length(data), times(end) = [];
+if times(end) + maxRegion(2) > size(data,2), times(end) = [];
     warning('maxRegion too long for last marker. Last marker removed.'), end
 
 disp('Adjusting markers to max instead of onset...')

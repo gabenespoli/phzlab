@@ -77,7 +77,7 @@ end
 
 function epochs = extractEpochs(data,times,extractWindow)
 
-% disp('Extracting epochs...')
+disp('Extracting epochs...')
 
 epochs = zeros(length(times),extractWindow(2) - extractWindow(1) + 1);
 
