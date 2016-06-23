@@ -20,8 +20,21 @@
 % 
 %   PHZ = phz_load('myfolder/myfile.phz') >> Loads the file 'myfile.phz'
 %         from the folder 'myfolder'.
-%
-% Written by Gabriel A. Nespoli 2016-03-07. Revised 2016-04-04.
+
+% Copyright (C) 2016 Gabriel A. Nespoli, gabenespoli@gmail.com
+% 
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% 
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+% 
+% You should have received a copy of the GNU General Public License
+% along with this program.  If not, see http://www.gnu.org/licenses/.
 
 function PHZ = phz_load(varargin)
 

@@ -19,8 +19,21 @@ function PHZ = phz_filter(PHZ,cutoff,verbose)
 %   PHZ = phz_filter(PHZ,[1 10])   >> 1-10 Hz band pass Butterworth filter
 %   PHZ = phz_filter(PHZ,[0 0 60]) >> 59-61 Hz band stop Butterworth filter
 %   PHZ = phz_filter(PHZ,[0 10 0 4]) >> 4th order 10 Hz low pass filter
-%
-% Written by Gabriel A. Nespoli 2014-03-18. Revised 2016-04-05.
+
+% Copyright (C) 2016 Gabriel A. Nespoli, gabenespoli@gmail.com
+% 
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% 
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+% 
+% You should have received a copy of the GNU General Public License
+% along with this program.  If not, see http://www.gnu.org/licenses/.
 
 if nargout == 0 && nargin == 0, help phz_filter, return, end
 if isempty(cutoff), return, end

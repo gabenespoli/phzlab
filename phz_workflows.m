@@ -1,7 +1,22 @@
-function phz_workflow(datatype)
+function phz_workflowsÎ©(datatype)
 %PHZ_WORKFLOW  Display sample workflows for a specific type of data.
 % 
 % 
+
+% Copyright (C) 2016 Gabriel A. Nespoli, gabenespoli@gmail.com
+% 
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% 
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+% 
+% You should have received a copy of the GNU General Public License
+% along with this program.  If not, see http://www.gnu.org/licenses/.
 
 if nargin == 0 && nargout == 0; help phz_workflow, return, end
 
@@ -33,7 +48,7 @@ switch lower(datatype)
 %         
 %         disp(' ')
 %         
-%         disp('Likowski et al. 2012: rectify, filter [30 500 50], 125ms moving avg, rej 8µV baseline or 30µV target')
+%         disp('Likowski et al. 2012: rectify, filter [30 500 50], 125ms moving avg, rej 8ÂµV baseline or 30ÂµV target')
 %         disp('Tierney Lindsay et al. 2011: rectify, smooth(?), blc, norm')
 %         disp('so... rectify, filter, smooth, rej, blc, norm')
 %         
