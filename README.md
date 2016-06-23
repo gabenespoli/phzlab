@@ -35,4 +35,4 @@ PHZ structures are created for each recording of data, and can be filtered, epoc
 The current version is 0.9 beta.
 
 ## Licence
-This program is covered by the GNU General Public Licence v3.
+This software is covered by the GNU General Public Licence v3.
