@@ -148,12 +148,14 @@ if do_rej || do_restore
         % check that ~reject all trials or ~reject no trials
         if length(PHZ.proc.rej.locs) == size(PHZ.data,1)
             disp('This threshold would reject all trials. Aborting...')
+            PHZ.proc = rmfield(PHZ.proc,'rej');
             disp(['The min threshold to reject a trial in this dataset is ',num2str(min(max(abs(PHZ.data),[],2))),'.'])
             return
         end
         
         if isempty(PHZ.proc.rej.locs)
             disp('This threshold would not reject any trials. Aborting...')
+            PHZ.proc = rmfield(PHZ.proc,'rej');
             disp(['The max value in this dataset is ',num2str(max(abs(PHZ.data(:)))),'.'])
             return
         end
