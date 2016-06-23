@@ -84,7 +84,7 @@ for i = {'participant','group','condition','session','trials'}, field = i{1};
             
             % only 1 grouping var value, auto-create tags
         elseif length(PHZ.(field)) == 1
-            PHZ.meta.tags.(field) = repmat(PHZ.(field),size(PHZ.data,1));
+            PHZ.meta.tags.(field) = repmat(PHZ.(field),size(PHZ.data,1),1);
             
             % multiple grouping var values; tags remains empty
         elseif length(PHZ.(field)) > 1
