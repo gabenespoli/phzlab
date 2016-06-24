@@ -171,8 +171,10 @@ if do_rej || do_restore
         
         % copy tags over to PHZ.rej.(field)
         for i = {'participant','group','condition','session','trials'}, field = i{1};
-            PHZ.proc.rej.(field) = PHZ.meta.tags.(field)(PHZ.proc.rej.locs);
-            PHZ.meta.tags.(field)(PHZ.proc.rej.locs) = [];
+            if ~isempty(PHZ.meta.tags.(field))
+                PHZ.proc.rej.(field) = PHZ.meta.tags.(field)(PHZ.proc.rej.locs);
+                PHZ.meta.tags.(field)(PHZ.proc.rej.locs) = [];
+            end
         end
         PHZ.proc.rej.data = PHZ.data(PHZ.proc.rej.locs,:);
         PHZ.data(PHZ.proc.rej.locs,:) = [];
