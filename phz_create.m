@@ -158,7 +158,7 @@ channel = [];
 
 filetype = 'acq';
 savefolder = 0;
-verbose = false;
+verbose = true;
 
 folder = '';
 
@@ -205,7 +205,7 @@ if ~ischar(savefolder) && length(files) > 1
     error('When creating more than one PHZ file, specify a folder where they should be saved.'), end
 
 % loop files
-if verbose, disp(' '), disp('Creating PHZ file(s) from data file(s)...'), end
+% if verbose, disp(' '), disp('Creating PHZ file(s) from data file(s)...'), end
 w = '';
 for i = 1:length(files)
     fileProgress = [num2str(i),'/',num2str(length(files)),': ',files{i}];

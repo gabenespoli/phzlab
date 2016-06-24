@@ -154,7 +154,7 @@ for i = {'participant','group','condition','session','trials'}, field = i{1};
             if length(PHZ.(field)) ~= length(PHZ.meta.spec.(field))
                 do_resetSpec = true;
                 if nargout == 0, warning([name,'.meta.spec.',field,' has an incorrect number of items.'])
-                elseif verbose, disp([name,'.meta.spec.',field,' had an incorrect number of items and was reset to the default order.'])
+                elseif verbose, disp(['- ',name,'.meta.spec.',field,' had an incorrect number of items and was reset to the default order.'])
                 end
             end
         else PHZ.meta.spec.(field) = {};
@@ -163,7 +163,7 @@ for i = {'participant','group','condition','session','trials'}, field = i{1};
         % else _order is empty, make sure spec is empty
     elseif ~isempty(PHZ.meta.spec.(field))
         PHZ.meta.spec.(field) = {};
-        disp([name,'.meta.spec.',field,' was emptied (set to {})'])
+        disp(['- ',name,'.meta.spec.',field,' was emptied (set to {})'])
         
     end
     
@@ -344,7 +344,7 @@ try
     if iscategorical(C),    C = cellstr(C);     end
     if iscell(C),           C = C{:};           end
     if ischar(C),           C = str2double(C);  end
-    if verbose, disp(['Changed ',name,' to a double.']), end
+    if verbose, disp(['- Changed ',name,' to a double.']), end
 catch, error([name,' should be a numeric array.'])
 end
 end
@@ -354,7 +354,7 @@ if ischar(C), return, end
 try
     if isnumeric(C), C = num2str(C); end
     if iscell(C), C = C{:}; end
-    if verbose, disp(['Changed ',name,' to a string.']), end
+    if verbose, disp(['- Changed ',name,' to a string.']), end
 catch, error([name,' should be a string.'])
 end
 end
@@ -365,7 +365,7 @@ try
     if isnumeric(C),        C = {C};        end
     if ischar(C),           C = cellstr(C); end
     if iscategorical(C),    C = cellstr(C); end
-    if verbose, disp(['Changed ',name,' to a cell array.']), end
+    if verbose, disp(['- Changed ',name,' to a cell array.']), end
 catch, error([name,' should be a cell array.'])
 end
 end
@@ -376,7 +376,7 @@ try
     if isnumeric(C), C = num2str(C);     end
     if ischar(C),    C = cellstr(C);     end
     if iscell(C),    C = categorical(C); end
-    if verbose, disp(['Changed ',name,' to a categorical array.']), end
+    if verbose, disp(['- Changed ',name,' to a categorical array.']), end
 catch, error([name,' should be a categorical array.'])
 end
 end
@@ -388,7 +388,7 @@ if ~isrow(x)
         x = x';
         if noutargs == 0
             warning([name,' should be changed from a column vector to a row vector.'])
-        elseif verbose, disp(['Changed ',name,' from a column vector to a row vector.'])
+        elseif verbose, disp(['- Changed ',name,' from a column vector to a row vector.'])
         end
     else error(['Something is wrong with ',name,'.'])
     end
@@ -402,7 +402,7 @@ if ~iscolumn(x)
         x = x';
         if noutargs == 0
             warning([name,' should be changed from a row vector to a column vector.'])
-        elseif verbose, disp(['Changed ',name,' from a row vector to a column vector.'])
+        elseif verbose, disp(['- Changed ',name,' from a row vector to a column vector.'])
         end
     else error(['Something is wrong with ',name,'.'])
     end

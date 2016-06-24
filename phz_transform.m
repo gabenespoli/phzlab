@@ -102,10 +102,11 @@ for i = 1:length(transform)
     PHZ = phz_history(PHZ,transformStr,verbose);
 end
 
-PHZ.proc.transform = transform;
-
-if ~isempty(units)
-    PHZ.proc.oldUnits = PHZ.units;
+if isempty(units)
+    PHZ.proc.transform = transform;
+else
+    PHZ.proc.transform.transform = transform;
+    PHZ.proc.transform.oldUnits = PHZ.units;
     PHZ.units = units;
 end
 end
