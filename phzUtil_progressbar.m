@@ -1,20 +1,27 @@
-function w = phzUtil_progressbar(w,val,str)
 %PHZUTIL_PROGRESSBAR  Text progress bar in the command window.
 % 
 % USAGE
-%   W = phzUtil_progressbar(w,val,str)
+%   w = phzUtil_progressbar(w,val,str)
 % 
 % INPUT
-%   w     = 
+%   w     = [string] Pass an empty value ('') to initiate the progress bar.
+%           This function will return a value for w (the number of
+%           characters to delete on the next loop), so pass that value in
+%           here on the next loop.
 % 
 %   val   = [numeric] Value between 0 and 1 indicating how much progress
-%           is complete.
+%           is complete. When a value of 1 is passed, the progress bar is
+%           printed with a newline ('\n') at the end.
 % 
-%   str   = [string] Text to display alongside the progress bar.
+%   str   = [string] Optional text to display on the right of 
+%           the progress bar. 
 % 
 % OUTPUT
 % 
-%   w     = 
+%   w     = The string that was printed for the current update of the
+%           progress bar. Pass this variable in on the next loop so that
+%           the function knows how many characters to delete before
+%           printing the next progress update.
 
 % Copyright (C) 2016 Gabriel A. Nespoli, gabenespoli@gmail.com
 % 
@@ -31,8 +38,12 @@ function w = phzUtil_progressbar(w,val,str)
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see http://www.gnu.org/licenses/.
 
+function w = phzUtil_progressbar(w,val,str)
+
 if nargin < 3, str = '';
-elseif length(str) > 25, str = ['\n' str]; end
+elseif length(str) > 25, str = ['\n' str];
+else str = [' ' str];
+end
 
 del = repmat('\b',1,length(w)-1);
 dot = floor(val * 20);
