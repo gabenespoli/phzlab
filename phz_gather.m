@@ -92,10 +92,15 @@ resetFields = {};
 % loop through files
 % ------------------
 if verbose, disp(' '), disp('Gathering PHZ data...'), end
-w = waitbar(0,'Gathering PHZ data...');
+% w = waitbar(0,'Gathering PHZ data...');
+disp('Gathering PHZ data...')
+w = '';
 for j = 1:length(files)
     fileProgress = [num2str(j),'/',num2str(length(files)),': ',files{j}];
-    waitbar((j-1)/length(files),w,['Gathering PHZ data from file ',fileProgress]);
+%     waitbar((j-1)/length(files),w,['Gathering PHZ data from file ',fileProgress]);
+    w = phzUtil_progressbar(w,j/length(files),fileProgress);
+
+    
     
     % load data
     if verbose, disp(['Loading data from file ',fileProgress]), end
@@ -202,7 +207,7 @@ for j = 1:length(files)
     
     if verbose, disp(' '), end
 end % end looping participants
-close(w)
+% close(w)
 
 % cleanup PHZS
 % ------------
