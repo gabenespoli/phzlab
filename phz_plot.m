@@ -37,8 +37,10 @@
 %                   x-axis and right y-axis, making plots look more
 %                   "presentation-ready". Default 0.
 % 
-%   'filename'    = [string] Enter a filename to save the created figure to
-%                   disk as a .png file.
+%   'title'       = [1|0] Enter 0 to suppress the plot title. Default 1.
+% 
+%   'filename'    = [string] Enter a filename to save the created figure
+%                   to disk as a .png file.
 %   
 %   These are executed in the order that they appear in the function call. 
 %   See the help of each function for more details.
@@ -107,6 +109,8 @@ yl = [];
 xl = [];
 sameyl = [];
 pretty = false;
+do_title = true;
+
 filename = '';
 
 verbose = true;
@@ -142,6 +146,7 @@ for i = 1:2:length(varargin)
         case {'xl','xlim'},             xl = varargin{i+1};
         case 'sameyl',                  sameyl = varargin{i+1};
         case 'pretty',                  pretty = varargin{i+1};
+        case {'do_title','title'},      do_title = varargin{i+1};
         case {'filename','save'},       filename = varargin{i+1};
     end
 end
@@ -205,7 +210,7 @@ for p = 1:length(plotOrder)
     end
     
     % label plot, add errorbars
-    title(char(plotOrder(p)))
+    if do_title, title(char(plotOrder(p))), end
     if isempty(ytitleLoc) || ytitleLoc == p, ylabel(ytitle), end
     
     if ismember(PHZ.feature,{'fft','itfft','itpc'}) % FFT / PC plots
