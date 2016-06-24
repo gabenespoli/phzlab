@@ -13,8 +13,8 @@
 %           is complete. When a value of 1 is passed, the progress bar is
 %           printed with a newline ('\n') at the end.
 % 
-%   str   = [string] Optional text to display on the right of 
-%           the progress bar. 
+%   str   = [string] Optional text to display on the line above the
+%           progress bar. 
 % 
 % OUTPUT
 % 
@@ -41,17 +41,17 @@
 function w = phzUtil_progressbar(w,val,str)
 
 if nargin < 3, str = '';
-elseif length(str) > 25, str = ['\n' str];
-else str = [' ' str];
+% elseif length(str) > 25, str = ['\n' str];
+else str = [str '\n'];
 end
 
-del = repmat('\b',1,length(w)-1);
+del = repmat('\b',1,length(w)-1-2); % extra -2 for the newline chars
 dot = floor(val * 20);
 pct = num2str(floor(val * 100));
 pct = [repmat(' ',1,3-length(pct)),pct,'%% '];
 
-w = [pct,'[',repmat('.',1,dot),repmat(' ',1,20 - dot) ']'];
-w = [w str];
+w = ['[',repmat('.',1,dot),repmat(' ',1,20 - dot) '] ',pct];
+w = [str w '\n'];
 
 fprintf([del w])
 if val == 1, fprintf('\n'), end
