@@ -1,4 +1,3 @@
-function PHZ = phz_filter(PHZ,cutoff,verbose)
 %PHZ_FILTER  Apply a zero-phase shift filter to the data.
 %
 % USAGE  
@@ -7,7 +6,7 @@ function PHZ = phz_filter(PHZ,cutoff,verbose)
 % INPUT
 %   PHZ       = PHZLAB data structure.
 %   CUTOFF    = Cutoff frequencies for filtering in Hertz, in the form 
-%               [locut hicut notch order]. Default is a 3rd-order
+%               [hipass lopass notch order]. Default is a 3rd-order
 %               Butterworth filter.
 %               
 % OUTPUT
@@ -34,6 +33,8 @@ function PHZ = phz_filter(PHZ,cutoff,verbose)
 % 
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see http://www.gnu.org/licenses/.
+
+function PHZ = phz_filter(PHZ,cutoff,verbose)
 
 if nargout == 0 && nargin == 0, help phz_filter, return, end
 if isempty(cutoff), return, end
@@ -85,4 +86,11 @@ for i = 1:size(PHZ.data,1)
     if nt ~= 0, PHZ.data(i,:) = filtfilt(nB,nA,PHZ.data(i,:)); end
 end
 if verbose, fprintf('Done.\n'), end
+
+PHZ.proc.filter.type = 'Butterworth';
+PHZ.proc.filter.hipass = hp;
+PHZ.proc.filter.lopass = lp;
+PHZ.proc.filter.notch = nt;
+PHZ.proc.filter.order = ord;
+
 end
