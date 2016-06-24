@@ -2,9 +2,11 @@
 %
 % USAGE
 %   PHZ = phz_transform(PHZ,transform)
+%   PHZ = phz_transform(PHZ,transform,units)
 % 
 % INPUT
 %   PHZ       = PHZLAB data structure.
+% 
 %   transform = [string|numeric] Type of transformation to apply to the 
 %               data. See below for a list of possible transformations.
 % 
@@ -16,8 +18,13 @@
 %       'log2'    = Base 2 logarithm.
 %       [numeric] = Multiply each data point by this number.
 % 
+%   units     = Optionally specifies new units for PHZ.units. Enter empty
+%               ([] or '') to erase the current units, or a boolean false
+%               to leave them as they are.
+% 
 % OUTPUT
 %   PHZ.data  = The transformed data.
+%   PHZ.units = Optionally the value in units.
 
 % Copyright (C) 2016 Gabriel A. Nespoli, gabenespoli@gmail.com
 % 
@@ -34,13 +41,14 @@
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see http://www.gnu.org/licenses/.
 
-function PHZ = phz_transform(PHZ,transform,verbose)
+function PHZ = phz_transform(PHZ,transform,units,verbose)
 
 if nargout == 0 && nargin == 0, help phz_transform, return, end
 if isempty(transform), return, end
 
 % parse input
-if nargin < 3, verbose = true; end
+if nargin < 3, units = ''; end
+if nargin < 4, verbose = true; end
 if ~iscell(transform), transform = {transform}; end
 if ismember('rej',fieldnames(PHZ)), do_rej = true; else do_rej = false; end
 
@@ -95,4 +103,9 @@ for i = 1:length(transform)
 end
 
 PHZ.proc.transform = transform;
+
+if ~isempty(units)
+    PHZ.proc.oldUnits = PHZ.units;
+    PHZ.units = units;
+end
 end
