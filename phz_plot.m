@@ -471,7 +471,7 @@ background = get(gcf, 'color'); % save the original bg color for later use
 set(gcf,'InvertHardCopy','off');
 
 [pathStr,name,~] = fileparts(filename);
-filename = [pathStr,name,'.png'];
+filename = fullfile(pathStr,[name,'.png']);
 
 % print file w/o transparency
 print('-dpng',filename);
