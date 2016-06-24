@@ -40,12 +40,14 @@
 
 function w = phzUtil_progressbar(w,val,str)
 
-if nargin < 3, str = '';
-% elseif length(str) > 25, str = ['\n' str];
+if nargin < 3, 
+    str = '';
+    extraChars = 1;
 else str = [str '\n'];
+    extraChars = 2;
 end
 
-del = repmat('\b',1,length(w)-1-2); % extra -2 for the newline chars
+del = repmat('\b',1,length(w)-1-extraChars); % extra -2 for the newline chars
 dot = floor(val * 20);
 pct = num2str(floor(val * 100));
 pct = [repmat(' ',1,3-length(pct)),pct,'%% '];
@@ -54,6 +56,5 @@ w = ['[',repmat('.',1,dot),repmat(' ',1,20 - dot) '] ',pct];
 w = [str w '\n'];
 
 fprintf([del w])
-if val == 1, fprintf('\n'), end
 
 end
