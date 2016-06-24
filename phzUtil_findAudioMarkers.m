@@ -20,7 +20,7 @@
 %                       around each marker to search for a maximum and set
 %                       that point as the marker instead. In samples.
 %
-%   'saveform'        = [numeric] Vector of the waveform of the audio
+%   'waveform'        = [numeric] Vector of the waveform of the audio
 %                       stimulus. 'markerWindow' must also be specified.
 %                       After the marker time is found, a cross-correlation
 %                       is calculated between DATA and MARKERWAVEFORM,
@@ -123,7 +123,7 @@ while ~foundMarkers
     
     % check for correct number of markers found
     if ~isempty(numMarkers)
-        disp(['- ',num2str(numMarkers),' markers were expected.'])
+        disp([num2str(numMarkers),' markers were expected.'])
         
         if length(times) == numMarkers
             foundMarkers = true;
