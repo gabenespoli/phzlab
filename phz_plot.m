@@ -37,6 +37,9 @@
 %                   x-axis and right y-axis, making plots look more
 %                   "presentation-ready". Default 0.
 % 
+%   'simpleYTitle'= [0|1] Enter 1 to suppress inclusion of processing info
+%                   in the y-axis title. Default 0 (include this info).
+% 
 %   'title'       = [1|0] Enter 0 to suppress the plot title. Default 1.
 % 
 %   'close'       = [0|1] Enter 1 to close the plot window after drawing
@@ -75,7 +78,7 @@
 % 
 %   If 'filename' is specified, a .png file of the plot is saved.
 % 
-%   Use phz_changefield to edit the order in which lines and bars are
+%   Use phz_field to edit the order in which lines and bars are
 %   plotted, as well as their colour and line style.
 
 % Copyright (C) 2016 Gabriel A. Nespoli, gabenespoli@gmail.com
@@ -113,6 +116,7 @@ yl = [];
 xl = [];
 sameyl = [];
 pretty = false;
+simpleytitle = false;
 do_title = true;
 do_close = false;
 
@@ -151,6 +155,7 @@ for i = 1:2:length(varargin)
         case {'xl','xlim'},             xl = varargin{i+1};
         case 'sameyl',                  sameyl = varargin{i+1};
         case 'pretty',                  pretty = varargin{i+1};
+        case 'simpleytitle',            simpleytitle = varargin{i+1};
         case {'do_title','title'},      do_title = varargin{i+1};
         case {'filename','save'},       filename = varargin{i+1};
         case {'close'},                 do_close = varargin{i+1};
@@ -174,7 +179,7 @@ end
 [rows,cols,pos,ytitleLoc,xtitleLoc] = getPlotDims(plotOrder);
 if isempty(yl), yl = nan(length(plotOrder),2); do_yl = true; else do_yl = false; end
 if isempty(xl), xl = nan(size(yl));            do_xl = true; else do_xl = false; end
-ytitle = getytitle(PHZ,feature,legendLoc,do_plotsmooth,featureTitle);
+ytitle = getytitle(PHZ,feature,legendLoc,do_plotsmooth,featureTitle,simpleytitle);
 
 % loop plots and plot lines/bars
 % ------------------------------
@@ -434,7 +439,7 @@ switch length(plotLabels)
 end
 end
 
-function ytitle = getytitle(PHZ,feature,legendLoc,do_plotsmooth,featureTitle)
+function ytitle = getytitle(PHZ,feature,legendLoc,do_plotsmooth,featureTitle,simpleytitle)
 
 % main titles
 % -----------
@@ -457,7 +462,7 @@ end
 
 % dsp-related titles
 % ------------------
-if skipDSPtitles, return, end % skip dsp titles for acc and rt
+if skipDSPtitles || simpleytitle, return, end % skip dsp titles for acc and rt
 
 % smoothing
 if do_plotsmooth && isempty(feature), ytitle = {[ytitle{1} ' (smoothed)']}; end
@@ -469,11 +474,11 @@ if ~isempty(feature) || (isempty(feature) && isempty(legendLoc))
     end
     
     if ismember('blsub',fieldnames(PHZ.proc))
-        ytitle = [ytitle; {['baseline-correction: ',phzUtil_num2strRegion(PHZ.proc.blsub.region)]}];
+        ytitle = [ytitle; {['baseline-subtraction: ',phzUtil_num2strRegion(PHZ.proc.blsub.region)]}];
     end
 
 elseif ismember('blsub',fieldnames(PHZ.proc))
-    ytitle = [ytitle; {'baseline-corrected'}];
+    ytitle = [ytitle; {'baseline-subtracted'}];
 end
 end
 
