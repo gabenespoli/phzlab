@@ -39,7 +39,11 @@
 % 
 %   'title'       = [1|0] Enter 0 to suppress the plot title. Default 1.
 % 
-%   'filename'    = [string] Enter a filename to save the created figure
+%   'close'       = [0|1] Enter 1 to close the plot window after drawing
+%                   it. This is useful when making (and saving) many plots 
+%                   with a script.
+% 
+%   'save'        = [string] Enter a filename to save the created figure
 %                   to disk as a .png file.
 %   
 %   These are executed in the order that they appear in the function call. 
@@ -110,6 +114,7 @@ xl = [];
 sameyl = [];
 pretty = false;
 do_title = true;
+do_close = false;
 
 filename = '';
 
@@ -148,6 +153,7 @@ for i = 1:2:length(varargin)
         case 'pretty',                  pretty = varargin{i+1};
         case {'do_title','title'},      do_title = varargin{i+1};
         case {'filename','save'},       filename = varargin{i+1};
+        case {'close'},                 do_close = varargin{i+1};
     end
 end
 
@@ -305,6 +311,8 @@ end
 if pretty, set(gcf,'color','w'), end
 
 if ~isempty(filename), savefig(filename), end
+
+if do_close, close(gcf), end
 
 % Done phz_plot
 end
