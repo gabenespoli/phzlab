@@ -1,21 +1,21 @@
 %PHZ_REGION  Restrict data to a specified time or frequency region.
 % 
-% usage:    
-%     PHZ = phz_region(PHZ,REGION)
+% USAGE
+%   PHZ = phz_region(PHZ,REGION)
 % 
-% input:   
-%     PHZ     = PHZLAB data structure.
+% INPUT   
+%   PHZ     = PHZLAB data structure.
 % 
-%     REGION  = A string specifying a region in PHZ.region, a 1-by-2 vector
+%   REGION  = A string specifying a region in PHZ.region, a 1-by-2 vector
 %               specifying the start and end times in seconds, or a 1-by-N
 %               vector (length > 2) of indices.
 % 
-% output:  
-%     PHZ.data   = Data for specified region only.
+% OUTPUT
+%   PHZ.data          = Data for specified region only.
+%   PHZ.proc.rej.data = Data for specified region only.
+%   PHZ.region        = Value specified in REGION.
 % 
-%     PHZ.region = Value specified in REGION.
-% 
-% examples:
+% EXAMPLES
 %     PHZ = phz_region(PHZ,'target') >> Restricts PHZ.data to the 'target'
 %           region only.
 %     PHZ = phz_region(PHZ,[0 3]) >> Restricts PHZ.data to the region from
@@ -78,7 +78,7 @@ if isempty(region), error('Region is empty.'), end
 % restrict PHZ.data to specified region
 PHZ.data = PHZ.data(:,region);
 PHZ.(indField) = PHZ.(indField)(region);
-if ismember('rej',fieldnames(PHZ)), 
+if ismember('rej',fieldnames(PHZ.proc)), 
     PHZ.proc.rej.data = PHZ.proc.rej.data(:,region);
 end
 
