@@ -116,13 +116,6 @@ if do_rej || do_restore
                 temp = eval(field);
                 PHZ.meta.tags.(field) = temp(ind);
             end
-            
-            
-%             PHZ.meta.tags.participant = participant(ind);
-%             PHZ.meta.tags.condition   = condition(ind);
-%             PHZ.meta.tags.group       = group(ind);
-%             PHZ.meta.tags.session     = session(ind);
-%             PHZ.meta.tags.trials      = trials(ind);
         end
         
         PHZ.proc = rmfield(PHZ.proc,'rej');
