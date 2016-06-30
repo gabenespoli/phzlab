@@ -20,7 +20,7 @@
 % 
 %   units     = Optionally specifies new units for PHZ.units. Enter empty
 %               ([] or '') to erase the current units, or a boolean false
-%               to leave them as they are.
+%               to leave them as they are. Default false (leave units).
 % 
 % OUTPUT
 %   PHZ.data  = The transformed data.
@@ -47,7 +47,7 @@ if nargout == 0 && nargin == 0, help phz_transform, return, end
 if isempty(transform), return, end
 
 % parse input
-if nargin < 3, units = ''; end
+if nargin < 3, units = false; end
 if nargin < 4, verbose = true; end
 if ~iscell(transform), transform = {transform}; end
 if ismember('rej',fieldnames(PHZ)), do_rej = true; else do_rej = false; end
@@ -102,7 +102,7 @@ for i = 1:length(transform)
     PHZ = phz_history(PHZ,transformStr,verbose);
 end
 
-if isempty(units)
+if islogical(units) && ~units
     PHZ.proc.transform = transform;
 else
     PHZ.proc.transform.transform = transform;
