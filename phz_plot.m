@@ -124,6 +124,8 @@ filename = '';
 
 verbose = true;
 
+sigstarVars = [];
+
 % user-defined
 if any(strcmp(varargin(1:2:end),'verbose'))
     i = find(strcmp(varargin(1:2:end),'verbose')) * 2 - 1;
@@ -137,7 +139,7 @@ for i = 1:2:length(varargin)
         case {'rect','rectify'},        PHZ = phz_rectify(PHZ,varargin{i+1},verbose);
         case {'filter','filt'},         PHZ = phz_filter(PHZ,varargin{i+1},verbose);
         case {'smooth','smoothing'},    PHZ = phz_smooth(PHZ,varargin{i+1},verbose);
-        case 'transform',               PHZ = phz_transform(PHZ,varargin{i+1},verbose);
+        case 'transform',               PHZ = phz_transform(PHZ,varargin{i+1},false,verbose);
         case {'blsub','blc'},           PHZ = phz_blsub(PHZ,varargin{i+1},verbose);
         case {'rej','reject'},          PHZ = phz_rej(PHZ,varargin{i+1},verbose);
         case {'norm','normtype'},       PHZ = phz_norm(PHZ,varargin{i+1},verbose);
@@ -159,6 +161,8 @@ for i = 1:2:length(varargin)
         case {'do_title','title'},      do_title = varargin{i+1};
         case {'filename','save'},       filename = varargin{i+1};
         case {'close'},                 do_close = varargin{i+1};
+            
+        case 'sigstar',                 sigstarVars = varargin{i+1};
     end
 end
 
@@ -245,6 +249,10 @@ for p = 1:length(plotOrder)
         set(gca,'XTick',1:length(lineOrder),'XTickLabel',cellstr(lineOrder))    
         errorbar(gca,1:length(lineOrder),PHZ.data(ind),PHZ.summary.stdError(ind),'.k');
     end
+    
+    % ---- sigstar (beta)
+    if ~isempty(sigstarVars),sigstar(sigstarVars{:}),end
+    % ----
     
     % record axes ranges
     if do_yl, yl(p,:) = ylim; end %#ok<AGROW>
@@ -490,8 +498,9 @@ background = get(gcf, 'color'); % save the original bg color for later use
 
 set(gcf,'InvertHardCopy','off');
 
-[pathStr,name,~] = fileparts(filename);
-filename = fullfile(pathStr,[name,'.png']);
+% add .png extension if not already
+[~,~,ext] = fileparts(filename);
+if ~strcmp(ext,'.png'), filename = [filename,'.png']; end
 
 % print file w/o transparency
 print('-dpng',filename);
