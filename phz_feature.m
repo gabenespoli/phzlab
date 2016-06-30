@@ -67,8 +67,6 @@
 %                   dealing with FFR responses, you probably want to
 %                   average across trials first (e.g., with phz_summary)
 %                   before calculating src.
-%
-%   'itrc'        = Intertrial response consistency (FFR feature).
 % 
 %   'snr'         = Signal-to-Noise Ratio of two given regions. Enter in
 %                   the form 'snr-target-baseline', which will divide the
@@ -249,7 +247,7 @@ switch lower(feature)
 %             PHZ.feature = TMP.feature;
         end
         
-    case 'itrc', featureTitle = 'Intertrial Phase Consistency';
+%     case 'itrc', featureTitle = 'Intertrial Phase Consistency';
         % Method adapted from Tierney & Kraus, 2013, Journal of Neuroscience.
         
         % if PHZS has already been summary'd, phzFeature_itrc will have to
