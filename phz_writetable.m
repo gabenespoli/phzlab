@@ -172,7 +172,7 @@ for i = 1:length(feature)
     end
     
     % add feature data to table
-    d.(s.feature) = s.data;
+    d.(strrep(s.feature,'-','_')) = s.data;
     d.Properties.VariableUnits{end} = s.units;
     d.Properties.VariableDescriptions{end} = featureTitle;
     
