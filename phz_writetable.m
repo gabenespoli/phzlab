@@ -163,9 +163,11 @@ for i = 1:length(feature)
         d.Properties.UserData.history = PHZ.history;
         
         for j = 1:length(addVars) - 1
-            d.(addVars{j+1}) = s.meta.tags.(addVars{j+1});
-            d.Properties.VariableUnits{end} = '';
-            d.Properties.VariableDescriptions{end} = '';
+            if ~strcmp(s.meta.tags.(addVars{j+1}),'<collapsed>')
+                d.(addVars{j+1}) = s.meta.tags.(addVars{j+1});
+                d.Properties.VariableUnits{end} = '';
+                d.Properties.VariableDescriptions{end} = '';
+            end
         end
     end
     
