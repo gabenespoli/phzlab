@@ -203,18 +203,27 @@ for p = 1:length(plotOrder)
         y = PHZ.data(ind(i),:);
         
         if size(PHZ.data,2) > 1 % line plots of time-series or fft data
-            plot(x,y,'Color',lineSpec{i},...
+            h = plot(x,y,...
                 'DisplayName',char(lineOrder(i)),...
-                'LineWidth',linewidth)
+                'LineWidth',linewidth);
+            
+            if ~isempty(lineSpec{i})
+                if ischar(lineSpec{i}), set(h,'Color',lineSpec{i}(1))
+                elseif isnumeric(lineSpec{i}), set(h,'Color',lineSpec{i}), end
+            end
+            
             if i == 1, hold on, end
             
         else % bar plots of feature values
             h = bar(i,y);
             if i == 1, hold on, end
             if ~isempty(lineSpec{i})
-                if ischar(lineSpec{i}), set(h,'FaceColor',lineSpec{i}(1))
-                elseif isnumeric(lineSpec{i}), set(h,'FaceColor',lineSpec{i})
+                
+                if ~isempty(lineSpec{i})
+                    if ischar(lineSpec{i}), set(h,'FaceColor',lineSpec{i}(1))
+                    elseif isnumeric(lineSpec{i}), set(h,'FaceColor',lineSpec{i}), end
                 end
+                
                 if length(lineSpec{i}) > 2
                     if strcmp(lineSpec{i}(2:3),'--')
                         currentColor = get(h,'FaceColor') + 0.7;
