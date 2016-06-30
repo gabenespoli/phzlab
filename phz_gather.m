@@ -71,7 +71,7 @@ if nargin > 0 && isdir(varargin{1})
     
 else [files,folder] = uigetfile({'.phz';'.mat'},'Select PHZ files to gather...','MultiSelect','on');
     if isnumeric(files) && files == 0, return, end
-    if ischar(files), cellstr(files); end
+    if ischar(files), files = cellstr(files); end
     
 end
 
