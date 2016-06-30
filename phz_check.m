@@ -102,7 +102,7 @@ for i = {'participant','group','condition','session','trials'}, field = i{1};
             if length(unique(PHZ.meta.tags.(field))) == 1
                 PHZ.meta.tags.(field) = repmat(PHZ.meta.tags.(field),size(PHZ.data,1),1);
             else
-                error([name,'.tags.',field,' must be the same length as the number of trials.'])
+                error([name,'meta.tags.',field,' must be the same length as the number of trials.'])
             end
         end
         
