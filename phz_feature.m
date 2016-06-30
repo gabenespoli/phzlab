@@ -74,7 +74,9 @@
 %                   the form 'snr-target-baseline', which will divide the
 %                   mean of the target region by the mean of the baseline
 %                   region for each trial. Note that the regions used for
-%                   SNR must be specified in PHZ.region.
+%                   SNR must be specified in PHZ.region. If snr is
+%                   specified without regions, the default is
+%                   'snr-target-baseline'.
 %
 %   Behavioural features:
 %   'acc','acc2',...  = Accuracy value in PHZ.resp.q1_acc, q2, etc.
@@ -231,6 +233,7 @@ switch lower(feature)
             trialsPerFile = size(PHZ.data,1) / length(PHZ.meta.files);
             
             for i = 1:length(PHZ.meta.files)
+                disp(['Calculating ITPC for file ',num2])
                 TMP = phz_load(PHZ.meta.files{i});
                 TMP = phz_proc(TMP,PHZ.proc.pre{:});
                 TMP = getitpc(TMP,PHZ.summary.keepVars);
@@ -333,6 +336,9 @@ elseif length(feature) >= 4 && strcmp(feature(1:4),'itpc')
 elseif length(feature) >= 4 && strcmp(feature(1:4),'itrc')
     if length(feature) > 4, val = feature(5:end); end
     feature = 'itrc';
+
+elseif length(feature) == 3 && strcmp(feature,'snr')
+    val = 'target-baseline';
     
 elseif length(feature) >= 4 && strcmp(feature(1:4),'snr-')
     if length(feature) > 4, val = feature(5:end); end
