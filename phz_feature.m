@@ -139,49 +139,60 @@ end
 %       PHZ.data and PHZ.units.
 switch lower(feature)
     
-    case 'time', featureTitle = '';
+    case 'time'
+        featureTitle = '';
         
-    case 'mean', featureTitle = 'Mean';
+    case 'mean'
+        featureTitle = 'Mean';
         PHZ.data  = mean(PHZ.data,2);
         
-    case 'max', featureTitle = 'Max';
+    case 'max'
+        featureTitle = 'Max';
         PHZ.data  = max(PHZ.data,[],2);
         
-    case 'min', featureTitle = 'Min';
+    case 'min'
+        featureTitle = 'Min';
         PHZ.data  = min(PHZ.data,[],2);
         
-    case 'maxi', featureTitle = 'Max Latency';
+    case 'maxi'
+        featureTitle = 'Max Latency';
         [~,ind] = max(PHZ.data,[],2);
         PHZ.data = PHZ.times(ind)';
         PHZ.units = 's';
         
-    case 'mini', featureTitle = 'Min Latency';
+    case 'mini'
+        featureTitle = 'Min Latency';
         [~,ind] = min(PHZ.data,[],2);
         PHZ.data = PHZ.times(ind)';
         PHZ.units = 's';
         
-    case 'slope', featureTitle = 'Max Slope';
+    case 'slope'
+        featureTitle = 'Max Slope';
         PHZ = phz_smooth(PHZ,'mean0.05');
         maxSlope = nan(size(PHZ.data,1),1);
         for i = 1:size(PHZ.data,1), maxSlope(i) = max(gradient(PHZ.data(i,:))); end
         PHZ.data = maxSlope;
         PHZ.units = '';
         
-    case 'slopei', featureTitle = 'Max Slope Latency';
+    case 'slopei'
+        featureTitle = 'Max Slope Latency';
         PHZ = phz_smooth(PHZ,'mean0.05');
         ind = nan(size(PHZ.data,1),1);
         for i = 1:size(PHZ.data,1), [~,ind(i)] = max(gradient(PHZ.data(i,:))); end
         PHZ.data = PHZ.times(ind)';
         PHZ.units = 's';
         
-    case {'rms'}, featureTitle = 'RMS';
+    case {'rms'}
+        featureTitle = 'RMS';
         PHZ.data  = rms(PHZ.data,2);
         
-    case {'area'}, featureTitle = 'Area Under Curve';
+    case {'area'}
+        featureTitle = 'Area Under Curve';
         PHZ.data  = trapz(PHZ.data,2);
         PHZ.units = [PHZ.units,'^2'];
         
-    case {'acc','acc1','acc2','acc3','acc4','acc5'}, featureTitle = 'Accuracy';
+    case {'acc','acc1','acc2','acc3','acc4','acc5'}
+        featureTitle = 'Accuracy';
         PHZ = phz_rej(PHZ,0,0); % restore all metadata
         if strcmp(feature,'acc'), feature = 'acc1'; end
         PHZ.data = PHZ.resp.(['q',feature(4),'_acc']);
@@ -191,7 +202,8 @@ switch lower(feature)
         else PHZ.units = '';
         end
         
-    case {'rt', 'rt1', 'rt2', 'rt3', 'rt4', 'rt5'}, featureTitle = 'Reaction Time';
+    case {'rt', 'rt1', 'rt2', 'rt3', 'rt4', 'rt5'}
+        featureTitle = 'Reaction Time';
         PHZ.units = 's';
         PHZ = phz_rej(PHZ,0,0); % restore all metadata
         if strcmp(feature,'rt'), feature = 'rt1'; end
@@ -212,7 +224,8 @@ switch lower(feature)
         [PHZ.data,PHZ.freqs,PHZ.units,featureTitle] = phzFeature_fft(PHZ.data,PHZ.srate,PHZ.units);
         PHZ = rmfield(PHZ,'times');
         
-    case 'itpc', featureTitle = 'Intertrial Phase Coherence';
+    case 'itpc'
+        featureTitle = 'Intertrial Phase Coherence';
         % Method adapted from Tierney & Kraus, 2013, Journal of Neuroscience.
         
         if ~ismember('summary',fieldnames(PHZ))
@@ -256,7 +269,8 @@ switch lower(feature)
         % calls phz_summary, which calls phzFeature_itrc
 
 
-    case 'src', featureTitle = 'Stimulus-Response Correlation';
+    case 'src'
+        featureTitle = 'Stimulus-Response Correlation';
         PHZ.units = '';
         PHZ.data = phzFeature_src(PHZ.data,PHZ.misc.stim,PHZ.srate,val);
         
@@ -266,15 +280,21 @@ switch lower(feature)
         %   response of many trials from a single participant or condition.
         %   This comment also applies to 'srclag'.
         
-    case 'srclag', featureTitle = 'Stimulus-Response Lag';
+    case 'srclag'
+        featureTitle = 'Stimulus-Response Lag';
         PHZ.units = 's';
         [~,PHZ.data] = phzFeature_src(PHZ.data,PHZ.misc.stim,PHZ.srate,val);
         
-    case 'snr', featureTitle = 'Signal-to-Noise Ratio';
+    case 'snr'
+        featureTitle = 'Signal-to-Noise Ratio';
         PHZ.units = 'SNR';
-
-        tg = phz_feature(PHZ,'mean','region',val{1});
-        bl = phz_feature(PHZ,'mean','region',val{2});
+        
+        % method taken from Skoe & Kraus (2010) Ear & Hearing
+        tg = phz_region(PHZ,val{1}); bl = phz_region(PHZ,val{2});
+        tg = phz_transform(tg,'^2'); bl = phz_transform(bl,'^2');
+        tg = phz_feature(tg,'mean'); bl = phz_feature(bl,'mean');
+        tg = phz_transform(tg,'sqrt'); bl = phz_transform(bl,'sqrt');
+        
         PHZ.data = tg.data ./ bl.data;
 
         PHZ.region = [val{1},' / ',val{2}];
