@@ -11,10 +11,10 @@
 %               calculate. FEATURE is specified as a paramter/value pair 
 %               so that the input format is the same as phz_plot.
 % 
-%   'unstack' = Rearranges the table so that columns for grouping
-%               variables are "unstacked" across columns. Enter a maximum
-%               of 2 columns that should be unstacked. See examples for 
-%               more details.
+%   'unstack' = [string|cell of strings] Rearranges the table so that 
+%               columns for grouping variables are "unstacked" across 
+%               columns. Enter a maximum of 2 columns that should be 
+%               unstacked. See examples for more details.
 % 
 %   'filename'= Filename and path to save resultant table as either a
 %               MATLAB file (.mat) or text file of comma-separated values
@@ -145,7 +145,7 @@ for i = 1:length(feature)
     if i == 1
         if ismember(keepVars,{'all'})
             addVars = {'participant','group','session','trials'};
-        else addVars = keepVars;
+        else addVars = cellstr(keepVars);
         end
         
         d = table(s.meta.tags.(addVars{1}),'VariableNames',addVars(1));
@@ -178,7 +178,7 @@ end
 
 % unstack
 if ~isempty(unstackVars)
-    if ~iscell(unstackVars), unstackVars = {unstackVars}; end
+    if ~iscell(unstackVars), unstackVars = cellstr(unstackVars); end
     d = unstack(d,feature,unstackVars{1});
     
     if length(unstackVars) == 2
