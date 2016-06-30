@@ -98,6 +98,7 @@ for j = 1:length(files)
     fileProgress = [num2str(j),'/',num2str(length(files)),': ''',files{j},''''];
 %     w = phzUtil_progressbar(w,j/length(files),...
 %         ['Gathering PHZ data from file ',fileProgress]);
+    disp(['Gathering PHZ data from file ',fileProgress])
     waitbar(j/length(files),w,['Gathering PHZ data from file ',fileProgress])
 
     
