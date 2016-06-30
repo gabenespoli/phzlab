@@ -233,7 +233,9 @@ switch lower(feature)
             trialsPerFile = size(PHZ.data,1) / length(PHZ.meta.files);
             
             for i = 1:length(PHZ.meta.files)
-                disp(['Calculating ITPC for file ',num2])
+                disp(['Calculating ITPC for file ',...
+                    num2str(i),'/',num2str(length(PHZ.meta.files)),...
+                    ': ''',PHZ.meta.files{i},''''])
                 TMP = phz_load(PHZ.meta.files{i});
                 TMP = phz_proc(TMP,PHZ.proc.pre{:});
                 TMP = getitpc(TMP,PHZ.summary.keepVars);
