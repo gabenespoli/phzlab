@@ -1,4 +1,4 @@
-%PHZ_FEATURE  Calculate the specified feature on each trial.
+%PHZ_FEATURE  Convert each trial to the specified feature.
 %
 % USAGE
 %   PHZ = phz_feature(PHZ,feature)
@@ -63,11 +63,10 @@
 %                   waveform. The stimulus waveform must be provided in
 %                   PHZ.misc.stim and must be the same length as a single
 %                   trial. SRC is usually used for FFR data. Note that SRC 
-%                   will operate on each row of PHZ.data (i.e. each trial).
-%                   If you are dealing with FFR responses, you don't want 
-%                   each trial to actually be a single trial, but rather 
-%                   the averaged response of many trials from a single 
-%                   participant or condition.
+%                   will operate on each row of PHZ.data. If you are 
+%                   dealing with FFR responses, you probably want to
+%                   average across trials first (e.g., with phz_summary)
+%                   before calculating src.
 %
 %   'itrc'        = Intertrial response consistency (FFR feature).
 % 
