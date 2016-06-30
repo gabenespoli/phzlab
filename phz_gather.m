@@ -171,8 +171,8 @@ for j = 1:length(files)
                 if ~ismember(field,resetFields), resetFields{end+1} = field; end
             end
             
-            PHZ.meta.tags.(field) = categorical(PHZ.meta.tags.(field),'Ordinal',false);
-            PHZS.meta.tags.(field) = categorical(PHZS.meta.tags.(field),'Ordinal',false);
+            PHZ.meta.tags.(field) = categorical(cellstr(PHZ.meta.tags.(field)),'Ordinal',false);
+            PHZS.meta.tags.(field) = categorical(cellstr(PHZS.meta.tags.(field)),'Ordinal',false);
             PHZS.meta.tags.(field) = [PHZS.meta.tags.(field); PHZ.meta.tags.(field)];
             
         end
