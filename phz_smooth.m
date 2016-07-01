@@ -8,17 +8,17 @@
 %   PHZ = phz_smooth(PHZ,win)
 % 
 % input:   
-%   PHZ           = [struct] PHZLAB data structure.
+%   PHZ   = [struct] PHZLAB data structure.
 % 
-%   WIN           = [numeric|string] Sliding window length in milliseconds 
-%                   (if >= 1) or proportion of total epoch length (if < 1). 
-%                   Default 0.05 (5% of the total epoch length). WIN can be
-%                   a string as shorthand for specifying both WIN and
-%                   SMOOTHTYPE. In this case the string must be the
-%                   SMOOTHTYPE followed by a number for win (e.g.,
-%                   'rms100', or the default 'mean0.05'). If 'mean' or
-%                   'rms' are specified without a number, the defaults for
-%                   WIN are 0.05 and 100 respectively.
+%   win   = [numeric|string] Sliding window length in milliseconds 
+%           (if >= 1) or proportion of total epoch length (if < 1). 
+%           Default 0.05 (5% of the total epoch length). WIN can also be
+%           a string as shorthand for specifying both window length and
+%           type of smoothing (i.e., mean or RMS). In this case the string 
+%           must be the smoothing type followed by a number for the window
+%           length (e.g., 'rms100', or the default 'mean0.05'). If 'mean' 
+%           or 'rms' are specified without a number, the defaults are 
+%           0.05 (5%) and 100 (ms) respectively.
 % 
 % OUTPUT
 %   PHZ.data = [numeric] The smoothed data.
