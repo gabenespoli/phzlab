@@ -68,13 +68,10 @@
 %                   average across trials first (e.g., with phz_summary)
 %                   before calculating src.
 % 
-%   'snr'         = Signal-to-Noise Ratio of two given regions. Enter in
-%                   the form 'snr-target-baseline', which will divide the
-%                   mean of the target region by the mean of the baseline
-%                   region for each trial. Note that the regions used for
-%                   SNR must be specified in PHZ.region. If snr is
-%                   specified without regions, the default is
-%                   'snr-target-baseline'.
+%   'snr'         = Signal-to-Noise Ratio. By default, SNR divides the RMS
+%                   of the target region by the RMS of the baseline region
+%                   (as specified in PHZ.region). Enter in the form 
+%                   'snr-target-baseline' to change regions.
 %
 %   Behavioural features:
 %   'acc','acc2',...  = Accuracy value in PHZ.resp.q1_acc, q2, etc.
