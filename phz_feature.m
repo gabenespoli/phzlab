@@ -287,15 +287,13 @@ switch lower(feature)
         PHZ.units = 'SNR';
         
         % method taken from Skoe & Kraus (2010) Ear & Hearing
-        tg = phz_region(PHZ,val{1}); bl = phz_region(PHZ,val{2});
-        tg = phz_transform(tg,'^2'); bl = phz_transform(bl,'^2');
-        tg = phz_feature(tg,'mean'); bl = phz_feature(bl,'mean');
-        tg = phz_transform(tg,'sqrt'); bl = phz_transform(bl,'sqrt');
+        tg = phz_region(PHZ,val{1},false);              bl = phz_region(PHZ,val{2},false);
+        tg = phz_transform(tg,'^2',false);              bl = phz_transform(bl,'^2',false);
+        tg = phz_feature(tg,'mean','verbose',false);    bl = phz_feature(bl,'mean','verbose',false);
+        tg = phz_transform(tg,'sqrt',false);            bl = phz_transform(bl,'sqrt',false);
         
         PHZ.data = tg.data ./ bl.data;
-
-        PHZ.region = [val{1},' / ',val{2}];
-
+        PHZ.region = [val{1},' / ',val{2}]; % this has to be done last
 
     otherwise, error([feature,' is an unknown feature.'])
 end
@@ -366,7 +364,7 @@ end
 if ~isempty(val)
     ind = strfind(val,'-');
     if ind, val = {val(1:ind - 1) val(ind + 1:end)};
-    else val = {val 0};
+    else val = {val '0'}; % default if no bin width specified
     end
     
     % convert to numeric if possible
