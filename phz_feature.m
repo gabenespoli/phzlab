@@ -225,7 +225,7 @@ switch lower(feature)
         featureTitle = 'Intertrial Phase Coherence';
         % Method adapted from Tierney & Kraus, 2013, Journal of Neuroscience.
         
-        if ~ismember('summary',fieldnames(PHZ))
+        if ~ismember('summary',fieldnames(PHZ.proc))
             
             % summarize (adding 'participant' to summary if it isn't already)
             if any(ismember({'participant','all','none'},keepVars)), PHZ = phz_summary(PHZ,keepVars);
