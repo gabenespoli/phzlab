@@ -244,7 +244,7 @@ if ismember('rej',fieldnames(PHZ.proc))
     checkSingleNumber(PHZ.proc.rej.threshold,[name,'.proc.rej.threshold']);
     PHZ.proc.rej.units = verifyChar(PHZ.proc.rej.units,[name,'.proc.rej.units'],verbose);
     
-    if ~ismember('summary',fieldnames(PHZ))
+    if ~ismember('summary',fieldnames(PHZ.proc))
         PHZ.proc.rej.data        = verifyNumeric(PHZ.proc.rej.data,      [name,'.proc.rej.data'],verbose);
         PHZ.proc.rej.data_locs   = verifyNumeric(PHZ.proc.rej.data_locs, [name,'.proc.rej.data_locs'],verbose);
         
@@ -253,14 +253,14 @@ if ismember('rej',fieldnames(PHZ.proc))
             PHZ.proc.rej.(i{1}) = checkAndFixColumn(PHZ.proc.rej.(i{1}),[name,'.proc.rej.(i{1})'],nargout,verbose);
         end
     else
-        if ~strcmp(PHZ.proc.rej.locs,'<collapsed>'),         error('Problem with PHZ.proc.rej and/or PHZ.summary.'), end
-        if ~strcmp(PHZ.proc.rej.data,'<collapsed>'),         error('Problem with PHZ.proc.rej and/or PHZ.summary.'), end
-        if ~strcmp(PHZ.proc.rej.data_locs,'<collapsed>'),    error('Problem with PHZ.proc.rej and/or PHZ.summary.'), end
-        if ~strcmp(PHZ.proc.rej.participant,'<collapsed>'),  error('Problem with PHZ.proc.rej and/or PHZ.summary.'), end
-        if ~strcmp(PHZ.proc.rej.group,'<collapsed>'),        error('Problem with PHZ.proc.rej and/or PHZ.summary.'), end
-        if ~strcmp(PHZ.proc.rej.session,'<collapsed>'),      error('Problem with PHZ.proc.rej and/or PHZ.summary.'), end
-        if ~strcmp(PHZ.proc.rej.trials,'<collapsed>'),       error('Problem with PHZ.proc.rej and/or PHZ.summary.'), end
-        if ~strcmp(PHZ.proc.rej.data,'<collapsed>'),         error('Problem with PHZ.proc.rej and/or PHZ.summary.'), end
+        if ~strcmp(PHZ.proc.rej.locs,'<collapsed>'),         error('Problem with PHZ.proc.rej and/or PHZ.proc.summary.'), end
+        if ~strcmp(PHZ.proc.rej.data,'<collapsed>'),         error('Problem with PHZ.proc.rej and/or PHZ.proc.summary.'), end
+        if ~strcmp(PHZ.proc.rej.data_locs,'<collapsed>'),    error('Problem with PHZ.proc.rej and/or PHZ.proc.summary.'), end
+        if ~strcmp(PHZ.proc.rej.participant,'<collapsed>'),  error('Problem with PHZ.proc.rej and/or PHZ.proc.summary.'), end
+        if ~strcmp(PHZ.proc.rej.group,'<collapsed>'),        error('Problem with PHZ.proc.rej and/or PHZ.proc.summary.'), end
+        if ~strcmp(PHZ.proc.rej.session,'<collapsed>'),      error('Problem with PHZ.proc.rej and/or PHZ.proc.summary.'), end
+        if ~strcmp(PHZ.proc.rej.trials,'<collapsed>'),       error('Problem with PHZ.proc.rej and/or PHZ.proc.summary.'), end
+        if ~strcmp(PHZ.proc.rej.data,'<collapsed>'),         error('Problem with PHZ.proc.rej and/or PHZ.proc.summary.'), end
     end
 end
 
@@ -272,12 +272,12 @@ if ismember('blsub',fieldnames(PHZ.proc))
     PHZ.proc.blsub.region = verifyNumeric(PHZ.proc.blsub.region,[name,'.proc.blsub.region'],verbose);
     PHZ.proc.blsub.region = checkAndFix1x2(PHZ.proc.blsub.region,[name,'.proc.blsub.region'],nargout,verbose);
     
-    if ~ismember('summary',fieldnames(PHZ))
+    if ~ismember('summary',fieldnames(PHZ.proc))
         PHZ.proc.blsub.values = verifyNumeric(PHZ.proc.blsub.values,[name,'.proc.blsub.values'],verbose);
         PHZ.proc.blsub.values = checkAndFixColumn(PHZ.proc.blsub.values,[name,'.proc.blsub.values'],nargout,verbose);
     else
         if ~strcmp(PHZ.proc.blsub.values,'<collapsed>')
-            error('Problem with PHZ.proc.blsub and/or PHZ.summary.'), end
+            error('Problem with PHZ.proc.blsub and/or PHZ.proc.summary.'), end
     end
 end
 
@@ -528,11 +528,9 @@ mainOrder = {
     'freqs'
     
     'data'
-    'feature'
     'units'
     'srate'
     
-    'summary'
     'resp'
     'proc'
     'meta'
