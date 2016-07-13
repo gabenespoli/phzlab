@@ -20,18 +20,17 @@
 %                   attempts to open the raw data file to get the epoch 
 %                   times from there. Default units is samples.
 % 
+%   'labels'      = Calls phz_triallabels to label each epoch. See the help
+%                   for phz_triallabels for more information. Default is to
+%                   label sequentially.
+% 
 %   'winUnits'    = [string] Specifies the units of the values in 
 %                   EXTRACTWINDOW. Options are 'samples', 's'/'seconds', 
 %                   'ms'/'milliseconds', 'min'/'minutes'.
-%                   Default 'samples'.
+%                   Default 'seconds'.
 % 
-%   'timesUnits'  = [string] Specifies the units of the values in TIMES.
-%                   Options are the same as 'winUnits'. Default 'seconds'.
-% 
-% x 'labels'      = [any] Specifies labels to use for each epoch. Must
-%                   have the same number of elements as times. If LABELS 
-%                   is a string, it specifies the filename containing the
-%                   labels.
+%   'timeUnits'   = [string] Specifies the units of the values in TIMES.
+%                   Options are the same as 'winUnits'. Default 'samples'.
 % 
 % OUTPUT
 %   PHZ.data              = Epoched data. Each row is a different epoch.
@@ -61,15 +60,17 @@ if nargin == 0 && nargout == 0, help phz_epoch, return, end
 if size(PHZ.data,1) > 1, error('PHZ.data seems to already be epoched...'), end
 
 % defaults
+labels = 'seq';
 winUnits = 'seconds';
-timesUnits = 'samples';
+timeUnits = 'samples';
 verbose = true;
 
 % user-defined
 for i = 1:2:length(varargin)
     switch lower(varargin{i})
-        case 'wunits',              winUnits = varargin{i+1};
-        case 'tunits',              timesUnits = varargin{i+1};
+        case 'labels',              labels = varargin{i+1};
+        case 'winunits',            winUnits = varargin{i+1};
+        case 'timeunits',           timeUnits = varargin{i+1};
         case 'verbose',             verbose = varargin{i+1};
     end
 end
@@ -77,18 +78,21 @@ end
 PHZ.proc.epoch.extractWindow = extractWindow;
 PHZ.proc.epoch.winUnits = winUnits;
 PHZ.proc.epoch.times = times;
-PHZ.proc.epoch.timesUnits = timesUnits;
+PHZ.proc.epoch.timesUnits = timeUnits;
 
-times = convertToSamples(times,timesUnits,PHZ.srate);
+times = convertToSamples(times,timeUnits,PHZ.srate);
 extractWindow = convertToSamples(extractWindow,winUnits,PHZ.srate);
 
-PHZ.data = extractEpochs(PHZ.data,times,extractWindow);
+[PHZ.data,rminds] = extractEpochs(PHZ.data,times,extractWindow);
 PHZ.times = (extractWindow(1):1:extractWindow(2)) / PHZ.srate; % convert times to seconds
 
 PHZ = phz_history(PHZ,'Extracted epochs from data.',verbose);
+
+PHZ = phz_triallabels(PHZ,labels,'rminds',rminds,'verbose',verbose);
+
 end
 
-function epochs = extractEpochs(data,times,extractWindow)
+function [epochs,rminds] = extractEpochs(data,times,extractWindow)
 
 disp('Extracting epochs...')
 
@@ -109,7 +113,9 @@ for i = 1:length(times) % loop through trials
     
     epochs(i,:) = data(:,times(i) + extractWindow(1):times(i) + extractWindow(2));
 end
-if rminds, epochs(rminds,:) = []; end
+if rminds
+    epochs(rminds,:) = []; 
+end
 end
 
 function val = convertToSamples(val,units,srate)
