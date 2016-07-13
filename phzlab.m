@@ -1,10 +1,11 @@
-function phzlab
 %PHZLAB  A MATLAB toolbox for analysis of physiological data.
 % PHZ structures are created for each recording of data, and can be
 %   filtered, epoched, and otherwise preprocessed. Multiple PHZ structures
 %   can be gathered into a single one, enabling powerful plotting
 %   functionality. Data can then be exported into a table for statistical
 %   analyses.
+% 
+% Version 0.9 (beta).
 % 
 % Copyright (C) 2016 Gabriel A. Nespoli, gabenespoli@gmail.com
 % 
@@ -21,9 +22,6 @@ function phzlab
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see http://www.gnu.org/licenses/.
 % 
-% * = These functions are reversible.
-% X = These functions are not available yet.
-% 
 % FILE I/O
 %   phz_create:      Create a PHZ structure from a data file.
 %   phz_gather:      Gather many PHZ structures into a single one.
@@ -32,15 +30,15 @@ function phzlab
 %   phz_field:       Change the values of certain PHZ structure fields.
 % 
 % PROCESSING
-% X phz_filter:      Butterworth filtering.
-% X phz_epoch:       Split a single channel of data into trials.
-% X phz_trials:      Add names to each trial of epoched data.
+%   phz_filter:      Butterworth filtering.
+%   phz_epoch:       Split a single channel of data into trials.
+%   phz_trials:      Add names to each trial of epoched data.
 %   phz_rectify:     Full- or half-wave rectification.
 %   phz_smooth:      Sliding window averaging (incl. RMS)
 %   phz_transform:   Transform data (e.g., square root, etc.)
-% * phz_rej:         Remove trials with values exceeding a threshold or SD.
-% * phz_blsub:       Subtract mean of baseline region from each trial.
-% * phz_norm:        Normalize across specified grouping variables.
+%   phz_rej:         Remove trials with values exceeding a threshold or SD.
+%   phz_blsub:       Subtract mean of baseline region from each trial.
+%   phz_norm:        Normalize across specified grouping variables.
 % 
 % ANALYSIS
 %   phz_subset:      Keep data only from specified grouping variables.
@@ -51,9 +49,5 @@ function phzlab
 % EXPORTING
 %   phz_plot:        Visualize data as line or bar graphs.
 %   phz_writetable:  Export features to a MATLAB table or csv file.
-% 
-% Version 0.8.4 dev Written by Gabriel A. Nespoli 2016-05-22.
 
-help phzlab
-
-end
+function phzlab, help phzlab, end
