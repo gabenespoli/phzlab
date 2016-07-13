@@ -83,8 +83,8 @@
 %         regardless of whether or not they are rejected.
 %
 % OUTPUT
-%   PHZ.data      = The data of the extracted feature for each trial.
-%   PHZ.feature   = The value specified in FEATURE.
+%   PHZ.data            = The data of the extracted feature for each trial.
+%   PHZ.proc.feature    = The value specified in FEATURE.
 %
 % EXAMPLES
 %   PHZ = phz_feature(PHZ,'mean')
@@ -254,7 +254,7 @@ switch lower(feature)
             PHZ.data = newData;
             PHZ.freqs = TMP.freqs;
             PHZ = rmfield(PHZ,'times');
-%             PHZ.feature = TMP.feature;
+%             PHZ.proc.feature = TMP.feature;
         end
         
 %     case 'itrc', featureTitle = 'Intertrial Phase Consistency';
@@ -315,7 +315,7 @@ if ismember('blc',fieldnames(PHZ.proc))
 if ismember('norm',fieldnames(PHZ.proc))
     PHZ.proc.norm.mean = []; PHZ.proc.norm.stDev = []; end
 
-if ~strcmp(PHZ.feature,'time')
+if ~strcmp(PHZ.proc.feature,'time')
     PHZ = phz_history(PHZ,['Extracted feature ''',feature,'''.'],verbose); end
 
 % apply summary
@@ -332,7 +332,7 @@ end
 function [PHZ,feature,val] = parseFeature(PHZ,feature)
 if isempty(feature), feature = 'time'; end
 if ~ischar(feature), error('FEATURE should be a string.'), end
-PHZ.feature = feature;
+PHZ.proc.feature = feature;
 
 % split feature and val
 val = [];

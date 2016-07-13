@@ -239,7 +239,7 @@ for p = 1:length(plotOrder)
     if do_title, title(char(plotOrder(p))), end
     if isempty(ytitleLoc) || ytitleLoc == p, ylabel(ytitle), end
     
-    if ismember(PHZ.feature,{'fft','itfft','itpc'}) % FFT / PC plots
+    if ismember(PHZ.proc.feature,{'fft','itfft','itpc'}) % FFT / PC plots
         if isempty(xtitleLoc) || xtitleLoc == p, xlabel('Frequency (Hz)'), end
         
         % custom FFT x-axis limits via PHZ.meta.spec.fftlim
@@ -251,7 +251,7 @@ for p = 1:length(plotOrder)
             end
         end
         
-    elseif ismember(PHZ.feature,{'','time'}) % time series plots
+    elseif ismember(PHZ.proc.feature,{'','time'}) % time series plots
         if isempty(xtitleLoc) || xtitleLoc == p, xlabel('Time (s)'), end
         
     elseif ~isempty(PHZ.proc.summary.stdError) % bar plots of feature values
@@ -464,7 +464,7 @@ function ytitle = getytitle(PHZ,feature,legendLoc,do_plotsmooth,featureTitle,sim
 % -----------
 
 % feature title and datatype
-if ismember(PHZ.feature,{'acc','acc1','acc2','acc3','acc4','acc5',...
+if ismember(PHZ.proc.feature,{'acc','acc1','acc2','acc3','acc4','acc5',...
         'rt', 'rt1', 'rt2', 'rt3', 'rt4', 'rt5'})
     ytitle = {featureTitle};
     skipDSPtitles = true;
