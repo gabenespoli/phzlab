@@ -193,7 +193,7 @@ for p = 1:length(plotOrder)
     subplot(rows,cols,p)
     
     % get indices of data for current plot
-    if ismember('summary',fieldnames(PHZ)) && length(PHZ.summary.keepVars) > 1
+    if ismember('summary',fieldnames(PHZ.proc)) && length(PHZ.proc.summary.keepVars) > 1
         ind = find(plotTags == plotOrder(p));
     else ind = 1:size(PHZ.data,1); 
     end
@@ -254,9 +254,9 @@ for p = 1:length(plotOrder)
     elseif ismember(PHZ.feature,{'','time'}) % time series plots
         if isempty(xtitleLoc) || xtitleLoc == p, xlabel('Time (s)'), end
         
-    elseif ~isempty(PHZ.summary.stdError) % bar plots of feature values
+    elseif ~isempty(PHZ.proc.summary.stdError) % bar plots of feature values
         set(gca,'XTick',1:length(lineOrder),'XTickLabel',cellstr(lineOrder))    
-        errorbar(gca,1:length(lineOrder),PHZ.data(ind),PHZ.summary.stdError(ind),'.k');
+        errorbar(gca,1:length(lineOrder),PHZ.data(ind),PHZ.proc.summary.stdError(ind),'.k');
     end
     
     % ---- sigstar (beta)
@@ -344,29 +344,29 @@ end
 function [lineOrder,lineTags,lineSpec,plotOrder,plotTags,plotSpec] = getLabelsAndSpec(PHZ,dispn)
 
 % lines/bars
-if ~ismember('summary',fieldnames(PHZ))
+if ~ismember('summary',fieldnames(PHZ.proc))
     lineOrder = cellstr(num2str((1:size(PHZ.data,1))));
     lineSpec = cell(size(lineOrder));
     for j = 1:length(lineOrder)
         lineSpec{j} = '';
     end
     lineTags = [];
-elseif ismember(PHZ.summary.keepVars{1},{' ','none'}) || isempty(PHZ.summary.keepVars{1})
+elseif ismember(PHZ.proc.summary.keepVars{1},{' ','none'}) || isempty(PHZ.proc.summary.keepVars{1})
     lineOrder = {'All trials'};
     lineSpec = {''};
     lineTags = [];
 else
-    lineOrder = PHZ.(PHZ.summary.keepVars{1});
-    lineSpec = PHZ.meta.spec.(PHZ.summary.keepVars{1});
-    lineTags = PHZ.meta.tags.(PHZ.summary.keepVars{1});
+    lineOrder = PHZ.(PHZ.proc.summary.keepVars{1});
+    lineSpec = PHZ.meta.spec.(PHZ.proc.summary.keepVars{1});
+    lineTags = PHZ.meta.tags.(PHZ.proc.summary.keepVars{1});
 end
 
 % plots
-if ~ismember('summary',fieldnames(PHZ))
+if ~ismember('summary',fieldnames(PHZ.proc))
     plotOrder = {''};
     plotSpec = {''};
     plotTags = [];
-elseif length(PHZ.summary.keepVars) == 1
+elseif length(PHZ.proc.summary.keepVars) == 1
     if length(PHZ.participant) > 1 || isundefined(PHZ.participant)
         plotOrder = {'All participants'};
     else plotOrder = {['Participant ',char(PHZ.participant)]};
@@ -374,9 +374,9 @@ elseif length(PHZ.summary.keepVars) == 1
     plotSpec = {''};
     plotTags = [];
 else 
-    plotOrder = PHZ.(PHZ.summary.keepVars{2});
-    plotSpec = PHZ.meta.spec.(PHZ.summary.keepVars{2});
-    plotTags = PHZ.meta.tags.(PHZ.summary.keepVars{2});
+    plotOrder = PHZ.(PHZ.proc.summary.keepVars{2});
+    plotSpec = PHZ.meta.spec.(PHZ.proc.summary.keepVars{2});
+    plotTags = PHZ.meta.tags.(PHZ.proc.summary.keepVars{2});
 end
 
 % add n's
@@ -388,49 +388,49 @@ if ~ismember(dispn,{'none',''})
     end
     
     % add n's to labels for lines/bars
-    switch PHZ.summary.keepVars{1}
+    switch PHZ.proc.summary.keepVars{1}
         case 'all'
             if nt
-                lineLabels{1} = [lineLabels{1},' (',num2str(PHZ.summary.nTrials),')'];
+                lineLabels{1} = [lineLabels{1},' (',num2str(PHZ.proc.summary.nTrials),')'];
             end
             
         case 'trials'
             if nt
-                for i = 1:numel(PHZ.summary.nTrials)
-                    lineLabels{i} = [lineLabels{i},' (',num2str(PHZ.summary.nTrials(i)),')'];
+                for i = 1:numel(PHZ.proc.summary.nTrials)
+                    lineLabels{i} = [lineLabels{i},' (',num2str(PHZ.proc.summary.nTrials(i)),')'];
                 end
             end
             
         case 'group'
             if np
-                for i = 1:numel(PHZ.summary.nParticipant)
-                    lineLabels{i} = [lineLabels{i},' (',num2str(PHZ.summary.nParticipant(i)),')'];
+                for i = 1:numel(PHZ.proc.summary.nParticipant)
+                    lineLabels{i} = [lineLabels{i},' (',num2str(PHZ.proc.summary.nParticipant(i)),')'];
                 end
             end
     end
     
     % add n's to labels for plots
-    if length(PHZ.summary.keepVars) > 1
-        switch PHZ.summary.keepVars{2}
+    if length(PHZ.proc.summary.keepVars) > 1
+        switch PHZ.proc.summary.keepVars{2}
             case 'trials'
                 if nt
                     for i = 1:length(plotLabels)
-%                         theseLabels = PHZ.summary.nTrials(PH
-                        plotLabels{i} = [plotLabels{i},' (',num2str(sum(PHZ.summary.nTrials(PHZ.trials == plotLabels{i}))),')'];
+%                         theseLabels = PHZ.proc.summary.nTrials(PH
+                        plotLabels{i} = [plotLabels{i},' (',num2str(sum(PHZ.proc.summary.nTrials(PHZ.trials == plotLabels{i}))),')'];
                     end
                 end
                 
             case 'group'
                 if np
                     for i = 1:length(plotLabels)
-                        plotLabels{i} = [plotLabels{i},' (',num2str(PHZ.summary.nParticipant(i)),')'];
+                        plotLabels{i} = [plotLabels{i},' (',num2str(PHZ.proc.summary.nParticipant(i)),')'];
                     end
                 end
         end
         
     else
-        if np && ~strcmp(PHZ.summary.keepVars{1},'group')
-            plotLabels{1} = [plotLabels{1},' (~',num2str(max(PHZ.summary.nParticipant)),')'];
+        if np && ~strcmp(PHZ.proc.summary.keepVars{1},'group')
+            plotLabels{1} = [plotLabels{1},' (~',num2str(max(PHZ.proc.summary.nParticipant)),')'];
         end
     end
 end

@@ -14,11 +14,11 @@
 %               cannot be used with other KEEPVARS.
 % 
 % OUTPUT
-%   PHZ.data                 = The data summarized by KEEPVARS.
-%   PHZ.summary.keepVars     = The values specified in KEEPVARS.
-%   PHZ.summary.stdError     = Standard error of each average.
-%   PHZ.summary.nParticipant = No. of participants in each average.
-%   PHZ.summary.nTrials      = No. of trials in each average.
+%   PHZ.data                      = The data summarized by KEEPVARS.
+%   PHZ.proc.summary.keepVars     = The values specified in KEEPVARS.
+%   PHZ.proc.summary.stdError     = Standard error of each average.
+%   PHZ.proc.summary.nParticipant = No. of participants in each average.
+%   PHZ.proc.summary.nTrials      = No. of trials in each average.
 % 
 % EXAMPLES
 %   PHZ = phz_summary(PHZ,'trials') >> For each value in PHZ.trials,
@@ -53,12 +53,12 @@ PHZ = phz_check(PHZ); % (make ordinal if there are new manually-made orders i.e.
 
 keepVars = verifyKeepVars(keepVars);
 if ismember(keepVars,{'all'}), return, end
-PHZ.summary.keepVars = keepVars;
+PHZ.proc.summary.keepVars = keepVars;
 
 if ismember(keepVars{1},{'none'})
-    PHZ.summary.nParticipant = length(PHZ.participant);
-    PHZ.summary.nTrials = size(PHZ.data,1);
-    PHZ.summary.stdError = ste(PHZ.data);
+    PHZ.proc.summary.nParticipant = length(PHZ.participant);
+    PHZ.proc.summary.nTrials = size(PHZ.data,1);
+    PHZ.proc.summary.stdError = ste(PHZ.data);
     PHZ.data = mean(PHZ.data,1);
 
 else
@@ -72,16 +72,16 @@ else
     
     % loop categories and average
     newData = nan(length(varTypes),size(PHZ.data,2));
-    PHZ.summary.stdError = nan(size(newData));
-    PHZ.summary.nParticipant = nan(length(varTypes),1);
-    PHZ.summary.nTrials = nan(length(varTypes),1);
+    PHZ.proc.summary.stdError = nan(size(newData));
+    PHZ.proc.summary.nParticipant = nan(length(varTypes),1);
+    PHZ.proc.summary.nTrials = nan(length(varTypes),1);
     
     for i = 1:length(varTypes)
         TMP = PHZ;
         TMP.data = PHZ.data(varInd == varTypes(i),:);
-        PHZ.summary.nParticipant(i) = length(unique(PHZ.meta.tags.participant(varInd == varTypes(i))));
-        PHZ.summary.nTrials(i) = size(TMP.data,1);
-        PHZ.summary.stdError(i,:) = ste(TMP.data);
+        PHZ.proc.summary.nParticipant(i) = length(unique(PHZ.meta.tags.participant(varInd == varTypes(i))));
+        PHZ.proc.summary.nTrials(i) = size(TMP.data,1);
+        PHZ.proc.summary.stdError(i,:) = ste(TMP.data);
         newData(i,:) = mean(TMP.data,1);
         
     end
