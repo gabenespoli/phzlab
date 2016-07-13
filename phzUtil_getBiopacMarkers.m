@@ -4,10 +4,6 @@ if nargin < 1, filename = []; end
 
 if isempty(filename)
     [filename,folder] = uigetfile('*.txt');
-    if isequal(filename,0) || isequal(folder,0), 
-        disp('Aborting...')
-        return
-    end
     filename = fullfile(folder,filename);
 end
 
