@@ -1,13 +1,13 @@
 %PHZ_LOAD  Load a PHZ structure (.phz or .mat file).
 % 
 % USAGE
-%   PHZ = PHZ_LOAD
-%   PHZ = PHZ_LOAD(FILENAME)
+%   PHZ = phz_load
+%   PHZ = phz_load(filename)
 % 
 % INPUT
 %   (none)    = A file browser will popup to select a file.
 % 
-%   FILENAME  = [string] Filename (and path) of file to load.
+%   filename  = [string] Filename (and path) of file to load.
 % 
 % OUTPUT
 %   PHZ       = [struct] PHZLAB data structure.
