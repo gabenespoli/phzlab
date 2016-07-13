@@ -81,9 +81,11 @@ for i = {'participant','group','condition','session','trials'}, field = i{1};
         
         % both are empty, do nothing
         if isempty(PHZ.(field)) || any(isundefined(PHZ.(field)))
+            PHZ.(field) = categorical(cellstr('-'));
+        end
             
-            % only 1 grouping var value, auto-create tags
-        elseif length(PHZ.(field)) == 1
+        % only 1 grouping var value, auto-create tags
+        if length(PHZ.(field)) == 1
             PHZ.meta.tags.(field) = repmat(PHZ.(field),size(PHZ.data,1),1);
             
             % multiple grouping var values; tags remains empty
@@ -498,7 +500,9 @@ function PHZ = orderPHZfields(PHZ)
 if isstruct(PHZ.region)
     
     % if spec order doesn't match the struct, recreate the struct
-    if ~strcmp(strjoin(fieldnames(PHZ.region)),strjoin(PHZ.meta.tags.region))
+%     if ~strcmp(strjoin(fieldnames(PHZ.region)),strjoin(PHZ.meta.tags.region))
+    [~,regionMatch] = ismember(PHZ.meta.tags.region,fieldnames(PHZ.region));
+    if ~all(regionMatch == 1:length(fieldnames(PHZ.region)))
         rname = fieldnames(PHZ.region);
         for i = 1:length(PHZ.meta.tags.region)
             temp.(PHZ.meta.tags.region{i}) = PHZ.region.(rname{i});
