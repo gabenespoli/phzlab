@@ -2,16 +2,19 @@
 % 
 % USAGE
 %   PHZ = phz_create
-%   PHZ = phz_create(files)
-%   PHZ = phz_create(files,...,'Param1',Value1,etc.)
+%   PHZ = phz_create('Param1',Value1,etc.)
+%   PHZ = phz_create('blank')
 % 
 % INPUT   
 %   PHZ           = PHZLAB data structure.
 % 
-%   files         = [string|cell of strings] Specifies the file(s) to
-%                   import. If left empty, a dialog box pops up for you 
+%   'files'       = [string|cell of strings] Specifies the file(s) to
+%                   import. If not specified, a dialog box pops up for you 
 %                   to select a file or files. If FILES is a folder, all
 %                   .mat files are used.
+% 
+%   'folder'      = [string] A folder path to prepend to each filename in
+%                   FILES.
 % 
 %   'filetype'    = [string] The type of file that is being loaded. All
 %                   files must be saved as matlab files (i.e., .mat), on
@@ -138,12 +141,16 @@
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see http://www.gnu.org/licenses/.
 
-function PHZ = phz_create(files,varargin)
+function PHZ = phz_create(varargin)
 
 if nargout == 0 && nargin == 0, help phz_create, return
 elseif nargout == 0 && nargin > 0, error('Assign an output argument.')
 end
-if nargin == 0, PHZ = getBlankPHZ(1); return, end
+
+if nargin == 1 && strcmp(varargin{1},'blank'), PHZ = getBlankPHZ(1); return, end
+
+files = '';
+folder = '';
 
 namestr = '';
 
@@ -160,7 +167,29 @@ filetype = 'acq';
 savefolder = 0;
 verbose = true;
 
-folder = '';
+
+
+% user-defined
+for i = 1:2:length(varargin)
+    switch lower(varargin{i})
+        case 'files',                   files = varargin{i+1};
+        case 'folder',                  folder = varargin{i+1};
+            
+        case 'channel',                 channel = varargin{i+1};
+        case 'namestr',                 namestr = varargin{i+1};
+        
+        case 'study',                   study = varargin{i+1}; %#ok<NASGU>
+        case 'datatype',                datatype = varargin{i+1}; %#ok<NASGU>
+        case 'participant',             participant = varargin{i+1}; %#ok<NASGU>
+        case 'group',                   group = varargin{i+1}; %#ok<NASGU>
+        case 'condition',               condition = varargin{i+1}; %#ok<NASGU>
+        case 'session',                 session = varargin{i+1}; %#ok<NASGU>
+
+        case 'filetype',                filetype = varargin{i+1};
+        case {'save','filename'},       savefolder = varargin{i+1};
+        case 'verbose',                 verbose = varargin{i+1};
+    end
+end
 
 % get data file names
 if isdir(files) % load all files from folder
@@ -179,25 +208,6 @@ elseif isempty(files) % prompt to select file(s)
 elseif ~iscell(files)  % (load many files from cell array of filenames)
     error('Problem with FILES input.')
     
-end
-
-% user-defined
-for i = 1:2:length(varargin)
-    switch lower(varargin{i})
-        case 'channel',                 channel = varargin{i+1};
-        case 'namestr',                 namestr = varargin{i+1};
-        
-        case 'study',                   study = varargin{i+1}; %#ok<NASGU>
-        case 'datatype',                datatype = varargin{i+1}; %#ok<NASGU>
-        case 'participant',             participant = varargin{i+1}; %#ok<NASGU>
-        case 'group',                   group = varargin{i+1}; %#ok<NASGU>
-        case 'condition',               condition = varargin{i+1}; %#ok<NASGU>
-        case 'session',                 session = varargin{i+1}; %#ok<NASGU>
-
-        case 'filetype',                filetype = varargin{i+1};
-        case {'save','filename'},       savefolder = varargin{i+1};
-        case 'verbose',                 verbose = varargin{i+1};
-    end
 end
 
 % check things before starting
