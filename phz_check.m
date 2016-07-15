@@ -377,7 +377,7 @@ try
 %     if isnumeric(C), C = num2str(C);     end
     if isnumeric(C)
         C = num2cell(C);
-        C = Cellfun(@num2str,C,'UniformOutput',false);
+        C = cellfun(@num2str,C,'UniformOutput',false);
     end
     
     if ischar(C),    C = cellstr(C);     end
