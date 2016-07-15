@@ -208,8 +208,12 @@ for p = 1:length(plotOrder)
                 'LineWidth',linewidth);
             
             if ~isempty(lineSpec{i})
-                if ischar(lineSpec{i}), set(h,'Color',lineSpec{i}(1))
-                elseif isnumeric(lineSpec{i}), set(h,'Color',lineSpec{i}), end
+                if ischar(lineSpec{i})
+                    set(h,'Color',lineSpec{i}(1))
+                    if length(lineSpec{i}) > 1
+                        set(h,'LineStyle',lineSpec{i}(2:end)), end
+                elseif isnumeric(lineSpec{i}), set(h,'Color',lineSpec{i})
+                end
             end
             
             if i == 1, hold on, end
