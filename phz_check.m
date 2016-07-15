@@ -126,12 +126,16 @@ for i = {'participant','group','condition','session','trials'}, field = i{1};
         % if numeric, order numerically
         try
             if ~any(isnan(str2double(cellstr(PHZ.(field)))))
-                PHZ.(field) = str2double(cellstr(PHZ.(field)));
-                PHZ.(field) = sort(PHZ.(field));
+                temp = str2double(cellstr(PHZ.(field)));
+                temp = sort(temp);
 %                 PHZ.(field) = cellstr(num2str(PHZ.(field)));
 %                 PHZ.(field) = strrep(PHZ.(field),' ','');
-                PHZ.(field) = verifyCategorical(PHZ.(field));
-                PHZ = phz_history(PHZ,[name,'.',field,' was ordered numerically.'],verbose,0);
+                temp = verifyCategorical(temp);
+                temp = categorical(temp,temp,'Ordinal',true);
+                if ~isequal(PHZ.(field),temp)
+                    PHZ.(field) = temp;
+                    PHZ = phz_history(PHZ,[name,'.',field,' was ordered numerically.'],verbose,0);
+                end
             end
         catch
         end
