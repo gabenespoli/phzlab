@@ -172,7 +172,7 @@ verbose = true;
 % user-defined
 for i = 1:2:length(varargin)
     switch lower(varargin{i})
-        case 'files',                   files = varargin{i+1};
+        case {'files','file'},          files = varargin{i+1};
         case 'folder',                  folder = varargin{i+1};
             
         case 'channel',                 channel = varargin{i+1};
