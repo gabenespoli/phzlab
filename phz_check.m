@@ -119,23 +119,21 @@ for i = {'participant','group','condition','session','trials'}, field = i{1};
         
         % if empty grouping var, reset (auto-create) from tags
         if isempty(PHZ.(field))
-            
             PHZ.(field) = unique(PHZ.meta.tags.(field))';
             PHZ = phz_history(PHZ,[name,'.',field,' was reset',resetStr,'.'],verbose,0);
-            
-            % if numeric, order numerically
-            try
-                if ~any(isnan(str2double(PHZ.(field))))
-                    PHZ.(field) = str2double(PHZ.(field));
-                    PHZ.(field) = sort(PHZ.(field));
-                    PHZ.(field) = cellstr(num2str(PHZ.(field)));
-                    PHZ.(field) = strrep(PHZ.(field),' ','');
-                    PHZ = phz_history(PHZ,[name,'.',field,' was ordered numerically.'],verbose,0);
-                end
-            catch
+        end
+        
+        % if numeric, order numerically
+        try
+            if ~any(isnan(str2double(cellstr(PHZ.(field)))))
+                PHZ.(field) = str2double(cellstr(PHZ.(field)));
+                PHZ.(field) = sort(PHZ.(field));
+%                 PHZ.(field) = cellstr(num2str(PHZ.(field)));
+%                 PHZ.(field) = strrep(PHZ.(field),' ','');
+                PHZ.(field) = verifyCategorical(PHZ.(field));
+                PHZ = phz_history(PHZ,[name,'.',field,' was ordered numerically.'],verbose,0);
             end
-            
-            
+        catch
         end
     end
     
@@ -374,8 +372,14 @@ end
 
 function C = verifyCategorical(C,name,verbose)
 if iscategorical(C), return, end
+
 try
-    if isnumeric(C), C = num2str(C);     end
+%     if isnumeric(C), C = num2str(C);     end
+    if isnumeric(C)
+        C = num2cell(C);
+        C = Cellfun(@num2str,C,'UniformOutput',false);
+    end
+    
     if ischar(C),    C = cellstr(C);     end
     if iscell(C),    C = categorical(C); end
     % if verbose, disp(['- Changed ',name,' to a categorical array.']), end
