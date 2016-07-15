@@ -153,7 +153,7 @@ end
 
 end
 
-function [threshold,times,foundMarkers,returnFlag] = prompt(data,srate,threshold,times,h)
+function [threshold,times,foundMarkers,returnFlag] = prompt(data,srate,threshold,times)
 askAgain = true;
 returnFlag = false;
 
@@ -180,25 +180,25 @@ while askAgain
             askAgain = false;
             
         case 'p'
-            if ishandle(h), close(h), end
+%             if ishandle(h), close(h), end
             h = plotMarkerChannel(data,srate,threshold,times,false);
             askAgain = true;
             
         case 'm'
-            if ishandle(h), close(h), end
+%             if ishandle(h), close(h), end
             h = plotMarkerChannel(data,srate,threshold,times,true);
             askAgain = true;
             
         case 'r'
             rmMarkers = input('  Enter marker number(s) to delete >> ');
-            close(h)
+%             close(h)
             times(rmMarkers) = [];
             disp([num2str(length(times)),' markers remain.'])
             askAgain = true;
             
         otherwise
             if ~isnan(str2double(resp))
-                close(h)
+%                 close(h)
                 threshold = str2double(resp);
                 times = [];
                 askAgain = false;
