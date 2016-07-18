@@ -24,6 +24,11 @@
 %   PHZ = phz_filter(PHZ,[0 10])   >> 10 Hz low pass Butterworth filter
 %   PHZ = phz_filter(PHZ,[1 10])   >> 1-10 Hz band pass Butterworth filter
 %   PHZ = phz_filter(PHZ,[0 0 60]) >> 59-61 Hz band stop Butterworth filter
+% 
+% TOOLBOX DEPENDENCIES
+%   Signal Processing Toolbox
+%     - butter.m
+%     - filtfilt.m
 
 % potential future funtionality
 % -----------------------------
