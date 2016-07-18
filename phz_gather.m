@@ -138,9 +138,13 @@ for j = 1:length(files)
         PHZS.meta.files{j} = currentFile;
         if ismember('filename',fieldnames(PHZ.meta)), PHZ.meta = rmfield(PHZ.meta,'filename'); end
         
-        % reset proc field
         PHZS.proc = [];
-        PHZS.proc.pre = processing;
+%         PHZS.
+        PHZS.proc.pre(j) = PHZ.proc;
+        
+        % reset proc field
+%         PHZS.proc = [];
+%         PHZS.proc.pre = processing;
         
         continue
     end    
@@ -156,6 +160,9 @@ for j = 1:length(files)
         PHZS = phz_history(PHZS,['NOTE: The ''srate'' field of ''',files{j},''' is different (',num2str(PHZ.(field)),'), so it was not included.'],verbose,0);
         continue
     end
+    
+    % proc field
+    PHZS.proc.pre(j) = PHZ.proc;
     
     % basic fields (strings)
     PHZS.meta.files{j} = currentFile;
