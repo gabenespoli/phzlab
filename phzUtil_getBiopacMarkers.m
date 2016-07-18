@@ -2,35 +2,47 @@
 % 
 % USAGE
 %   times = phzUtil_getBiopacMarkers
-%   times = phzUtil_getBiopacMarkers(filename)
-%   times = phzUtil_getBiopacMarkers(
+%   times = phzUtil_getBiopacMarkers('Param1',Value1,etc.)
 %   [times,labels] = phzUtil_getBiopacMarkers(...)
 % 
 % INPUT
-%   filename  = [string] Optionally specify the journal file. If not
+%   'filename'= [string] Optionally specify the journal file. If not
 %               specified, a dialog box will pop up to choose a file.
 %               Note that this file must be manually created from within
 %               AcqKnowledge. The following steps to do so are taken from
 %               the Biopac website "https://www.biopac.com/knowledge-base/
 %               exporting-event-labels-into-matlab/":
 % 
-%               In AcqKnowledge, choose ?Display > Show > Event Palette?? 
-%               (a toolbar button is also available for this at the far 
-%               right edge of the events toolbar). Under ?Actions? click 
-%               ?Summarize in Journal?. The journal will then have a list 
-%               of lines such as:
-%               1277.13 sec Skin Conductance Response CH1, GSR100C No label
+%                   In AcqKnowledge, choose ?Display > Show > Event 
+%                   Palette...? (a toolbar button is also available for 
+%                   this at the far right edge of the events toolbar). 
+%                   Under ?Actions? click ?Summarize in Journal?. The 
+%                   journal will then have a list of lines such as:
+%                   
+%                   1277.13 sec Skin Conductance Response CH1, 
+%                   GSR100C No label
 % 
 %               Copy the lines of the journal, paste them into a text file,
 %               and save the file to disk as a .txt file. This is the file
 %               that should be used as input for this function.
 % 
-% OUTPUT
-%   times     = [numeric] A vector of times (in seconds) 
+%   'rmTimeStamp' = [1|0] Removes the time stamp which can be
+%               appended to the event labels. e.g., changes the label 
+%               'User event Tue Jul 19 2016 12:41:30' to 'User event'.
+%               Default 1.
 % 
-%   labels    = [cell of strings] A cell array vector of strings, the same
-%               length as TIMES, containing the labels associated with each
-%               time.
+%   'rmAppendEvents' = [1|0] Removes events of the type 'Append'. When the 
+%               acquisition type is set to 'Append', there is an 'Append'
+%               event inserted every time you stop and start the recording.
+%               Set this parameter to TRUE (1) to ignore these events or
+%               FALSE (0) to keep them. Default 1.
+% 
+% OUTPUT
+%   times     = [numeric] A vector of times (in seconds).
+% 
+%   labels    = [cell of strings] A cell array vector of strings, the
+%               same length as TIMES, containing the labels associated 
+%               with each time.
 %   
 % TOOLBOX DEPENDENCIES
 %   Statistics and Machine Learning Toolbox
@@ -56,10 +68,14 @@ function [times,labels] = phzUtil_getBiopacMarkers(varargin)
 if nargin == 0 && nargout == 0, help phzUtil_getBiopacMarkers, return, end
 
 filename = [];
+rmAppendEvents = true;
+rmTimeStampFromLabels = true;
 
 for i = 1:2:length(varargin)
     switch lower(varargin{i})
         case 'filename',        filename = varargin{i+1};
+        case 'rmappendevents',  rmAppendEvents = varargin{i+1};
+        case 'rmtimestamp',     rmTimeStampFromLabels = varargin{i+1};
         otherwise, warning(['Unknown parameter ''',varargin{i},'''.'])
     end
 end
@@ -69,11 +85,8 @@ if isempty(filename)
     filename = fullfile(folder,filename);
 end
 
-
-rmTimeFromLabels = true;
-
-
-data = caseread(filename);
+% read data from file
+data = caseread(filename); % need Stats Toolbox for caseread.m
 data = regexp(cellstr(data),'\t','split');
 
 % strip html if journal file
@@ -88,17 +101,18 @@ if isequal(data{1},{'0' '0.00 ns' 'Append' 'Global' 'Segment 1'}), data(1) = [];
 data = cat(1,data{:});
 data = cell2table(data,'VariableNames',{'Index' 'Time' 'Type' 'Channel' 'Label'});
 
-% convert times to numberic values in seconds
+if rmAppendEvents
+    data(categorical(data.Type) == 'Append',:) = [];
+end
+
 data.Time = convertTimesToSeconds(data.Time);
-
-
 
 % show all event markers to the user, ask to remove some
 
 
-
-% return a list of times and labels
-if rmTimeFromLabels, data.Label = rmLabelTimeStamp(data.Label); end
+if rmTimeStampFromLabels
+    data.Label = do_rmTimeStampFromLabel(data.Label);
+end
 
 
 times = data.Time;
@@ -120,14 +134,28 @@ for i = 1:length(timeStr)
 end
 end
 
-function labels = rmLabelTimeStamp(labels)
+function labels = do_rmTimeStampFromLabel(labels)
+
+dayStr = {'Mon','Tue','Wed','Thu','Fri','Sat','Sun'};
+monthStr = {'Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'};
+dayNumStr = cellfun(@num2str,num2cell(1:31),'UniformOutput',false);
 
 for i = 1:length(labels)
     if length(labels{i}) > 23
-        testStr = labels{i}(end-22:end);
-        if ismember(testStr(1:3),{'Mon','Tue','Wed','Thu','Fri','Sat','Sun'}) && ...
-                ismember(testStr(5:7),{'Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'})
-            labels{i} = labels{i}(1:end-23);
+        temp = regexp(labels{i},' ','split');
+        
+        % check if there is a time stamp appended to the label
+        if ismember(temp(end-4),dayStr) && ...
+                ismember(temp(end-3),monthStr) && ...
+                ismember(temp(end-2),dayNumStr) && ...
+                length(temp{end-1}) == 4 && ...
+                length(temp{end}) == 8
+            
+            switch length(temp(end-2))
+                case 1, lengthOfTimeStamp = 23+1; % include leading space
+                case 2, lengthOfTimeStamp = 24+1;
+            end
+            labels{i} = labels{i}(1:end-lengthOfTimeStamp);
         end
     end
     labels{i} = strtrim(labels{i});
