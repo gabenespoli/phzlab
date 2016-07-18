@@ -30,7 +30,7 @@
 %                   Default 'seconds'.
 % 
 %   'timeUnits'   = [string] Specifies the units of the values in TIMES.
-%                   Options are the same as 'winUnits'. Default 'samples'.
+%                   Options are the same as 'winUnits'. Default 'seconds'.
 % 
 % OUTPUT
 %   PHZ.data              = Epoched data. Each row is a different epoch.
@@ -62,7 +62,7 @@ if size(PHZ.data,1) > 1, error('PHZ.data seems to already be epoched...'), end
 % defaults
 labels = 'seq';
 winUnits = 'seconds';
-timeUnits = 'samples';
+timeUnits = 'seconds';
 verbose = true;
 
 % user-defined
