@@ -14,9 +14,10 @@
 %   'unstack' = [string|cell of strings] Rearranges the table so that 
 %               columns for grouping variables are "unstacked" across 
 %               columns. Enter a maximum of 2 columns that should be 
-%               unstacked. See examples for more details.
+%               unstacked. This is useful if you will be using SPSS
+%               with a repeated measures design. See examples.
 % 
-%   'filename'= Filename and path to save resultant table as either a
+%   'save'    = Filename and path to save resultant table as either a
 %               MATLAB file (.mat) or text file of comma-separated values
 %               (.csv). The file extension determines the type of file.
 %   
@@ -40,10 +41,12 @@
 %                 'none', which returns all trials.
 % 
 % OUTPUT
-%   d = [table] MATLAB table.
+%   d                 = [table] MATLAB table.
+%   path/filename.csv = If the 'save' parameter is used, a comma delimited 
+%                       values file of the table data is saved to disk.
 % 
 % EXAMPLES
-%   d = phz_writetable(PHZ,'feature',{'mean','max'},'save','myfile.csv')
+%   phz_writetable(PHZ,'feature',{'mean','max'},'save','myfile.csv')
 %       >> Finds the mean and max of each trial, and writes a .csv file
 %          where each trial is a row, and all grouping variable headings
 %          are present (i.e., participant, group, session, trials).
@@ -172,7 +175,7 @@ for i = 1:length(feature)
     end
     
     % add feature data to table
-    d.(strrep(s.feature,'-','_')) = s.data;
+    d.(strrep(s.proc.feature,'-','_')) = s.data;
     d.Properties.VariableUnits{end} = s.units;
     d.Properties.VariableDescriptions{end} = featureTitle;
     
