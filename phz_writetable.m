@@ -24,7 +24,7 @@
 %   and are executed in the same order as they appear in the
 %   function call. See the help of each function for more details.
 %   'subset'    = Calls phz_subset.
-%   'rectify'   = Calls phz_rect.
+%   'rectify'   = Calls phz_rectify.
 %   'filter'    = Calls phz_filter.
 %   'smooth'    = Calls phz_smooth.
 %   'transform' = Calls phz_transform.
@@ -103,7 +103,7 @@ for i = 1:2:length(varargin)
         
         % do preprocessing in order of input
         case 'subset',                  PHZ = phz_subset(PHZ,varargin{i+1},verbose);
-        case {'rect','rectify'},        PHZ = phz_rect(PHZ,varargin{i+1},verbose);
+        case {'rect','rectify'},        PHZ = phz_rectify(PHZ,varargin{i+1},verbose);
         case {'filter','filt'},         PHZ = phz_filter(PHZ,varargin{i+1},verbose);
         case {'smooth','smoothing'},    PHZ = phz_smooth(PHZ,varargin{i+1},verbose);
         case 'transform',               PHZ = phz_transform(PHZ,varargin{i+1},verbose);
