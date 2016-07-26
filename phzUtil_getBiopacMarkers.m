@@ -127,6 +127,7 @@ times = nan(size(timeStr));
 for i = 1:length(timeStr)
     times(i) = str2double(timeStr{i}{1});
     switch timeStr{i}{2}
+        case 'hrs', times(i) = times(i) * 60 * 60;
         case 'min', times(i) = times(i) * 60;
         case 'sec', % nothing to adjust
         otherwise, error(['Unknown time unit ''',timeStr{i}{2},'''.'])
