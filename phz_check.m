@@ -510,10 +510,15 @@ if isstruct(PHZ.region)
     % if spec order doesn't match the struct, recreate the struct
 %     if ~strcmp(strjoin(fieldnames(PHZ.region)),strjoin(PHZ.meta.tags.region))
     [~,regionMatch] = ismember(PHZ.meta.tags.region,fieldnames(PHZ.region));
-    if ~all(regionMatch == 1:length(fieldnames(PHZ.region)))
+    if length(regionMatch) > length(fieldnames(PHZ.region)) || ...
+        ~all(regionMatch == 1:length(fieldnames(PHZ.region)))
         rname = fieldnames(PHZ.region);
         for i = 1:length(PHZ.meta.tags.region)
-            temp.(PHZ.meta.tags.region{i}) = PHZ.region.(rname{i});
+            if i > length(rname)
+                temp.(PHZ.meta.tags.region{i}) = [];
+            else
+                temp.(PHZ.meta.tags.region{i}) = PHZ.region.(rname{i});
+            end
         end
         PHZ.region = temp;
     end
