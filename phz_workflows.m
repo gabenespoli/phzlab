@@ -1,4 +1,4 @@
-function phz_workflowsΩ(datatype)
+function phz_workflows(datatype)
 %PHZ_WORKFLOW  Display sample workflows for a specific type of data.
 % 
 % 
