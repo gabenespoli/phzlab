@@ -26,16 +26,20 @@
 %               and save the file to disk as a .txt file. This is the file
 %               that should be used as input for this function.
 % 
-%   'rmTimeStamp' = [1|0] Removes the time stamp which can be
-%               appended to the event labels. e.g., changes the label 
-%               'User event Tue Jul 19 2016 12:41:30' to 'User event'.
-%               Default 1.
+%   'eventTypes' = [string|cell of strings] Only return these event types.
+%               Default (leave empty []) returns all event types (except
+%               see 'rmAppendEvents' option).
 % 
 %   'rmAppendEvents' = [1|0] Removes events of the type 'Append'. When the 
 %               acquisition type is set to 'Append', there is an 'Append'
 %               event inserted every time you stop and start the recording.
 %               Set this parameter to TRUE (1) to ignore these events or
 %               FALSE (0) to keep them. Default 1.
+% 
+%   'rmTimeStamp' = [1|0] Removes the time stamp which can be
+%               appended to the event labels. e.g., changes the label 
+%               'User event Tue Jul 19 2016 12:41:30' to 'User event'.
+%               Default 1.
 % 
 % OUTPUT
 %   times     = [numeric] A vector of times (in seconds).
@@ -68,12 +72,14 @@ function [times,labels] = phzUtil_getBiopacMarkers(varargin)
 if nargin == 0 && nargout == 0, help phzUtil_getBiopacMarkers, return, end
 
 filename = [];
+eventTypes = [];
 rmAppendEvents = true;
 rmTimeStampFromLabels = true;
 
 for i = 1:2:length(varargin)
     switch lower(varargin{i})
         case 'filename',        filename = varargin{i+1};
+        case 'eventtypes',      eventTypes = varargin{i+1};
         case 'rmappendevents',  rmAppendEvents = varargin{i+1};
         case 'rmtimestamp',     rmTimeStampFromLabels = varargin{i+1};
         otherwise, warning(['Unknown parameter ''',varargin{i},'''.'])
@@ -103,6 +109,23 @@ data = cell2table(data,'VariableNames',{'Index' 'Time' 'Type' 'Channel' 'Label'}
 
 if rmAppendEvents
     data(categorical(data.Type) == 'Append',:) = [];
+end
+
+if ~isempty(eventTypes)
+    if ischar(eventTypes), eventTypes = cellstr(eventTypes); end
+    
+    ind = zeros(size(data,1),1);
+    for i = 1:length(eventTypes)
+        
+        temp = categorical(data.Type) == eventTypes{i};
+        
+        ind = ind + temp;
+        
+    end
+        
+    ind = logical(ind);
+    data = data(ind,:);
+    
 end
 
 data.Time = convertTimesToSeconds(data.Time);
