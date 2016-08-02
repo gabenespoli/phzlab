@@ -8,7 +8,7 @@
 % INPUT   
 %   PHZ           = PHZLAB data structure.
 % 
-%   'files'       = [string|cell of strings] Specifies the file(s) to
+%   'filename'    = [string|cell of strings] Specifies the file(s) to
 %                   import. If not specified, a dialog box pops up for you 
 %                   to select a file or files. If FILES is a folder, all
 %                   .mat files are used.
@@ -143,9 +143,7 @@
 
 function PHZ = phz_create(varargin)
 
-if nargout == 0 && nargin == 0, help phz_create, return
-elseif nargout == 0 && nargin > 0, error('Assign an output argument.')
-end
+if nargout == 0 && nargin == 0, help phz_create, return, end
 
 if nargin == 1 && strcmp(varargin{1},'blank'), PHZ = getBlankPHZ(1); return, end
 
@@ -172,7 +170,7 @@ verbose = true;
 % user-defined
 for i = 1:2:length(varargin)
     switch lower(varargin{i})
-        case {'files','file'},          files = varargin{i+1};
+        case {'files','file','filename'},files = varargin{i+1};
         case 'folder',                  folder = varargin{i+1};
             
         case 'channel',                 channel = varargin{i+1};
@@ -186,7 +184,7 @@ for i = 1:2:length(varargin)
         case 'session',                 session = varargin{i+1}; %#ok<NASGU>
 
         case 'filetype',                filetype = varargin{i+1};
-        case {'save','filename'},       savefolder = varargin{i+1};
+        case {'save'},                  savefolder = varargin{i+1};
         case 'verbose',                 verbose = varargin{i+1};
     end
 end
@@ -262,6 +260,8 @@ for i = 1:length(files)
             
         otherwise, error('Unknown file type.')
     end
+    
+    if ~isempty(datatype), PHZ.datatype = datatype; end
     
     % save PHZ file
     if ischar(savefolder)
