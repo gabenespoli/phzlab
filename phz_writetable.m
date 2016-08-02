@@ -147,7 +147,7 @@ for i = 1:length(feature)
     % create table on first loop
     if i == 1
         if ismember(keepVars,{'all'})
-            addVars = {'participant','group','session','trials'};
+            addVars = {'participant','group','condition','session','trials'};
         else addVars = cellstr(keepVars);
         end
         
@@ -161,7 +161,13 @@ for i = 1:length(feature)
         if ischar(PHZ.region), d.Properties.UserData.region = PHZ.region;
         else d.Properties.UserData.region = 'epoch';
         end
-        d.Properties.UserData.files = PHZ.meta.files;
+        
+        if ismember('files',fieldnames(PHZ.meta))
+            d.Properties.UserData.files = PHZ.meta.files;
+        elseif ismember('create',fieldnames(PHZ.proc)) && ismember('datafile',fieldnames(PHZ.proc.create))
+            d.Properties.UserData.files = PHZ.proc.create.datafile;
+        end
+
         d.Properties.UserData.misc = PHZ.misc;
         d.Properties.UserData.history = PHZ.history;
         
@@ -188,7 +194,7 @@ if ~isempty(unstackVars)
     
     if length(unstackVars) == 2
         dataVars = d.Properties.VariableNames;
-        rm = ismember(dataVars,{'participant','group','session','trials'});
+        rm = ismember(dataVars,{'participant','group','condition','session','trials'});
         dataVars(rm) = [];
         
         d = unstack(d,dataVars,unstackVars{2});
