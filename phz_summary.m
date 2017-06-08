@@ -6,7 +6,10 @@
 % INPUT
 %   PHZ       = PHZLAB data structure.
 % 
-%   keepVars  = A string or a cell array of strings and can contain a
+%   keepVars  = A string or a cell array of strings of grouping
+%               variables that you would like to keep. All other 
+%               grouping variables (i.e., those not listed in 
+%               KEEPVARS will be averaged across. KEEPVARS can be a 
 %               combination of 'participant', 'group', 'session', and
 %               'trials'. Use 'all' or [] (empty) to retain all trials
 %               (i.e., do nothing) or 'none' to average all trials together
@@ -25,7 +28,7 @@
 %         average all of those trials together. The number of trials in
 %         PHZ.data will correspond to the number of different kinds of
 %         trials.
-%   PHZ = phz_summary(PHZ,{'trials','group') >> For each unique combination
+%   PHZ = phz_summary(PHZ,{'trials','group'}) >> For each unique combination
 %         of PHZ.trials and PHZ.group, average those trials together.
 
 % Copyright (C) 2016 Gabriel A. Nespoli, gabenespoli@gmail.com
