@@ -1,4 +1,4 @@
-%PHZFEATURE_ITRC  Inter-trial Response Consitency
+%PHZFEATURE_ITRC  Inter-trial Response Consitency (usually for FFR data)
 %   R = FFR_ITRC(FFR) takes the average of half the trials and calculates
 %       the cross-correlation with the average of the other half of trials.
 %       This is repeated 100 times (default) with different random
