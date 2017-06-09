@@ -231,7 +231,7 @@ switch lower(feature)
             if any(ismember({'participant','all','none'},keepVars)), PHZ = phz_summary(PHZ,keepVars);
             else PHZ = phz_summary(PHZ,[{'participant'} keepVars]); end
             
-            PHZ = getitpc(PHZ,keepVars);
+            PHZ = phzFeature_itpc(PHZ,keepVars);
             
         else
             
@@ -246,7 +246,7 @@ switch lower(feature)
                     ': ''',PHZ.meta.files{i},''''])
                 TMP = phz_load(PHZ.meta.files{i});
                 TMP = phz_proc(TMP,PHZ.proc.pre{:});
-                TMP = getitpc(TMP,PHZ.summary.keepVars);
+                TMP = phzFeature_itpc(TMP,PHZ.summary.keepVars);
                 
                 j = 1 + (i-1) * trialsPerFile;
                 newData(j:j+trialsPerFile-1,:) = TMP.data;
@@ -375,11 +375,3 @@ if ~isempty(val)
 end
 end
 
-function PHZ = getitpc(PHZ,keepVars)
-% get complex fft
-[PHZ.data,PHZ.freqs,PHZ.units,~] = phzFeature_fft(PHZ.data,PHZ.srate,PHZ.units,'spectrum','complex');
-PHZ = rmfield(PHZ,'times');
-PHZ.data = PHZ.data ./ abs(PHZ.data); % transform each vector to a unit vector (magnitude of 1)
-PHZ = phz_summary(PHZ,keepVars); % average trials
-PHZ.data = abs(PHZ.data); % magnitude of resultant vector is the measure of phase coherence
-end
