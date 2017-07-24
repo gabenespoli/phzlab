@@ -102,8 +102,6 @@ for j = 1:length(files)
     disp(['Gathering PHZ data from file ',fileProgress])
     waitbar(j/length(files),w,['Gathering PHZ data from file ',fileProgress])
 
-    
-    
     % load data
     if verbose, disp(['Loading data from file ',fileProgress]), end
     
@@ -216,7 +214,8 @@ end
 % save to file (& phz_check)
 if ~isempty(filename)
     PHZS = phz_save(PHZS,filename);
-else PHZS = phz_check(PHZS);
+else
+    PHZS = phz_check(PHZS);
 end
 
 end
