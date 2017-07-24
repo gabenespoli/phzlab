@@ -66,33 +66,62 @@ if any(strcmp(varargin(1:2:end),'verbose'))
     varargin([i,i+1]) = [];
 end
 
-% varargin = convertStructsToParamValuePairs(varargin);
+opts = varargin;
+opts = convertStructsToParamValuePairs(opts);
 
-for i = 1:2:length(varargin)
-    switch lower(varargin{i})
-        case 'subset',                  PHZ = phz_subset(PHZ,varargin{i+1},verbose);
-        case {'rect','rectify'},        PHZ = phz_rectify(PHZ,varargin{i+1},verbose);
-        case {'filter','filt'},         PHZ = phz_filter(PHZ,varargin{i+1},verbose);
-        case 'smooth',                  PHZ = phz_smooth(PHZ,varargin{i+1},verbose);
-        case 'transform',               PHZ = phz_transform(PHZ,varargin{i+1},verbose);
-        case {'blsub','blc'},           PHZ = phz_blsub(PHZ,varargin{i+1},verbose);
-        case {'rej','reject'},          PHZ = phz_rej(PHZ,varargin{i+1},verbose);
-        case {'norm','normtype'},       PHZ = phz_norm(PHZ,varargin{i+1},verbose);
+for i = 1:2:length(opts)
+    switch lower(opts{i})
+        case 'subset',                  PHZ = phz_subset(PHZ,opts{i+1},verbose);
+        case {'rect','rectify'},        PHZ = phz_rectify(PHZ,opts{i+1},verbose);
+        case {'filter','filt'},         PHZ = phz_filter(PHZ,opts{i+1},verbose);
+        case 'smooth',                  PHZ = phz_smooth(PHZ,opts{i+1},verbose);
+        case 'transform',               PHZ = phz_transform(PHZ,opts{i+1},verbose);
+        case {'blsub','blc'},           PHZ = phz_blsub(PHZ,opts{i+1},verbose);
+        case {'rej','reject'},          PHZ = phz_rej(PHZ,opts{i+1},verbose);
+        case {'norm','normtype'},       PHZ = phz_norm(PHZ,opts{i+1},verbose);
         
-        case 'region',                  region = varargin{i+1};
-        case 'feature',                 feature = varargin{i+1};
-        case {'summary','keepvars'},    keepVars = varargin{i+1};
+        case 'region',                  region = opts{i+1};
+        case 'feature',                 feature = opts{i+1};
+        case {'summary','keepvars'},    keepVars = opts{i+1};
     end
 end
 
-if ~isempty(feature) && ~strcmp(feature,'time'), PHZ = phz_region(PHZ,region,verbose); end
+if ~isempty(feature) && ~strcmp(feature,'time')
+    PHZ = phz_region(PHZ,region,verbose);
+end
+
 PHZ = phz_feature(PHZ,feature,'summary',keepVars,'verbose',verbose);
 
 end
 
-% function opts = convertStructsToParamValuePairs(opts)
-% 
-% 
-% 
-% 
-% end
+function optsOut = convertStructsToParamValuePairs(optsIn)
+optsOut = {};
+for i = 1:length(optsIn)
+    if isstruct(optsIn{i})
+        procs = fieldnames(optsIn{i});
+        for j = 1:length(procs)
+            switch procs{j}
+                % case 'subset', optsOut = appendToCell(optsOut, {'blsub', optsIn{i}.blsub.region});
+                case 'rectify',  optsOut = appendToCell(optsOut, {'rectify', optsIn{i}.rectify});
+                case 'filter',  optsOut = appendToCell(optsOut, {'filter', [optsIn{i}.filter.hipass optsIn{i}.filter.lopass optsIn{i}.notch]});
+                case 'smooth',  optsOut = appendToCell(optsOut, {'smooth', optsIn{i}.smooth});
+                case 'transform',  optsOut = appendToCell(optsOut, {'transform', optsIn{i}.transform});
+                case 'blsub',  optsOut = appendToCell(optsOut, {'blsub', optsIn{i}.blsub.region});
+                case 'rej',    optsOut = appendToCell(optsOut, {'rej', optsIn{i}.rej.threshold});
+                case 'norm',    optsOut = appendToCell(optsOut, {'norm', optsIn{i}.norm.type});
+            end
+            
+        end
+
+    else
+        optsOut = appendToCell(optsOut, optsIn{i});
+
+    end
+end
+end
+
+function cellOut = appendToCell(cellIn,cellToAppend)
+if ~iscell(cellToAppend), cellToAppend = {cellToAppend}; end
+if ~iscell(cellIn),       cellIn = {cellIn}; end
+cellOut = [cellIn, cellToAppend];
+end
