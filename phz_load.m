@@ -51,7 +51,11 @@ else
 end
 
 % parse input
-if nargin > 1, verbose = varargin{2}; else verbose = false; end
+if nargin > 1
+    verbose = varargin{2};
+else
+    verbose = false;
+end
 
 if ~exist(filename,'file'), error('File doesn''t exist.'), end
 
@@ -67,6 +71,7 @@ while badFile
         PHZ = S.(name{i});
         PHZ = phz_check(PHZ,verbose);
         badFile = false;
+        
     catch me %#ok<NASGU>
         i = i + 1;
     end
