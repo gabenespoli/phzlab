@@ -325,6 +325,7 @@ PHZ = phz_summary(PHZ,keepVars,verbose);
 if ~isempty(val) && isnumeric(val)
     featureTitle = [featureTitle,' at ',num2str(val(1)),' Hz'];
     PHZ = phzUtil_binmean(PHZ,val(1),val(2));
+    PHZ.freqs = val(1);
 end
 
 end
