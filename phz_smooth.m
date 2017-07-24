@@ -110,5 +110,4 @@ winStr = [smoothtype,' smoothing with a ',...
     ' ms sliding window (',winStr,').'];
 PHZ = phz_history(PHZ,winStr,verbose);
 
-
 end
