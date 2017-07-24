@@ -69,7 +69,8 @@ if nargin > 0 && isdir(varargin{1})
     files = files.mat;
     varargin(1) = [];
     
-else [files,folder] = uigetfile({'.phz';'.mat'},'Select PHZ files to gather...','MultiSelect','on');
+else
+    [files,folder] = uigetfile({'*.phz','PHZ-files (*.phz)';'*.mat','MAT-files (*.mat)'},'Select PHZ files to gather...','MultiSelect','on');
     if isnumeric(files) && files == 0, return, end
     if ischar(files), files = cellstr(files); end
     
@@ -139,13 +140,8 @@ for j = 1:length(files)
         if ismember('filename',fieldnames(PHZ.meta)), PHZ.meta = rmfield(PHZ.meta,'filename'); end
         
         PHZS.proc = [];
-%         PHZS.
         PHZS.proc.pre(j) = PHZ.proc;
-        
-        % reset proc field
-%         PHZS.proc = [];
-%         PHZS.proc.pre = processing;
-        
+
         continue
     end    
     
@@ -206,13 +202,6 @@ for j = 1:length(files)
 
     PHZS = verifyFieldsThatShouldBeTheSame(PHZS,PHZ,j);
     
-    % concatenate summary info if applicable
-    if ~ismember(keepVars,{'all'})
-        PHZS.summary.stdError     = [PHZS.summary.stdError;     PHZ.summary.stdError];
-        PHZS.summary.nTrials      = [PHZS.summary.nTrials;      PHZ.summary.nTrials];
-        PHZS.summary.nParticipant = [PHZS.summary.nParticipant; PHZ.summary.nParticipant];
-    end
-    
     if verbose, disp(' '), end
 end % end looping participants
 close(w)
@@ -223,17 +212,6 @@ for j = 1:length(resetFields), field = resetFields{j};
     PHZS.(field) = unique(PHZS.meta.tags.(field));
     PHZS = phz_history(PHZS,['The ',field,' field was reset to include the unique values of tags.',field,'.'],verbose,0);
 end
-
-if ~ismember(keepVars,{'all'})
-    PHZS.summary.type = keepVars;
-end
-
-
-% add preprocessing to PHZ.history
-% if ~isempty(rect), PHZS = phzUtil_history(PHZS,['Pre-gathering rectification: ',rect,'.']); end
-% if ~isempty(blsub),     if isnumeric(blsub), blsub = num2str(blsub); end, PHZS = phzUtil_history(PHZS,['Pre-gathering baseline correction: ',blsub,'.']); end
-% if ~isempty(rej),     PHZS = phzUtil_history(PHZS,['Pre-gathering rejection threshold: ',num2str(rej),' ',PHZS.units,'.']); end
-% if ~ismember(keepVars,{'all'}), PHZS = phzUtil_history(PHZS,['Pre-gathering summary: ',strjoin(keepVars),'.']); end
 
 % save to file (& phz_check)
 if ~isempty(filename)
@@ -255,12 +233,8 @@ if i == 1
         PHZS.region.(rname{j}) = PHZ.region.(rname{j});
     end
     
-    if ismember('summary',fieldnames(PHZ))
-        PHZS.summary = PHZ.summary;
-    end
-    
 else
-    if ismember('times',fieldnames(PHZS)),
+    if ismember('times',fieldnames(PHZS))
         if ~all(PHZS.times == PHZ.times)
             error('PHZ.times is inconsistent.')
         end
@@ -272,7 +246,7 @@ else
     
     rname = fieldnames(PHZS.region);
     for j = 1:length(rname)
-        if ~all(PHZS.region.(rname{j}) == PHZ.region.(rname{j})),
+        if ~all(PHZS.region.(rname{j}) == PHZ.region.(rname{j}))
             error(['FFR.region.',(rname{j}),' is inconsistent.'])
         end
     end
