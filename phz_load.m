@@ -42,7 +42,7 @@ if nargout == 0 && nargin == 0, help phz_load, return, end
 
 % get filename if none given
 if nargin == 0
-    [filename,pathname] = uigetfile({'.phz';'.mat'},'Select a PHZ file to load...');
+    [filename,pathname] = uigetfile({'*.phz','PHZ-files (*.phz)';'*.mat','MAT-files (*.mat)'},'Select a PHZ file to load...');
     if filename == 0, return, end
     filename = fullfile(pathname,filename);
 else
