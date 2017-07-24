@@ -225,13 +225,16 @@ switch lower(feature)
         featureTitle = 'Intertrial Phase Coherence';
         % Method adapted from Tierney & Kraus, 2013, Journal of Neuroscience.
         
-        if ~ismember('summary',fieldnames(PHZ.proc))
+        if ~ismember('summary', fieldnames(PHZ.proc)) && ~ismember('summary', fieldnames(PHZ.proc.pre))
             
             % summarize (adding 'participant' to summary if it isn't already)
-            if any(ismember({'participant','all','none'},keepVars)), PHZ = phz_summary(PHZ,keepVars);
-            else PHZ = phz_summary(PHZ,[{'participant'} keepVars]); end
+            if any(ismember({'participant','all','none'}, keepVars))
+                PHZ = phz_summary(PHZ,keepVars);
+            else
+                PHZ = phz_summary(PHZ, [{'participant'} keepVars]);
+            end
             
-            PHZ = phzFeature_itpc(PHZ,keepVars);
+            PHZ = phzFeature_itpc(PHZ, keepVars);
             
         else
             
@@ -245,8 +248,8 @@ switch lower(feature)
                     num2str(i),'/',num2str(length(PHZ.meta.files)),...
                     ': ''',PHZ.meta.files{i},''''])
                 TMP = phz_load(PHZ.meta.files{i});
-                TMP = phz_proc(TMP,PHZ.proc.pre{:});
-                TMP = phzFeature_itpc(TMP,PHZ.summary.keepVars);
+                TMP = phz_proc(TMP,PHZ.proc.pre(i));
+                TMP = phzFeature_itpc(TMP,PHZ.proc.pre(i).summary.keepVars);
                 
                 j = 1 + (i-1) * trialsPerFile;
                 newData(j:j+trialsPerFile-1,:) = TMP.data;
@@ -254,7 +257,6 @@ switch lower(feature)
             PHZ.data = newData;
             PHZ.freqs = TMP.freqs;
             PHZ = rmfield(PHZ,'times');
-%             PHZ.proc.feature = TMP.feature;
         end
         
 %     case 'itrc', featureTitle = 'Intertrial Phase Consistency';
@@ -281,6 +283,8 @@ switch lower(feature)
         featureTitle = 'Stimulus-Response Lag';
         PHZ.units = 's';
         [~,PHZ.data] = phzFeature_src(PHZ.data,PHZ.misc.stim,PHZ.srate,val);
+        
+        % note: See comment above in the 'src' section.
         
     case 'snr'
         featureTitle = 'Signal-to-Noise Ratio';
