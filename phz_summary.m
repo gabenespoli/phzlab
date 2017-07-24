@@ -64,11 +64,12 @@ if ismember(keepVars{1},{'none'})
     PHZ.proc.summary.stdError = ste(PHZ.data);
     PHZ.data = mean(PHZ.data,1);
 
-else
-    % get categories to collapse across
+else % get categories to collapse across
     for i = 1:length(keepVars)
-        if i == 1, varInd = PHZ.meta.tags.(keepVars{i});
-        else       varInd = varInd .* PHZ.meta.tags.(keepVars{i});
+        if i == 1
+            varInd = PHZ.meta.tags.(keepVars{i});
+        else
+            varInd = varInd .* PHZ.meta.tags.(keepVars{i});
         end
     end
     varTypes = unique(varInd); % this will be in the proper spec order because they are ordinal categorical arrays
@@ -86,15 +87,15 @@ else
         PHZ.proc.summary.nTrials(i) = size(TMP.data,1);
         PHZ.proc.summary.stdError(i,:) = ste(TMP.data);
         newData(i,:) = mean(TMP.data,1);
-        
     end
+    
     PHZ.data = newData;
     
     % adjust PHZ.(keepVars) vars
     varTypes = regexp(cellstr(varTypes),' ','split');
     for i = 1:length(keepVars), field = keepVars{i};
         newVar = cell(size(PHZ.data,1),1);
-        for j = 1:length(varTypes);
+        for j = 1:length(varTypes)
             newVar{j} = varTypes{j}{i};
         end
         PHZ.meta.tags.(field) = categorical(newVar,cellstr(PHZ.(field)),'Ordinal',true);
@@ -133,12 +134,18 @@ PHZ = phz_history(PHZ,['Summarized data by ''',strjoin(keepVars),'''.'],verbose)
 end
 
 function y = ste(x,varargin) %STE  Standard error.
-if nargin > 1, dim = varargin{1}; else dim = 1; end
+if nargin > 1
+    dim = varargin{1};
+else
+    dim = 1;
+end
 y = std(x,0,dim) / sqrt(size(x,dim));
 end
 
 function keepVars = verifyKeepVars(keepVars)
-if ~iscell(keepVars), keepVars = cellstr(keepVars); end
+if ~iscell(keepVars)
+    keepVars = cellstr(keepVars);
+end
 if ~isempty(keepVars)
     if ~all(ismember(keepVars,{'trials','session','condition','group','participant','all','',' ','none'}))
         error('Invalid summaryType.'), end
