@@ -57,9 +57,10 @@ if nargout == 0 && nargin == 0, help phz_filter, return, end
 
 if isempty(cutoff), return, end
 if ~isnumeric(cutoff), error('Invalid input.'), end
+
 hipass = cutoff(1);
-if length(cutoff) < 2, lopass = 0; else lopass = cutoff(2); end
-if length(cutoff) < 3, notch = 0; else notch = cutoff(3); end
+if length(cutoff) < 2, lopass = 0; else, lopass = cutoff(2); end
+if length(cutoff) < 3, notch  = 0; else, notch  = cutoff(3); end
 
 filterType = 'butter';
 filterOrder = 3;
@@ -96,23 +97,23 @@ end
 
 % filter data
 if verbose, fprintf('Filtering... '), end
+
 for i = 1:size(PHZ.data,1)
     
     if do_zeroPhase
-        
         if hipass ~= 0, PHZ.data(i,:) = filtfilt(hpB,hpA,PHZ.data(i,:)); end
         if lopass ~= 0, PHZ.data(i,:) = filtfilt(lpB,lpA,PHZ.data(i,:)); end
         if notch ~= 0,  PHZ.data(i,:) = filtfilt(nB,nA,PHZ.data(i,:)); end
         
     else
-        
         if hipass ~= 0, PHZ.data(i,:) = filter(hpB,hpA,PHZ.data(i,:)); end
         if lopass ~= 0, PHZ.data(i,:) = filter(lpB,lpA,PHZ.data(i,:)); end
         if notch ~= 0,  PHZ.data(i,:) = filter(nB,nA,PHZ.data(i,:)); end
+        
     end
 end
-if verbose, fprintf('Done.\n'), end
 
+if verbose, fprintf('Done.\n'), end
 
 PHZ.proc.filter.hipass = hipass;
 PHZ.proc.filter.lopass = lopass;
