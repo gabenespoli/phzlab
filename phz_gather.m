@@ -181,7 +181,7 @@ for j = 1:length(files)
         if ~strcmp(PHZ.meta.tags.(field),'<collapsed>')
             
             if ~all(ismember(cellstr(PHZ.(field)),cellstr(PHZS.(field))))
-                if ~ismember(field,resetFields), resetFields{end+1} = field; end
+                if ~ismember(field,resetFields), resetFields{end+1} = field; end %#ok<AGROW>
             end
             
             PHZ.meta.tags.(field) = categorical(cellstr(PHZ.meta.tags.(field)),'Ordinal',false);
@@ -270,10 +270,24 @@ end
 
 function s = strnumjoin(C)
 if ~iscell(C), return, end
+allStrings = {};
 for i = 1:length(C)
-    if isnumeric(C{i}), C{i} = num2str(C{i});
-    elseif ~ischar(C{i}), error('Problem with strnumjoin function.')
+    
+    if ischar(C{i})
+        temp = C(i);
+        
+    elseif isnumeric(C{i}) || islogical(C{i})
+        temp = {num2str(C{i})};
+        
+    elseif iscell(C{i})
+        temp = strnumjoin(C{i});
+        
+    else
+        error('Problem with strnumjoin function.')
+        
     end
+    
+    allStrings = [allStrings temp]; %#ok<AGROW>
 end
-s = strjoin(C);
+s = strjoin(allStrings);
 end
