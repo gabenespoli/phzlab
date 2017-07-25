@@ -102,13 +102,13 @@ for i = 1:length(optsIn)
         for j = 1:length(procs)
             switch procs{j}
                 % case 'subset', optsOut = appendToCell(optsOut, {'blsub', optsIn{i}.blsub.region});
-                case 'rectify',  optsOut = appendToCell(optsOut, {'rectify', optsIn{i}.rectify});
-                case 'filter',  optsOut = appendToCell(optsOut, {'filter', [optsIn{i}.filter.hipass optsIn{i}.filter.lopass optsIn{i}.notch]});
-                case 'smooth',  optsOut = appendToCell(optsOut, {'smooth', optsIn{i}.smooth});
-                case 'transform',  optsOut = appendToCell(optsOut, {'transform', optsIn{i}.transform});
-                case 'blsub',  optsOut = appendToCell(optsOut, {'blsub', optsIn{i}.blsub.region});
-                case 'rej',    optsOut = appendToCell(optsOut, {'rej', optsIn{i}.rej.threshold});
-                case 'norm',    optsOut = appendToCell(optsOut, {'norm', optsIn{i}.norm.type});
+                case 'rectify'      optsOut = appendToCell(optsOut, {'rectify', optsIn{i}.rectify});
+                case 'filter',      optsOut = appendToCell(optsOut, {'filter', [optsIn{i}.filter.hipass optsIn{i}.filter.lopass optsIn{i}.notch]});
+                case 'smooth',      optsOut = appendToCell(optsOut, {'smooth', optsIn{i}.smooth});
+                case 'transform',   optsOut = appendToCell(optsOut, {'transform', optsIn{i}.transform.transform});
+                case 'blsub',       optsOut = appendToCell(optsOut, {'blsub', optsIn{i}.blsub.region});
+                case 'rej',         optsOut = appendToCell(optsOut, {'rej', optsIn{i}.rej.threshold});
+                case 'norm',        optsOut = appendToCell(optsOut, {'norm', optsIn{i}.norm.type});
             end
             
         end
