@@ -113,7 +113,7 @@ for j = 1:length(files)
         switch lower(processing{i})
             case 'subset',                  PHZ = phz_subset(PHZ,processing{i+1},verbose);
             case {'rect','rectify'},        PHZ = phz_rect(PHZ,processing{i+1},verbose);
-            case {'filter','filt'},         PHZ = phz_filter(PHZ,processing{i+1},verbose);
+            case {'filter','filt'},         PHZ = phz_filter(PHZ,processing{i+1},'verbose',verbose);
             case {'smooth','smoothing'},    PHZ = phz_smooth(PHZ,processing{i+1},verbose);
             case 'transform',               PHZ = phz_transform(PHZ,processing{i+1},verbose);
             case 'blsub',                   PHZ = phz_blsub(PHZ,processing{i+1},verbose);
