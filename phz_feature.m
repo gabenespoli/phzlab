@@ -196,7 +196,8 @@ switch lower(feature)
         if all(ismember(PHZ.data,[0 1]))
             PHZ.data = PHZ.data * 100;
             PHZ.units = '%';
-        else PHZ.units = '';
+        else
+            PHZ.units = '';
         end
         
     case {'rt', 'rt1', 'rt2', 'rt3', 'rt4', 'rt5'}
@@ -214,8 +215,11 @@ switch lower(feature)
         
     case 'fft'
         % summarize in time domain (adding 'participant' to summary if it isn't already)
-        if any(ismember({'participant','all','none'},keepVars)), PHZ = phz_summary(PHZ,keepVars);
-        else PHZ = phz_summary(PHZ,[{'participant'} keepVars]); end
+        if any(ismember({'participant','all','none'},keepVars))
+            PHZ = phz_summary(PHZ,keepVars);
+        else
+            PHZ = phz_summary(PHZ,[{'participant'} keepVars]);
+        end
         
         % get fft of each summary
         [PHZ.data,PHZ.freqs,PHZ.units,featureTitle] = phzFeature_fft(PHZ.data,PHZ.srate,PHZ.units);
