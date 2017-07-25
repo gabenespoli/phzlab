@@ -81,18 +81,23 @@ end
 hpB = []; hpA = []; lpB = []; lpA = []; nB = []; nA = [];
 
 if hipass ~= 0
-    [hpB,hpA] = butter(filterOrder,hipass / (PHZ.srate / 2),'high');
-    PHZ = phz_history(PHZ,['Butterworth highpass filter at ',num2str(hipass),' Hz.'],verbose);
+    [hpB,hpA] = butter(filterOrder,hipass / (PHZ.srate / 2), 'high');
+    PHZ = phz_history(PHZ, ['Butterworth highpass filter at ', ...
+        num2str(hipass), ' Hz.'], verbose);
 end
 
 if lopass ~= 0
-    [lpB,lpA] = butter(filterOrder,lopass / (PHZ.srate / 2),'low');
-    PHZ = phz_history(PHZ,['Butterworth lowpass filter at ',num2str(lopass),' Hz.'],verbose);
+    [lpB,lpA] = butter(filterOrder,lopass / (PHZ.srate / 2), 'low');
+    PHZ = phz_history(PHZ, ['Butterworth lowpass filter at ', ...
+        num2str(lopass), ' Hz.'], verbose);
 end
 
 if notch ~= 0
-    [nB,nA] = butter(filterOrder,[(notch - 1) / (PHZ.srate / 2) (notch + 1) / (PHZ.srate / 2)]);
-    PHZ = phz_history(PHZ,['Butterworth bandstop filter at ',num2str(notch),' ± 1 Hz.'],verbose);
+    [nB,nA] = butter(filterOrder,[ ...
+        (notch - 1) / (PHZ.srate / 2) ...
+        (notch + 1) / (PHZ.srate / 2)]);
+    PHZ = phz_history(PHZ,['Butterworth bandstop filter at ', ...
+        num2str(notch), ' ± 1 Hz.'], verbose);
 end
 
 % filter data
