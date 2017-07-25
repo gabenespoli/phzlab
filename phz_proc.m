@@ -73,7 +73,7 @@ for i = 1:2:length(opts)
     switch lower(opts{i})
         case 'subset',                  PHZ = phz_subset(PHZ,opts{i+1},verbose);
         case {'rect','rectify'},        PHZ = phz_rectify(PHZ,opts{i+1},verbose);
-        case {'filter','filt'},         PHZ = phz_filter(PHZ,opts{i+1},verbose);
+        case {'filter','filt'},         PHZ = phz_filter(PHZ,opts{i+1},'verbose',verbose);
         case 'smooth',                  PHZ = phz_smooth(PHZ,opts{i+1},verbose);
         case 'transform',               PHZ = phz_transform(PHZ,opts{i+1},verbose);
         case {'blsub','blc'},           PHZ = phz_blsub(PHZ,opts{i+1},verbose);
