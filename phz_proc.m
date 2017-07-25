@@ -1,4 +1,6 @@
 %PHZ_PROC  Use many processing functions with a single function call.
+%   Input can be parameter/value pairs, or a structure variable, i.e.,
+%   the PHZ.proc field.
 % 
 % USAGE
 %   phz_proc(PHZ,'Param1',Value1,etc.)
