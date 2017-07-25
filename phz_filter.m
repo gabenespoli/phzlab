@@ -96,7 +96,7 @@ if notch ~= 0
 end
 
 % filter data
-if verbose, fprintf('Filtering... '), end
+if verbose, fprintf('  Filtering... '), end
 
 for i = 1:size(PHZ.data,1)
     

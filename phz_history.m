@@ -45,10 +45,10 @@ if nargin < 4, check = true; end
 [st,i] = dbstack;
 caller_function = st(i+1).file;
 
-PHZ.history{end+1} = [datestr(now),' ',caller_function,'>> ',str];
+PHZ.history{end+1} = [datestr(now), ' ', caller_function, '>> ', str];
 
-if verbose, disp(str), end
+if verbose, fprintf(['  ', str, '\n']), end
 
-if check, PHZ = phz_check(PHZ,verbose); end
+if check, PHZ = phz_check(PHZ, verbose); end
 
 end

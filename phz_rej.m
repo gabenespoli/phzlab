@@ -111,7 +111,8 @@ if do_rej || do_restore
         [~,ind]                   = sort(locs);
         PHZ.data                  = data(ind,:);
         
-        for i = {'participant','group','condition','session','trials'}, field = i{1};
+        for i = {'participant','group','condition','session','trials'}
+            field = i{1};
             if ~isempty(PHZ.meta.tags.(field))
                 temp = eval(field);
                 PHZ.meta.tags.(field) = temp(ind);
@@ -149,16 +150,19 @@ if do_rej || do_restore
         
         % check that ~reject all trials or ~reject no trials
         if length(PHZ.proc.rej.locs) == size(PHZ.data,1)
-            disp('This threshold would reject all trials. Aborting...')
+            disp('! This threshold would reject all trials. Aborting phz_rej.m...')
             PHZ.proc = rmfield(PHZ.proc,'rej');
-            disp(['The min threshold to reject a trial in this dataset is ',num2str(min(max(abs(PHZ.data),[],2))),'.'])
+            disp(['  The min threshold to reject a trial in this dataset is ', ...
+                num2str(min(max(abs(PHZ.data),[],2))),'.'])
             return
         end
         
         if isempty(PHZ.proc.rej.locs)
-            disp('This threshold would not reject any trials. Aborting...')
+            disp(['  This threshold would not reject any trials. ', ...
+                'Aborting phz_rej.m...'])
             PHZ.proc = rmfield(PHZ.proc,'rej');
-            disp(['The max value in this dataset is ',num2str(max(abs(PHZ.data(:)))),'.'])
+            disp(['  The max value in this dataset is ', ...
+                num2str(max(abs(PHZ.data(:)))),'.'])
             return
         end
         
