@@ -274,13 +274,40 @@ allStrings = {};
 for i = 1:length(C)
     
     if ischar(C{i})
-        temp = C(i);
+        temp = {['''', C{i}, '''']};
         
-    elseif isnumeric(C{i}) || islogical(C{i})
-        temp = {num2str(C{i})};
+    elseif islogical(C{i})
+        if C{i} == true
+            temp = 'true';
+        else
+            temp = 'false';
+        end
         
+    elseif isnumeric(C{i})
+        if length(C{i}) == 1
+            temp = num2str(C{i});
+            
+        elseif isvector(C{i})
+            temp = '[';
+            for j = 1:length(C{i})
+                temp = [temp, num2str(C{i}(j))]; %#ok<AGROW>
+                if j == length(C{i})
+                    temp = [temp, ']']; %#ok<AGROW>
+                else
+                    temp = [temp, ' ']; %#ok<AGROW>
+                end
+            end
+            
+        else
+            warning('Cannot print matrix in history string.')
+            temp = '<some matrix>';
+
+        end
+        
+        temp = {temp};
+                
     elseif iscell(C{i})
-        temp = strnumjoin(C{i});
+        temp = ['{', strnumjoin(C{i}), '}'];
         
     else
         error('Problem with strnumjoin function.')
@@ -289,5 +316,5 @@ for i = 1:length(C)
     
     allStrings = [allStrings temp]; %#ok<AGROW>
 end
-s = strjoin(allStrings);
+s = strjoin(allStrings, ', ');
 end
