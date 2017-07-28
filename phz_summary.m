@@ -46,7 +46,7 @@
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see http://www.gnu.org/licenses/.
 
-function PHZ = phz_summary(PHZ,keepVars,verbose)
+function [PHZ, preSummaryData] = phz_summary(PHZ,keepVars,verbose)
 
 if nargout == 0 && nargin == 0, help phz_summary, return, end
 if isempty(keepVars), return, end
@@ -73,24 +73,25 @@ else % get categories to collapse across
         end
     end
     varTypes = unique(varInd); % this will be in the proper spec order because they are ordinal categorical arrays
-    
+
     % loop categories and average
-    newData = nan(length(varTypes),size(PHZ.data,2));
-    PHZ.proc.summary.stdError = nan(size(newData));
+    summaryData = nan(length(varTypes),size(PHZ.data,2));
+    PHZ.proc.summary.stdError = nan(size(summaryData));
     PHZ.proc.summary.nParticipant = nan(length(varTypes),1);
     PHZ.proc.summary.nTrials = nan(length(varTypes),1);
-    
+
+    preSummaryData = {};
     for i = 1:length(varTypes)
-        TMP = PHZ;
-        TMP.data = PHZ.data(varInd == varTypes(i),:);
+        % preSummaryData = PHZ;
+        preSummaryData{i} = PHZ.data(varInd == varTypes(i),:);
         PHZ.proc.summary.nParticipant(i) = length(unique(PHZ.meta.tags.participant(varInd == varTypes(i))));
-        PHZ.proc.summary.nTrials(i) = size(TMP.data,1);
-        PHZ.proc.summary.stdError(i,:) = ste(TMP.data);
-        newData(i,:) = mean(TMP.data,1);
+        PHZ.proc.summary.nTrials(i) = size(preSummaryData{i},1);
+        PHZ.proc.summary.stdError(i,:) = ste(preSummaryData{i});
+        summaryData(i,:) = mean(preSummaryData{i},1);
     end
-    
-    PHZ.data = newData;
-    
+
+    PHZ.data = summaryData;
+
     % adjust PHZ.(keepVars) vars
     varTypes = regexp(cellstr(varTypes),' ','split');
     for i = 1:length(keepVars), field = keepVars{i};
