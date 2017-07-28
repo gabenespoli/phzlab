@@ -3,6 +3,7 @@
 % USAGE
 %   PHZ = phz_feature(PHZ,feature)
 %   PHZ = phz_feature(PHZ,feature,'Param1',Value1,etc.)
+%   [PHZ, featureTitle, preSummaryData] = phz_feature(PHZ,...)
 %
 % INPUT
 %   PHZ       = PHZLAB data structure.
@@ -85,6 +86,8 @@
 % OUTPUT
 %   PHZ.data            = The data of the extracted feature for each trial.
 %   PHZ.proc.feature    = The value specified in FEATURE.
+%   featureTitle        = A string describing the feature. Used for plots.
+%   preSummaryData      = Optional output from phz_summary.
 %
 % EXAMPLES
 %   PHZ = phz_feature(PHZ,'mean')
@@ -104,7 +107,7 @@
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see http://www.gnu.org/licenses/.
 
-function [PHZ,featureTitle] = phz_feature(PHZ,feature,varargin)
+function [PHZ, featureTitle, preSummaryData] = phz_feature(PHZ, feature, varargin)
 
 if nargout == 0 && nargin == 0, help phz_feature, return, end
 
@@ -216,9 +219,9 @@ switch lower(feature)
     case 'fft'
         % summarize in time domain (adding 'participant' to summary if it isn't already)
         if any(ismember({'participant','all','none'},keepVars))
-            PHZ = phz_summary(PHZ,keepVars);
+            [PHZ, preSummaryData] = phz_summary(PHZ,keepVars);
         else
-            PHZ = phz_summary(PHZ,[{'participant'} keepVars]);
+            [PHZ, preSummaryData] = phz_summary(PHZ,[{'participant'} keepVars]);
         end
         
         % get fft of each summary
@@ -233,9 +236,9 @@ switch lower(feature)
             
             % summarize (adding 'participant' to summary if it isn't already)
             if any(ismember({'participant','all','none'}, keepVars))
-                PHZ = phz_summary(PHZ,keepVars);
+                [PHZ, preSummaryData] = phz_summary(PHZ,keepVars);
             else
-                PHZ = phz_summary(PHZ, [{'participant'} keepVars]);
+                [PHZ, preSummaryData] = phz_summary(PHZ, [{'participant'} keepVars]);
             end
             
             PHZ = phzFeature_itpc(PHZ, keepVars);
@@ -327,7 +330,7 @@ if ~strcmp(PHZ.proc.feature,'time')
     PHZ = phz_history(PHZ,['Extracted feature ''',feature,'''.'],verbose); end
 
 % apply summary
-PHZ = phz_summary(PHZ,keepVars,verbose);
+[PHZ, preSummaryData] = phz_summary(PHZ,keepVars,verbose);
 
 % binmean for spectral features
 if ~isempty(val) && isnumeric(val)
