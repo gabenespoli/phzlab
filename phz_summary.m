@@ -61,11 +61,13 @@ PHZ = phz_check(PHZ); % (make ordinal if there are new manually-made orders i.e.
 keepVars = verifyKeepVars(keepVars);
 if ismember(keepVars,{'all'}), return, end
 PHZ.proc.summary.keepVars = keepVars;
+preSummaryData = {};
 
 if ismember(keepVars{1},{'none'})
     PHZ.proc.summary.nParticipant = length(PHZ.participant);
     PHZ.proc.summary.nTrials = size(PHZ.data,1);
     PHZ.proc.summary.stdError = ste(PHZ.data);
+    preSummaryData{1} = PHZ.data;
     PHZ.data = mean(PHZ.data,1);
 
 else % get categories to collapse across
@@ -84,7 +86,6 @@ else % get categories to collapse across
     PHZ.proc.summary.nParticipant = nan(length(varTypes),1);
     PHZ.proc.summary.nTrials = nan(length(varTypes),1);
 
-    preSummaryData = {};
     for i = 1:length(varTypes)
         % preSummaryData = PHZ;
         preSummaryData{i} = PHZ.data(varInd == varTypes(i),:);
