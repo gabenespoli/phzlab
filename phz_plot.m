@@ -163,7 +163,7 @@ for i = 1:2:length(varargin)
         case 'pretty',                  pretty = varargin{i+1};
         case 'simpleytitle',            simpleytitle = varargin{i+1};
         case {'do_title','title'},      do_title = varargin{i+1};
-        case {'plotall','all'),         plotall = varargin{i+1};
+        case {'plotall','all'},         plotall = varargin{i+1};
         case {'filename','save'},       filename = varargin{i+1};
         case {'close'},                 do_close = varargin{i+1};
             
