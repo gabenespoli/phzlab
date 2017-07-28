@@ -127,17 +127,19 @@ end
 if isempty(keepVars), keepVars = ''; end
 
 % parse feature input
-[PHZ,feature,val] = parseFeature(PHZ,feature);
+if isempty(feature), feature = 'time'; end
+[PHZ,featureStr,val] = parseFeature(PHZ,feature);
 
 % restrict to region
-if isempty(region) && isstruct(PHZ.region), % PHZ.region = 'whole epoch';
-else PHZ = phz_region(PHZ,region,verbose);
+if isempty(region) && isstruct(PHZ.region) % PHZ.region = 'whole epoch';
+else
+    PHZ = phz_region(PHZ,region,verbose);
 end
 
 % calculate feature
 %   each case MUST set a featureTitle, and will usually adjust
 %       PHZ.data and PHZ.units.
-switch lower(feature)
+switch lower(featureStr)
     
     case 'time'
         featureTitle = '';
@@ -219,9 +221,9 @@ switch lower(feature)
     case 'fft'
         % summarize in time domain (adding 'participant' to summary if it isn't already)
         if any(ismember({'participant','all','none'},keepVars))
-            [PHZ, preSummaryData] = phz_summary(PHZ,keepVars);
+            PHZ = phz_summary(PHZ,keepVars);
         else
-            [PHZ, preSummaryData] = phz_summary(PHZ,[{'participant'} keepVars]);
+            PHZ = phz_summary(PHZ,[{'participant'} keepVars]);
         end
         
         % get fft of each summary
@@ -236,9 +238,9 @@ switch lower(feature)
             
             % summarize (adding 'participant' to summary if it isn't already)
             if any(ismember({'participant','all','none'}, keepVars))
-                [PHZ, preSummaryData] = phz_summary(PHZ,keepVars);
+                PHZ = phz_summary(PHZ,keepVars);
             else
-                [PHZ, preSummaryData] = phz_summary(PHZ, [{'participant'} keepVars]);
+                PHZ = phz_summary(PHZ, [{'participant'} keepVars]);
             end
             
             PHZ = phzFeature_itpc(PHZ, keepVars);
@@ -309,6 +311,10 @@ switch lower(feature)
     otherwise, error([feature,' is an unknown feature.'])
 end
 
+% this must be done after the feature extraction in case preprocessing
+%   needs to be undone and redone (e.g., for acc or rt)
+PHZ.proc.feature = feature;
+
 if isempty(region) && isstruct(PHZ.region), PHZ.region = 'whole epoch'; end
 
 % adjust PHZ and PHZ.proc fields
@@ -341,42 +347,46 @@ end
 
 end
 
-function [PHZ,feature,val] = parseFeature(PHZ,feature)
-if isempty(feature), feature = 'time'; end
+function [PHZ,featureStr,val] = parseFeature(PHZ,feature)
 if ~ischar(feature), error('FEATURE should be a string.'), end
-PHZ.proc.feature = feature;
 
 % split feature and val
 val = [];
 if length(feature) >= 3 && strcmp(feature(1:3),'fft')
     if length(feature) > 3, val = feature(4:end); end
-    feature = 'fft';
+    featureStr = 'fft';
     
 elseif length(feature) >= 5 && strcmp(feature(1:5),'itfft')
     if length(feature) > 5, val = feature(6:end); end
-    feature = 'itfft';
+    featureStr = 'itfft';
     
 elseif length(feature) >= 4 && strcmp(feature(1:4),'itpc')
     if length(feature) > 4, val = feature(5:end); end
-    feature = 'itpc';
+    featureStr = 'itpc';
     
 elseif length(feature) >= 4 && strcmp(feature(1:4),'itrc')
     if length(feature) > 4, val = feature(5:end); end
-    feature = 'itrc';
+    featureStr = 'itrc';
 
 elseif length(feature) == 3 && strcmp(feature,'snr')
     val = 'target-baseline';
+    featureStr = feature;
     
 elseif length(feature) >= 4 && strcmp(feature(1:4),'snr-')
     if length(feature) > 4, val = feature(5:end); end
-    feature = 'snr';
+    featureStr = 'snr';
+    
+else
+    featureStr = feature;
+    
 end
 
 % convert val(s) to numeric ([freq binWidth]) or cell ({baseline target})
 if ~isempty(val)
     ind = strfind(val,'-');
     if ind, val = {val(1:ind - 1) val(ind + 1:end)};
-    else val = {val '0'}; % default if no bin width specified
+    else
+        val = {val '0'}; % default if no bin width specified
     end
     
     % convert to numeric if possible
