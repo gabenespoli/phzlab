@@ -301,7 +301,11 @@ for p = 1:length(plotOrder)
 
     % ---- sigstar (beta)
     if ~isempty(sigstarVars)
-        phzUtil_sigstar(sigstarVars{:})
+        try
+            phzUtil_sigstar(sigstarVars{:})
+        catch
+            fprintf('  Problem with sigstar input. Aborting using sigstar...\n')
+        end
     end
     % ----
 
