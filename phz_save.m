@@ -75,7 +75,7 @@ PHZ.meta.filename = filename;
 
 PHZ = phz_history(PHZ,['Saved to ''',filename,'''.'],verbose);
 
-fprintf('Saving...')
+fprintf('  Saving...')
 
 save(filename,'PHZ')
 
