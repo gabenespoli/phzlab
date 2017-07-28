@@ -104,6 +104,7 @@ else % get categories to collapse across
 end
 
 % cleanup
+preSummaryData = preSummaryData(:); % make col so dims match PHZ.data
 loseVars = {'participant','group','condition','session','trials'};
 loseVars(ismember(loseVars,keepVars)) = [];
 for i = loseVars, field = i{1};
