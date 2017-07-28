@@ -84,7 +84,7 @@ if ischar(win)
 
 elseif isnumeric(win)
     winStr = ['mean',num2str(win)];
-    smoothtype = 'mean';
+    smoothtype = 'Mean';
 
 else error('Invalid input.')    
 end
