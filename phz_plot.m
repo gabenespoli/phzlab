@@ -191,22 +191,22 @@ figure('units','normalized','outerposition',pos,...
     'name',inputname(1),'numbertitle','off');
 for p = 1:length(plotOrder)
     subplot(rows,cols,p)
-    
+
     % get indices of data for current plot
     if ismember('summary',fieldnames(PHZ.proc)) && length(PHZ.proc.summary.keepVars) > 1
         ind = find(plotTags == plotOrder(p));
     else ind = 1:size(PHZ.data,1); 
     end
-        
+
     % loop lines/bars
     for i = 1:length(lineOrder)
         y = PHZ.data(ind(i),:);
-        
+
         if size(PHZ.data,2) > 1 % line plots of time-series or fft data
             h = plot(x,y,...
                 'DisplayName',char(lineOrder(i)),...
                 'LineWidth',linewidth);
-            
+
             if ~isempty(lineSpec{i})
                 if ischar(lineSpec{i})
                     set(h,'Color',lineSpec{i}(1))
@@ -215,37 +215,51 @@ for p = 1:length(plotOrder)
                 elseif isnumeric(lineSpec{i}), set(h,'Color',lineSpec{i})
                 end
             end
-            
+
             if i == 1, hold on, end
-            
+
         else % bar plots of feature values
+
             h = bar(i,y);
             if i == 1, hold on, end
+
+            % change color if specified
             if ~isempty(lineSpec{i})
-                
+
+                % color
                 if ~isempty(lineSpec{i})
                     if ischar(lineSpec{i}), set(h,'FaceColor',lineSpec{i}(1))
                     elseif isnumeric(lineSpec{i}), set(h,'FaceColor',lineSpec{i}), end
                 end
-                
-                if length(lineSpec{i}) > 2
-                    if strcmp(lineSpec{i}(2:3),'--')
-                        currentColor = get(h,'FaceColor') + 0.7;
+
+                % use linespec to change brightness of color
+                if length(lineSpec{i}) > 1 && strcmp(lineSpec{i}(2), ':')
+                        currentColor = get(h,'FaceColor') + 0.8;
                         currentColor(currentColor > 1) = 1;
                         set(h,'FaceColor',currentColor)
-                    end
+
+                elseif length(lineSpec{i}) > 2 && strcmp(lineSpec{i}(2:3),'-.')
+                        currentColor = get(h,'FaceColor') + 0.6;
+                        currentColor(currentColor > 1) = 1;
+                        set(h,'FaceColor',currentColor)
+
+                elseif length(lineSpec{i}) > 2 && strcmp(lineSpec{i}(2:3),'--')
+                        currentColor = get(h,'FaceColor') + 0.4;
+                        currentColor(currentColor > 1) = 1;
+                        set(h,'FaceColor',currentColor)
+
                 end
             end
         end
     end
-    
+
     % label plot, add errorbars
     if do_title, title(char(plotOrder(p))), end
     if isempty(ytitleLoc) || ytitleLoc == p, ylabel(ytitle), end
-    
+
     if ismember(PHZ.proc.feature,{'fft','itfft','itpc'}) % FFT / PC plots
         if isempty(xtitleLoc) || xtitleLoc == p, xlabel('Frequency (Hz)'), end
-        
+
         % custom FFT x-axis limits via PHZ.meta.spec.fftlim
         if ismember('fftlim',fieldnames(PHZ.meta.spec))
             if isnumeric(PHZ.meta.spec.fftlim) && isvector(PHZ.meta.spec.fftlim) && length(PHZ.meta.spec.fftlim) == 2
@@ -254,29 +268,29 @@ for p = 1:length(plotOrder)
             else warning('Problem with PHZ.meta.spec.fftlim. Using defaults.')
             end
         end
-        
+
     elseif ismember(PHZ.proc.feature,{'','time'}) % time series plots
         if isempty(xtitleLoc) || xtitleLoc == p, xlabel('Time (s)'), end
-        
+
     elseif ~isempty(PHZ.proc.summary.stdError) % bar plots of feature values
         set(gca,'XTick',1:length(lineOrder),'XTickLabel',cellstr(lineOrder))    
         errorbar(gca,1:length(lineOrder),PHZ.data(ind),PHZ.proc.summary.stdError(ind),'.k');
     end
-    
+
     % ---- sigstar (beta)
     if ~isempty(sigstarVars),sigstar(sigstarVars{:}),end
     % ----
-    
+
     % record axes ranges
     if do_yl, yl(p,:) = ylim; end %#ok<AGROW>
-    
+
     hold off
 end
 
 % get min/max axes ranges
 if do_yl
     yl = [min(yl(:,1)) max(yl(:,2))];
-    
+
     % if data are centered on zero, set +ve and -ve limit to same
     if isempty(sameyl)
         if yl(1) / yl(2) < -0.5 && yl(1) / yl(2) > -2, sameyl = true;
@@ -294,7 +308,7 @@ end
 % -------------------------------
 for p = 1:length(plotOrder)
     subplot(rows,cols,p)
-    
+
     % set y- and x-axis ranges
     ylim(yl)
     if size(PHZ.data,2) > 1, xlim(xl), end
@@ -329,11 +343,11 @@ for p = 1:length(plotOrder)
     if size(PHZ.data,2) > 1 && ~isempty(legendLoc)
         legend('-DynamicLegend','Location',legendLoc)
     end
-    
+
     % adjust font size
     set(gca,'FontSize',fontsize)
     if pretty, set(gca,'box','off'), end
-    
+
 end
 
 if pretty, set(gcf,'color','w'), end
