@@ -240,7 +240,8 @@ for p = 1:length(plotOrder)
                         if plotall, set(hall,'MarkerFaceColor',lineSpec{i}(1),'MarkerEdgeColor',lineSpec{i}(1)), end
                     elseif isnumeric(lineSpec{i})
                         set(h,'FaceColor',lineSpec{i})
-                        set(hall,'MarkerFaceColor',lineSpec{i},'MarkerEdgeColor',lineSpec{i}(1)), end
+                        if plotall, set(hall,'MarkerFaceColor',lineSpec{i},'MarkerEdgeColor',lineSpec{i}(1)), end
+                    end
                 end
 
                 % use linespec to change brightness of color
@@ -248,19 +249,25 @@ for p = 1:length(plotOrder)
                         currentColor = get(h,'FaceColor') + 0.8;
                         currentColor(currentColor > 1) = 1;
                         set(h,'FaceColor',currentColor)
-                        set(hall,'MarkerFaceColor',currentColor,'MarkerEdgeColor',currentColor)
+                        if plotall, set(hall,'MarkerFaceColor',currentColor,'MarkerEdgeColor',currentColor), end
 
                 elseif length(lineSpec{i}) > 2 && strcmp(lineSpec{i}(2:3),'-.')
                         currentColor = get(h,'FaceColor') + 0.6;
                         currentColor(currentColor > 1) = 1;
                         set(h,'FaceColor',currentColor)
-                        set(hall,'MarkerFaceColor',currentColor,'MarkerEdgeColor',currentColor)                        
+                        if plotall, set(hall,'MarkerFaceColor',currentColor,'MarkerEdgeColor',currentColor), end
 
                 elseif length(lineSpec{i}) > 2 && strcmp(lineSpec{i}(2:3),'--')
                         currentColor = get(h,'FaceColor') + 0.4;
                         currentColor(currentColor > 1) = 1;
                         set(h,'FaceColor',currentColor)
-                        set(hall,'MarkerFaceColor',currentColor,'MarkerEdgeColor',currentColor)                        
+                        if plotall, set(hall,'MarkerFaceColor',currentColor,'MarkerEdgeColor',currentColor), end
+
+                elseif length(lineSpec{i}) > 1 && strcmp(lineSpec{i}(2), '-')
+                        currentColor = get(h,'FaceColor') + 0.2;
+                        currentColor(currentColor > 1) = 1;
+                        set(h,'FaceColor',currentColor)
+                        if plotall, set(hall,'MarkerFaceColor',currentColor,'MarkerEdgeColor',currentColor), end
 
                 end
             end
@@ -293,7 +300,9 @@ for p = 1:length(plotOrder)
     end
 
     % ---- sigstar (beta)
-    if ~isempty(sigstarVars),sigstar(sigstarVars{:}),end
+    if ~isempty(sigstarVars)
+        phzUtil_sigstar(sigstarVars{:})
+    end
     % ----
 
     % record axes ranges
