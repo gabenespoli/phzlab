@@ -181,8 +181,8 @@ end
 % prepare plot stuff
 [lineOrder,~,lineSpec,plotOrder,plotTags] = getLabelsAndSpec(PHZ,dispn);
 [rows,cols,pos,ytitleLoc,xtitleLoc] = getPlotDims(plotOrder);
-if isempty(yl), yl = nan(length(plotOrder),2); do_yl = true; else do_yl = false; end
-if isempty(xl), xl = nan(size(yl));            do_xl = true; else do_xl = false; end
+if isempty(yl), yl = nan(length(plotOrder),2); do_yl = true; else, do_yl = false; end
+if isempty(xl), xl = nan(size(yl));            do_xl = true; else, do_xl = false; end
 ytitle = getytitle(PHZ,feature,legendLoc,do_plotsmooth,featureTitle,simpleytitle);
 
 % loop plots and plot lines/bars
@@ -195,7 +195,8 @@ for p = 1:length(plotOrder)
     % get indices of data for current plot
     if ismember('summary',fieldnames(PHZ.proc)) && length(PHZ.proc.summary.keepVars) > 1
         ind = find(plotTags == plotOrder(p));
-    else ind = 1:size(PHZ.data,1); 
+    else
+        ind = 1:size(PHZ.data,1);
     end
 
     % loop lines/bars
@@ -265,7 +266,8 @@ for p = 1:length(plotOrder)
             if isnumeric(PHZ.meta.spec.fftlim) && isvector(PHZ.meta.spec.fftlim) && length(PHZ.meta.spec.fftlim) == 2
                 do_xl = false;
                 xl = PHZ.meta.spec.fftlim;
-            else warning('Problem with PHZ.meta.spec.fftlim. Using defaults.')
+            else
+                warning('Problem with PHZ.meta.spec.fftlim. Using defaults.')
             end
         end
 
@@ -294,7 +296,8 @@ if do_yl
     % if data are centered on zero, set +ve and -ve limit to same
     if isempty(sameyl)
         if yl(1) / yl(2) < -0.5 && yl(1) / yl(2) > -2, sameyl = true;
-        else sameyl = false;
+        else
+            sameyl = false;
         end
     end
     if sameyl, yl = [-(max(abs(yl))) (max(abs(yl)))]; end
@@ -387,7 +390,8 @@ if ~ismember('summary',fieldnames(PHZ.proc))
 elseif length(PHZ.proc.summary.keepVars) == 1
     if length(PHZ.participant) > 1 || isundefined(PHZ.participant)
         plotOrder = {'All participants'};
-    else plotOrder = {['Participant ',char(PHZ.participant)]};
+    else
+        plotOrder = {['Participant ',char(PHZ.participant)]};
     end
     plotSpec = {''};
     plotTags = [];
