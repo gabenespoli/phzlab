@@ -10,7 +10,7 @@
 % input:   
 %   PHZ   = [struct] PHZLAB data structure.
 % 
-%   win   = [numeric|string] Sliding window length in milliseconds 
+%   win   = [numeric|string|boolean] Sliding window length in milliseconds 
 %           (if >= 1) or proportion of total epoch length (if < 1). 
 %           Default 0.05 (5% of the total epoch length). WIN can also be
 %           a string as shorthand for specifying both window length and
@@ -18,7 +18,8 @@
 %           must be the smoothing type followed by a number for the window
 %           length (e.g., 'rms100', or the default 'mean0.05'). If 'mean' 
 %           or 'rms' are specified without a number, the defaults are 
-%           0.05 (5%) and 100 (ms) respectively.
+%           0.05 (5%) and 100 (ms) respectively. Logical true will use the 
+%           defaults.
 % 
 % OUTPUT
 %   PHZ.data = [numeric] The smoothed data.
@@ -53,8 +54,12 @@
 function PHZ = phz_smooth(PHZ,win,verbose)
 
 if nargout == 0 && nargin == 0, help phz_smooth, return, end
-if nargin == 1, win = 0.05; end
-if nargin > 1 && isempty(win), return, end
+if nargin == 1 || (nargin > 1 && islogical(win) && win)
+    win = 0.05;
+end
+if nargin > 1 && (isempty(win) || (islogical(win) && ~win))
+    return
+end
 if nargin < 3, verbose = true; end
 
 % parse input
@@ -64,21 +69,23 @@ if ischar(win)
         smoothtype = 'RMS';
         if length(win) > 3
             win = str2double(win(4:end));
-        else win = 100; % default RMS window in ms
+        else
+            win = 100; % default RMS window in ms
         end
-    
+
     elseif strfind(lower(win),'mean')
         smoothtype = 'Mean';
         if length(win) > 4
             win = str2double(win(5:end));
-        else win = 0.05; % default mean window in proportion of length
+        else
+            win = 0.05; % default mean window in proportion of length
         end
     end
-    
+
 elseif isnumeric(win)
     winStr = ['Mean',num2str(win)];
     smoothtype = 'Mean';
-    
+
 else error('Invalid input.')    
 end
 
