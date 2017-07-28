@@ -83,8 +83,8 @@ if ischar(win)
     end
 
 elseif isnumeric(win)
-    winStr = ['Mean',num2str(win)];
-    smoothtype = 'Mean';
+    winStr = ['mean',num2str(win)];
+    smoothtype = 'mean';
 
 else error('Invalid input.')    
 end
