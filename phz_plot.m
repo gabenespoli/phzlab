@@ -41,6 +41,9 @@
 %                   in the y-axis title. Default 0 (include this info).
 % 
 %   'title'       = [1|0] Enter 0 to suppress the plot title. Default 1.
+%
+%   'plotall'     = [0|1] Enter 1 to overlay all raw data points on bar
+%                   plots. Default 0.
 % 
 %   'close'       = [0|1] Enter 1 to close the plot window after drawing
 %                   it. This is useful when making (and saving) many plots 
@@ -119,6 +122,7 @@ pretty = false;
 simpleytitle = false;
 do_title = true;
 do_close = false;
+plotall = false;
 
 filename = '';
 
@@ -159,6 +163,7 @@ for i = 1:2:length(varargin)
         case 'pretty',                  pretty = varargin{i+1};
         case 'simpleytitle',            simpleytitle = varargin{i+1};
         case {'do_title','title'},      do_title = varargin{i+1};
+        case {'plotall','all'),         plotall = varargin{i+1};
         case {'filename','save'},       filename = varargin{i+1};
         case {'close'},                 do_close = varargin{i+1};
             
@@ -169,7 +174,7 @@ end
 % process & prepare data to plot
 if length(cellstr(keepVars)) > 2, error('Cannot plot more than 2 summary types.'), end
 if ~isempty(feature) && ~strcmp(feature,'time'), PHZ = phz_region(PHZ,region,verbose); end
-[PHZ,featureTitle] = phz_feature(PHZ,feature,'summary',keepVars,'verbose',verbose);
+[PHZ,featureTitle,preSummaryData] = phz_feature(PHZ,feature,'summary',keepVars,'verbose',verbose);
 % (run phz_summary through phz_feature because fft feature needs to average
 %  over the summaryType by participant before doing the fft)
 
@@ -202,11 +207,13 @@ for p = 1:length(plotOrder)
     % loop lines/bars
     for i = 1:length(lineOrder)
         y = PHZ.data(ind(i),:);
+        yall = preSummaryData{i};
 
         if size(PHZ.data,2) > 1 % line plots of time-series or fft data
             h = plot(x,y,...
                 'DisplayName',char(lineOrder(i)),...
                 'LineWidth',linewidth);
+            if i == 1, hold on, end
 
             if ~isempty(lineSpec{i})
                 if ischar(lineSpec{i})
@@ -217,20 +224,23 @@ for p = 1:length(plotOrder)
                 end
             end
 
-            if i == 1, hold on, end
-
         else % bar plots of feature values
 
             h = bar(i,y);
             if i == 1, hold on, end
+            if plotall, hall = scatter(repmat(i,size(yall)),yall); end
 
             % change color if specified
             if ~isempty(lineSpec{i})
 
                 % color
                 if ~isempty(lineSpec{i})
-                    if ischar(lineSpec{i}), set(h,'FaceColor',lineSpec{i}(1))
-                    elseif isnumeric(lineSpec{i}), set(h,'FaceColor',lineSpec{i}), end
+                    if ischar(lineSpec{i})
+                        set(h,'FaceColor',lineSpec{i}(1))
+                        if plotall, set(hall,'MarkerFaceColor',lineSpec{i}(1),'MarkerEdgeColor',lineSpec{i}(1)), end
+                    elseif isnumeric(lineSpec{i})
+                        set(h,'FaceColor',lineSpec{i})
+                        set(hall,'MarkerFaceColor',lineSpec{i},'MarkerEdgeColor',lineSpec{i}(1)), end
                 end
 
                 % use linespec to change brightness of color
@@ -238,16 +248,19 @@ for p = 1:length(plotOrder)
                         currentColor = get(h,'FaceColor') + 0.8;
                         currentColor(currentColor > 1) = 1;
                         set(h,'FaceColor',currentColor)
+                        set(hall,'MarkerFaceColor',currentColor,'MarkerEdgeColor',currentColor)
 
                 elseif length(lineSpec{i}) > 2 && strcmp(lineSpec{i}(2:3),'-.')
                         currentColor = get(h,'FaceColor') + 0.6;
                         currentColor(currentColor > 1) = 1;
                         set(h,'FaceColor',currentColor)
+                        set(hall,'MarkerFaceColor',currentColor,'MarkerEdgeColor',currentColor)                        
 
                 elseif length(lineSpec{i}) > 2 && strcmp(lineSpec{i}(2:3),'--')
                         currentColor = get(h,'FaceColor') + 0.4;
                         currentColor(currentColor > 1) = 1;
                         set(h,'FaceColor',currentColor)
+                        set(hall,'MarkerFaceColor',currentColor,'MarkerEdgeColor',currentColor)                        
 
                 end
             end
