@@ -1,7 +1,8 @@
 %PHZ_SUMMARY  Average across grouping variables.
 % 
 % USAGE
-%   PHZ = phz_summary(PHZ,keepVars)
+%   PHZ = phz_summary(PHZ, keepVars)
+%   [PHZ, preSummaryData] = phz_summary(PHZ, keepVars)
 % 
 % INPUT
 %   PHZ       = PHZLAB data structure.
@@ -22,6 +23,9 @@
 %   PHZ.proc.summary.stdError     = Standard error of each average.
 %   PHZ.proc.summary.nParticipant = No. of participants in each average.
 %   PHZ.proc.summary.nTrials      = No. of trials in each average.
+%   preSummaryData                = A cell array the same height as PHZ.data
+%                                   containing vectors with the raw data 
+%                                   points included in each average.
 % 
 % EXAMPLES
 %   PHZ = phz_summary(PHZ,'trials') >> For each value in PHZ.trials,
