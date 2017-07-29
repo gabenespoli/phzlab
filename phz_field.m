@@ -31,7 +31,7 @@
 
 function PHZ = phz_field(PHZ,field,verbose)
 
-if nargin == 0 && nargout == 0, hel phz_field, return, end
+if nargin == 0 && nargout == 0, help phz_field, return, end
 if nargin < 2, field = 'basic'; end
 if nargin < 3, verbose = true; end
 
