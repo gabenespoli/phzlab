@@ -301,10 +301,19 @@ for p = 1:length(plotOrder)
 
     % ---- sigstar (beta)
     if ~isempty(sigstarVars)
-        try
-            phzUtil_sigstar(sigstarVars{:})
-        catch
-            fprintf('  Problem with sigstar input. Aborting using sigstar...\n')
+        if isstruct(sigstarVars)
+            if ismember(plotOrder(p), fieldnames(sigstarVars))
+                sigstarVarsCurrent = sigstarVars.(char(plotOrder(p)));
+            end
+        else
+            sigstarVarsCurrent = sigstarVars;
+        end
+        if ~isempty(sigstarVarsCurrent)
+            try
+                phzUtil_sigstar(sigstarVarsCurrent{:})
+            catch
+                fprintf('  Aborting using sigstar for some reason...\n')
+            end
         end
     end
     % ----
