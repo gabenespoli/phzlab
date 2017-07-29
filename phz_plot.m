@@ -246,25 +246,25 @@ for p = 1:length(plotOrder)
 
                 % use linespec to change brightness of color
                 if length(lineSpec{i}) > 1 && strcmp(lineSpec{i}(2), ':')
-                        currentColor = get(h,'FaceColor') + 0.8;
+                        currentColor = get(h,'FaceColor') + 0.2;
                         currentColor(currentColor > 1) = 1;
                         set(h,'FaceColor',currentColor)
                         if plotall, set(hall,'MarkerFaceColor',currentColor,'MarkerEdgeColor',currentColor), end
 
                 elseif length(lineSpec{i}) > 2 && strcmp(lineSpec{i}(2:3),'-.')
-                        currentColor = get(h,'FaceColor') + 0.6;
-                        currentColor(currentColor > 1) = 1;
-                        set(h,'FaceColor',currentColor)
-                        if plotall, set(hall,'MarkerFaceColor',currentColor,'MarkerEdgeColor',currentColor), end
-
-                elseif length(lineSpec{i}) > 2 && strcmp(lineSpec{i}(2:3),'--')
                         currentColor = get(h,'FaceColor') + 0.4;
                         currentColor(currentColor > 1) = 1;
                         set(h,'FaceColor',currentColor)
                         if plotall, set(hall,'MarkerFaceColor',currentColor,'MarkerEdgeColor',currentColor), end
 
+                elseif length(lineSpec{i}) > 2 && strcmp(lineSpec{i}(2:3),'--')
+                        currentColor = get(h,'FaceColor') + 0.6;
+                        currentColor(currentColor > 1) = 1;
+                        set(h,'FaceColor',currentColor)
+                        if plotall, set(hall,'MarkerFaceColor',currentColor,'MarkerEdgeColor',currentColor), end
+
                 elseif length(lineSpec{i}) > 1 && strcmp(lineSpec{i}(2), '-')
-                        currentColor = get(h,'FaceColor') + 0.2;
+                        currentColor = get(h,'FaceColor') + 0.8;
                         currentColor(currentColor > 1) = 1;
                         set(h,'FaceColor',currentColor)
                         if plotall, set(hall,'MarkerFaceColor',currentColor,'MarkerEdgeColor',currentColor), end
