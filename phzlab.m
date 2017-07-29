@@ -30,12 +30,12 @@
 %   phz_field:       Change the values of certain PHZ structure fields.
 % 
 % PROCESSING
+%   phz_transform:   Transform data (e.g., square root, etc.)
 %   phz_filter:      Butterworth filtering.
-%   phz_epoch:       Split a single channel of data into trials.
-%   phz_trials:      Add names to each trial of epoched data.
 %   phz_rectify:     Full- or half-wave rectification.
 %   phz_smooth:      Sliding window averaging (incl. RMS)
-%   phz_transform:   Transform data (e.g., square root, etc.)
+%   phz_epoch:       Split a single channel of data into trials.
+%   phz_trials:      Add names to each trial of epoched data.
 %   phz_rej:         Remove trials with values exceeding a threshold or SD.
 %   phz_blsub:       Subtract mean of baseline region from each trial.
 %   phz_norm:        Normalize across specified grouping variables.
