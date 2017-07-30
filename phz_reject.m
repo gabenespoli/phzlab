@@ -64,7 +64,6 @@ end
 if isnumeric(threshold)
     units = PHZ.units;
 
-
 elseif ischar(threshold) 
     if strcmpi(threshold(end-1:end),'sd')
         units = 'SD';
@@ -95,22 +94,18 @@ else
     error('Problem with THRESHOLD.')
 end
 
-% loop trials and mark trials for rejection
+% get actual std value
+if strcmpi(units, 'SD')
+    threshold = std(PHZ.data(:)) * threshold;
+end
+
+% loop trials and mark for rejection
 ind = false(size(PHZ.data,1), 1);
-switch lower(units)
-    case 'sd'
-        for i = 1:size(PHZ.data,1)
-            if max(abs(PHZ.data(i,:))) > std(PHZ.data(i,:)) * threshold
-                    ind(i) = true;
-            end
-        end
-            
-    case lower(PHZ.units)
-        for i = 1:size(PHZ.data,1)
-            if max(abs(PHZ.data(i,:))) > threshold
-                ind(i) = true;
-            end
-        end
+
+for i = 1:size(PHZ.data,1)
+    if max(abs(PHZ.data(i,:))) > threshold
+            ind(i) = true;
+    end
 end
     
 % check that ~reject all trials or ~reject no trials
