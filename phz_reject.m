@@ -81,7 +81,7 @@ elseif ischar(threshold)
                 PHZ.proc.reject = rmfield(PHZ.proc.reject, ...
                     {'threshold', 'units', 'ind'});
             else
-                PHZ.proc = rmfield(PHZ.proc, 'reject')
+                PHZ.proc = rmfield(PHZ.proc, 'reject');
             end
             PHZ = phz_history(PHZ, ['All trials marked for rejection ', ...
                 'were unmarked (not including manual rejections).'], verbose);
@@ -109,7 +109,6 @@ else
     ind = max(PHZ.data, [], 2) > threshold;
 
 end
-
 
 % check that ~reject all trials or ~reject no trials
 if sum(ind) == size(PHZ.data,1)
