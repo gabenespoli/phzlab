@@ -47,7 +47,7 @@ caller_function = st(i+1).file;
 
 PHZ.history{end+1} = [datestr(now), ' ', caller_function, '>> ', str];
 
-if verbose, fprintf(['  ', str, '\n']), end
+if verbose, fprintf('  %s\n', str), end
 
 if check, PHZ = phz_check(PHZ, verbose); end
 
