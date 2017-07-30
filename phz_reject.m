@@ -94,20 +94,23 @@ else
     error('Problem with THRESHOLD.')
 end
 
-% get actual std value
+historyThreshold = [num2str(threshold),' ',units];
+
+% find trials with a value greater than the threshold
 if strcmpi(units, 'SD')
-    threshold = std(PHZ.data(:)) * threshold;
+    % get actual std value
+    adjThreshold = std(PHZ.data(:)) * threshold;
+    historyThreshold = [historyThreshold, ...
+        ' (', num2str(adjThreshold), ' ', PHZ.units, ')'];
+
+    ind = max(abs(PHZ.data), [], 2) > adjThreshold;
+
+else
+    ind = max(PHZ.data, [], 2) > threshold;
+
 end
 
-% loop trials and mark for rejection
-ind = false(size(PHZ.data,1), 1);
 
-for i = 1:size(PHZ.data,1)
-    if max(abs(PHZ.data(i,:))) > threshold
-            ind(i) = true;
-    end
-end
-    
 % check that ~reject all trials or ~reject no trials
 if sum(ind) == size(PHZ.data,1)
     fprintf('! This threshold would reject all trials. Aborting phz_reject.m...\n')
@@ -129,7 +132,6 @@ PHZ.proc.reject.units = units;
 PHZ.proc.reject.ind = ind;
 
 % add to PHZ.history
-historyThreshold = [num2str(threshold),' ',PHZ.proc.reject.units];
 PHZ = phz_history(PHZ,['Threshold of ', historyThreshold, ' rejected ', ...
     num2str(sum(PHZ.proc.reject.ind)),' / ', num2str(length(PHZ.proc.reject.ind)), ...
     ' trials (', num2str(round(phz_rejrate(PHZ,'%'),1)), '%).'], verbose);
