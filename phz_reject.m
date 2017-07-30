@@ -7,20 +7,17 @@
 %   PHZ       = [struct] PHZLAB data structure.
 % 
 %   threshold = [numeric|string] Trials with any value exceeding this 
-%               value of THRESHOLD will be rejected. Enter 0 to unreject 
-%               all trials. THRESHOLD can be a string in order to reject
-%               by standard deviation. In this case the string must be a
-%               number followed by 'sd' (e.g., '0.05sd'). A trial will be
-%               rejected if any value exceeds a THRESHOLD number of that
-%               trial's standard deviation.
+%               value of THRESHOLD will be rejected. THRESHOLD can be a 
+%               string in order to reject by standard deviation. In this 
+%               case the string must be a number followed by 'sd' (e.g., 
+%               '0.05sd'). A trial will be rejected if any value exceeds 
+%               a THRESHOLD number of SD's of all trials.
 %
-%               Note that trials can be rejected manually with
-%               phz_plotTrials. This function creates a field
-%               PHZ.proc.reject.manual with these rejections. Calling
-%               phz_reject with threshold=0 or threshold=<other value>
-%               will not erase these manual rejections. Use
-%               threshold='reset' to clear all rejections.
-
+%               Use 'reset' to unmark all trials for rejection (but
+%               keeping manual marks made with phz_plotTrials.
+%
+%               Use 'resetall' to unmark all trials for rejection
+%               (including those manual marks made with phz_plotTrials.
 %                       
 % OUTPUT  
 %   PHZ.proc.reject.threshold   = The value specified in THRESHOLD.
@@ -28,12 +25,12 @@
 %   PHZ.proc.reject.ind         = Indices of rejected trials.
 % 
 % EXAMPLES
-%   PHZ = phz_reject(PHZ,20)     >> Reject all trials with a value > 20.
+%   PHZ = phz_reject(PHZ,20)      >> Mark trials with a value > 20.
 % 
-%   PHZ = phz_reject(PHZ,'3sd')  >> Reject trials with a value > 3 standard
-%                                deviations from the mean of all trials.
+%   PHZ = phz_reject(PHZ,'3sd')   >> Mark trials with a value > 3 standard
+%                                 deviations from the mean of all trials.
 % 
-%   PHZ = phz_reject(PHZ,0)      >> Restore all rejected trials.
+%   PHZ = phz_reject(PHZ,'reset') >> Unmark trials for rejection.
 
 % Copyright (C) 2016 Gabriel A. Nespoli, gabenespoli@gmail.com
 % 
@@ -67,16 +64,31 @@ end
 if isnumeric(threshold)
     units = PHZ.units;
 
+
 elseif ischar(threshold) 
     if strcmpi(threshold(end-1:end),'sd')
         units = 'SD';
         threshold = str2double(threshold(1:end-2));
 
-    elseif strcmpi(threshold, 'reset')
+    elseif strcmpi(threshold, 'resetall')
         PHZ.proc = rmfield(PHZ.proc, 'reject');
         PHZ = phz_history(PHZ, ['All trials marked for rejection ', ...
-            'were unmarked for rejection (even manual rejections).'], ...
-            verbose);
+            'were unmarked (including manual rejections).'], verbose);
+        return
+
+    elseif strcmpi(threshold, 'reset')
+        if ismember('reject', names)
+            if ismember('manual', fieldnames(PHZ.proc.reject))
+                PHZ.proc.reject = rmfield(PHZ.proc.reject, ...
+                    {'threshold', 'units', 'ind'});
+            else
+                PHZ.proc = rmfield(PHZ.proc, 'reject')
+            end
+            PHZ = phz_history(PHZ, ['All trials marked for rejection ', ...
+                'were unmarked (not including manual rejections).'], verbose);
+        end
+        return
+
     end
 
 else
