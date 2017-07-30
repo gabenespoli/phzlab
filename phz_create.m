@@ -153,7 +153,7 @@ folder = '';
 namestr = '';
 
 study = ''; %#ok<NASGU>
-datatype = ''; %#ok<NASGU>
+datatype = '';
 participant = ''; %#ok<NASGU>
 group = ''; %#ok<NASGU>
 condition = ''; %#ok<NASGU>
@@ -177,7 +177,7 @@ for i = 1:2:length(varargin)
         case 'namestr',                 namestr = varargin{i+1};
         
         case 'study',                   study = varargin{i+1}; %#ok<NASGU>
-        case 'datatype',                datatype = varargin{i+1}; %#ok<NASGU>
+        case 'datatype',                datatype = varargin{i+1};
         case 'participant',             participant = varargin{i+1}; %#ok<NASGU>
         case 'group',                   group = varargin{i+1}; %#ok<NASGU>
         case 'condition',               condition = varargin{i+1}; %#ok<NASGU>
@@ -270,7 +270,8 @@ for i = 1:length(files)
         [pathstr,name] = fileparts(PHZ.meta.datafile);
         if isempty(savefolder), savefolder = pathstr; end
         PHZ = phz_save(PHZ,fullfile(savefolder,[name,'.phz']));
-    else PHZ = phz_check(PHZ,verbose);
+    else
+        PHZ = phz_check(PHZ,verbose);
     end
      
 end
