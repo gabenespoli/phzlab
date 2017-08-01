@@ -61,7 +61,9 @@ end
 regionLabel = '';
 if ischar(region)
     if ismember(region,possibleRegions)
-        regionLabel = region;
+        regionLabel = [region,                 ' [', ...
+            num2str(PHZ.region.(region)(1)),   ' ', ...
+            num2str(PHZ.region.(region)(end)), ']'];
         region = PHZ.region.(region);
         if isempty(region), error('This region is empty.'), end
     else error('Invalid region.')
@@ -69,7 +71,11 @@ if ischar(region)
 end
 
 if length(region) == 2
-    if isempty(regionLabel), regionLabel = phzUtil_num2strRegion(region); end
+    if isempty(regionLabel)
+        regionLabel = ['region',  ' [', ...
+            num2str(region(1)),   ' ', ...
+            num2str(region(end)), ']'];
+    end
     region = getind(PHZ.(indField),region(1)):getind(PHZ.(indField),region(2));
 end
 
