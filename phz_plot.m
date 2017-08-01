@@ -518,44 +518,43 @@ end
 function ytitle = getytitle(PHZ,feature,legendLoc,do_plotsmooth,featureTitle,simpleytitle)
 
 % main titles
-% -----------
-
-% feature title and datatype
-if ismember(PHZ.proc.feature,{'acc','acc1','acc2','acc3','acc4','acc5',...
-        'rt', 'rt1', 'rt2', 'rt3', 'rt4', 'rt5'})
+if ismember(PHZ.proc.feature,{ ...
+    'acc','acc1','acc2','acc3','acc4','acc5', ...
+    'rt', 'rt1', 'rt2', 'rt3', 'rt4', 'rt5'})
     ytitle = {featureTitle};
     skipDSPtitles = true;
-    
-else ytitle = {[upper(PHZ.datatype),' ',...
-        featureTitle]};
+else
+    ytitle = {[PHZ.datatype,' ',featureTitle]};
     skipDSPtitles = false;
 end
 
-% units
 if ~isempty(PHZ.units)
-    ytitle = {[ytitle{1},' (',PHZ.units,')']};
-end
+    ytitle = {[ytitle{1},' (',PHZ.units,')']}; end
 
 % dsp-related titles
-% ------------------
-if skipDSPtitles || simpleytitle, return, end % skip dsp titles for acc and rt
+if skipDSPtitles || simpleytitle % skip dsp titles for acc and rt
+    return, end
 
-% smoothing
-if do_plotsmooth && isempty(feature), ytitle = {[ytitle{1} ' (smoothed)']}; end
+if do_plotsmooth && isempty(feature)
+    ytitle = {[ytitle{1} ' (smoothed)']}; end
 
-% region name and baseline-correction
-if ~isempty(feature) || (isempty(feature) && isempty(legendLoc))
-    if ~isempty(PHZ.region) && ~isstruct(PHZ.region)
-        ytitle = [ytitle; {['region: ',PHZ.region]}];
-    end
-    
-    if ismember('blsub',fieldnames(PHZ.proc))
-        ytitle = [ytitle; {['baseline-subtraction: ',phzUtil_num2strRegion(PHZ.proc.blsub.region)]}];
-    end
+% line 2
+line2 = '';
+if ismember('blsub', fieldnames(PHZ.proc))
+    baselineStr = ['baseline [', ...
+        num2str(PHZ.proc.blsub.region(1)),   ' ', ...
+        num2str(PHZ.proc.blsub.region(end)), ']'];
+    line2 = [line2, baselineStr];
+end    
 
-elseif ismember('blsub',fieldnames(PHZ.proc))
-    ytitle = [ytitle; {'baseline-subtracted'}];
+if ~isempty(PHZ.region) && ~isstruct(PHZ.region) && ~strcmp(PHZ.region,'whole epoch')
+    if ~isempty(line2), line2 = [line2, '; ']; end % spacer if incl bl
+    line2 = [line2, PHZ.region];
 end
+
+if ~isempty(line2), ytitle{2} = line2; end % add 2nd line titles if any
+ytitle{end+1} = ' '; % spacer to prevent overlapping with y ticks
+
 end
 
 function savefig(filename)
