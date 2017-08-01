@@ -7,17 +7,17 @@
 %   PHZ       = [struct] PHZLAB data structure.
 % 
 %   threshold = [numeric|string] Trials with any value exceeding this 
-%               value of THRESHOLD will be rejected. THRESHOLD can be a 
+%               value will be marked for rejection. THRESHOLD can be a 
 %               string in order to reject by standard deviation. In this 
 %               case the string must be a number followed by 'sd' (e.g., 
 %               '0.05sd'). A trial will be rejected if any value exceeds 
 %               a THRESHOLD number of SD's of all trials.
 %
 %               Use 'reset' to unmark all trials for rejection (but
-%               keeping manual marks made with phz_plotTrials.
+%               keeping manual marks made with phz_plotTrials).
 %
 %               Use 'resetall' to unmark all trials for rejection
-%               (including those manual marks made with phz_plotTrials.
+%               (including those manual marks made with phz_plotTrials).
 %                       
 % OUTPUT  
 %   PHZ.proc.reject.threshold   = The value specified in THRESHOLD.
