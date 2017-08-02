@@ -43,6 +43,8 @@
 %       the command window and prompt for a smoothing type (i.e., 
 %       the win parameter in phz_smooth).
 %
+%   f = Enter new fontsize for the plot in the command window.
+%
 %   escape/q = Quit phz_plotTrials and close the plot window.
 %
 % OUTPUT
@@ -164,6 +166,7 @@ while keepGoing == true
     while isempty(key)
         [~,~,key] = ginput(1);
     end
+
     switch key
         case {32, 114} % spacebar, r
             PHZ = addView(PHZ, currentTrial);
