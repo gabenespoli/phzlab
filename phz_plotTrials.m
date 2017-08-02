@@ -73,7 +73,7 @@
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see http://www.gnu.org/licenses/.
 
-function PHZ = phz_plotTrials(PHZ, startTrial, smoothing, verbose)
+function PHZ = phz_plotTrials(PHZ, startTrial, verbose)
 
 if nargout == 0 && nargin == 0, help phz_plotTrials, return, end
 if nargout == 0
