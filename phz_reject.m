@@ -71,7 +71,7 @@ elseif ischar(threshold)
 
     elseif strcmpi(threshold, 'resetall')
         PHZ.proc = rmfield(PHZ.proc, 'reject');
-        PHZ = phz_history(PHZ, ['All rejection marks were discarded.', verbose);
+        PHZ = phz_history(PHZ, ['All rejection marks were discarded.'], verbose);
         return
 
     elseif strcmpi(threshold, 'reset')
