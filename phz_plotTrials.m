@@ -8,7 +8,9 @@
 %   PHZ = [struct] PHZLAB data structure.
 %
 %   startTrial = [numeric|'reset'] If numeric, this is the trial
-%       number to start at.
+%       number to start at. Default is to start at the first 
+%       unviewed trial (the number of times each trial has been
+%       viewed is stored in PHZ.proc.reject.views).
 %
 %       If it is the string 'reset', all manual rejection marks 
 %       are discarded. Note that trials marked with threshold 
@@ -21,7 +23,10 @@
 %       the phz_smoothing function. 
 %
 % OUTPUT
-%   PHZ.proc.rej.manual = [logical vector]
+%   PHZ.proc.rej.manual = [logical vector] Trials that have been
+%       manually marked for rejection.
+%   PHZ.proc.rej.views = [numeric] Number of times each trial
+%       has been viewed.
 %
 % EXAMPLES
 %   PHZ = phz_plotTrials(PHZ,50,true)   >> plot trial #50 using
@@ -52,7 +57,7 @@ if nargout == 0
     warning('No output argument is specified. Rejection marks won''t be saved.')
 end
 
-if nargin < 2 || isempty(startTrial), startTrial = 1; end
+if nargin < 2, startTrial = []; end
 if nargin < 3, smoothing = false; end
 if nargin < 4, verbose = true; end
 
@@ -83,18 +88,28 @@ if ischar(startTrial)
             fprintf('Unknown string input to phz_plotTrials.\n')
     end
     return
+
+elseif ~isnumeric(startTrial)
+    error('startTrial must be numeric, ''reset'', or ''resetall''.')
 end
 
 % create manual rejection marks if none exists
 if ~ismember('reject', fieldnames(PHZ.proc)) || ...
     ~ismember('manual', fieldnames(PHZ.proc.reject))
     PHZ.proc.reject.manual = false(size(PHZ.data,1),1);
+    PHZ.proc.reject.views = zeros(size(PHZ.data,1),1);
+end
+
+% default start at first unviewed trial
+if isempty(startTrial)
+    currentTrial = min(find(PHZ.proc.reject.views == 0));
+else
+    currentTrial = startTrial;
 end
 
 % prepare for while loop
 yl = [min(PHZ.data(:)) max(PHZ.data(:))];
 yScaleAll = true;
-currentTrial = startTrial;
 keepGoing = true;
 
 while keepGoing == true
@@ -105,22 +120,25 @@ while keepGoing == true
     xlabel('Time (s)');
     title({getPlotTitle(PHZ.proc.reject.manual, currentTrial);
         getTrialTagTitle(PHZ.meta.tags, currentTrial)});
-    
+
     [~,~,key] = ginput(1);
-    
     switch key
         case {32, 114} % spacebar, r
+            PHZ = addView(PHZ, currentTrial);
             PHZ.proc.reject.manual = rejToggle(PHZ.proc.reject.manual, currentTrial);
-            
+
         case {29, 31, 106, 108, 110} % right, down, j, l, n
+            PHZ = addView(PHZ, currentTrial);
             currentTrial = currentTrial + 1;
             if currentTrial > size(PHZ.data,1), currentTrial = 1; end
-            
+
         case {28, 30, 104, 107, 112} % left, up, h, k, p
+            PHZ = addView(PHZ, currentTrial);
             currentTrial = currentTrial - 1;
             if currentTrial < 1, currentTrial = size(PHZ.data,1); end
-            
+
         case 103 % g
+            PHZ = addView(PHZ, currentTrial);
             goto = input(['Enter trial number (1-', ...
                 num2str(size(PHZ.data,1)), '): ']);
             if goto < 1 || goto > size(PHZ.data,1)
@@ -169,4 +187,8 @@ if rej(i)
 else
     rej(i) = true;
 end
+end
+
+function PHZ = addView(PHZ, currentTrial)
+PHZ.proc.reject.views(currentTrial) = PHZ.proc.reject.views(currentTrial) + 1;
 end
