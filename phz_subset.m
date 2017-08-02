@@ -18,12 +18,8 @@
 %               positions with a 0 are excluded.
 %
 % OUTPUT
-%   The following fields are restricted to the specified subset:
-%       PHZ.(participant/group/condition/session/trials)
-%       PHZ.data
-%       PHZ.resp.*
-%       PHZ.meta.spec.*
-%       PHZ.meta.tags.*
+%       PHZ.proc.subset.type
+%       PHZ.proc.subset.ind
 %
 % EXAMPLES
 %   phz_subset(PHZ,{'session' '1'}) >> Only include data from session 1.
@@ -55,35 +51,20 @@ if nargin < 3, verbose = true; end
 
 % get indices to keep
 if isnumeric(subset) || islogical(subset)
-    indall = subset;
-    if ~ismember('rej',fieldnames(PHZ.proc)) && length(subset) == size(PHZ.data,1) % ok, no rej
-        inddata = subset;
-        indrej = [];
-        
-    elseif ismember('rej',fieldnames(PHZ.proc)) && length(subset) == length(PHZ.proc.rej.locs) + length(PHZ.proc.rej.data_locs)
-        inddata = subset(PHZ.proc.rej.data_locs);
-        indrej = subset(PHZ.proc.rej.locs);
-    else
+    inddata = subset;
+    if length(subset) ~= size(PHZ.data,1)
         error('Index vector is an invalid length.')
     end
-    
     subsetStr = 'Restricted data by indices.';
-    
+
 elseif iscell(subset)
     [field,labels] = verifySubsetInput(PHZ,subset);
-    
+
     if strcmp(field,'acc'), field = 'acc1'; end
     switch field
         case {'acc1','acc2','acc3','acc4','acc5'},
-            indall = ismember(PHZ.resp.(['q',field(4),'_acc']),labels);
-            if ismember('rej',fieldnames(PHZ.proc))
-                indrej = indall(PHZ.proc.rej.locs);
-                inddata = indall(PHZ.proc.rej.data_locs);
-            else
-                indrej = [];
-                inddata = indall;
-            end
-            
+            inddata = ismember(PHZ.resp.(['q',field(4),'_acc']),labels);
+
         case {'participant','group','condition','session','trials'}
             inddata = ismember(PHZ.meta.tags.(field),labels);
             if ismember('rej',fieldnames(PHZ.proc))
@@ -95,36 +76,36 @@ elseif iscell(subset)
                 indrej = [];
                 indall = inddata;
             end
-            
+
         otherwise
             error('Invalid field by which to restrict.')
     end
-    
+
     if isnumeric(labels), labels = num2str(labels); end
     subsetStr = ['Restricted data to: ',field,' = ',...
         strjoin(cellstr(labels)),'.'];
-    
-else error('Invalid input.')
+
+else
+    error('Invalid input.')
 end
 
 inddata = logical(inddata);
 indall = logical(indall);
 indrej = logical(indrej);
 
-% adjust tags and grouping vars (also rej)
+% adjust tags
 for i = {'participant','group','condition','session','trials'}, field = i{1};
     if ~isempty(PHZ.(field))
         PHZ.meta.tags.(field) = PHZ.meta.tags.(field)(inddata);
-        if ismember('rej',fieldnames(PHZ.proc)), PHZ.proc.rej.(field) = PHZ.proc.rej.(field)(indrej); end
     end
 end
 
-% adjust grouping vars
+% adjust grouping vars (unique vals of tags)
 for i = {'participant','group','condition','session','trials'}, field = i{1};
     if length(PHZ.(field)) ~= length(unique(PHZ.meta.tags.(field)))
-        ind = ismember(PHZ.(field),unique(PHZ.meta.tags.(field)));
-        PHZ.(field)      = PHZ.(field)(ind);
-        PHZ.meta.spec.(field) = PHZ.meta.spec.(field)(ind);
+        uniqueInd = ismember(PHZ.(field), unique(PHZ.meta.tags.(field)));
+        PHZ.(field) = PHZ.(field)(uniqueInd);
+        PHZ.meta.spec.(field) = PHZ.meta.spec.(field)(uniqueInd);
     end
 end
 
@@ -156,16 +137,25 @@ end
 
 function [field,labels] = verifySubsetInput(PHZ,subset)
 
-if ~iscell(subset), error('SUBSET must be a cell array.'), end
-
-if length(subset) ~= 2, error('SUBSET must be of length 2.'), end
+if length(subset) ~= 2
+    error('SUBSET cell array input must be of length 2.')
+end
 
 field = subset{1};
 labels = subset{2};
 
-if ~ischar(field), error('The first item in SUBSET must be a string.'), end
+if ~ischar(field)
+    error('The first item in SUBSET must be a string.')
+end
+if ~ismember(field, {'participant','group','condition','session','trials'})
+    error(['The first item in SUBSET must be a grouping variable, i.e., ', ...
+       'participant, group, condition, session, or trials.'])
+end
 
-if ischar(labels), labels = cellstr(labels); end
-if iscell(labels), labels = categorical(labels,categories(PHZ.(field)),'Ordinal',true); end
-
+if ischar(labels)
+    labels = cellstr(labels);
+end
+if iscell(labels)
+    labels = categorical(labels,categories(PHZ.(field)),'Ordinal',true);
+end
 end
