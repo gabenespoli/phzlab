@@ -54,11 +54,9 @@
 %       has been viewed.
 %
 % EXAMPLES
-%   PHZ = phz_plotTrials(PHZ,50,true)   >> plot trial #50 using
-%                                          the default smoothing
+%   PHZ = phz_plotTrials(PHZ) >> plot the first unviewed trial
 %
-%   PHZ = phz_plotTrials(PHZ,[],'rms')  >> plot trial #1 using
-%                                          RMS smoothing
+%   PHZ = phz_plotTrials(PHZ,50) >> plot trial #50
 
 % Copyright (C) 2017 Gabriel A. Nespoli, gabenespoli@gmail.com
 % 
