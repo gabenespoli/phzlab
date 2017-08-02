@@ -160,7 +160,10 @@ while keepGoing == true
         getTrialTagTitle(PHZ.meta.tags, currentTrial)});
     set(gca, 'Fontsize', fontsize)
 
-    [~,~,key] = ginput(1);
+    key = [];
+    while isempty(key)
+        [~,~,key] = ginput(1);
+    end
     switch key
         case {32, 114} % spacebar, r
             PHZ = addView(PHZ, currentTrial);
