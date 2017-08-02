@@ -1,39 +1,122 @@
-
-
+%PHZ_PLOTTRIALS  Plot single trials and manually mark for rejection.
+%
+% USAGE
+%   PHZ = phz_plotTrials(PHZ)
+%   PHZ = phz_plotTrials(PHZ, startTrial, smoothing)
+%
+% INPUT
+%   PHZ = [struct] PHZLAB data structure.
+%
+%   startTrial = [numeric|'reset'] If numeric, this is the trial
+%       number to start at.
+%
+%       If it is the string 'reset', all manual rejection marks 
+%       are discarded. Note that trials marked with threshold 
+%       rejection (i.e., with phz_reject) will be kept.
+%
+%       If it is the string 'resetall', all rejection marks will
+%       be discarded, i.e. manual marks and threshold marks.
+%
+%   smoothing = [boolean|string] This will be used as input to 
+%       the phz_smoothing function. 
+%
 % OUTPUT
 %   PHZ.proc.rej.manual = [logical vector]
+%
+% EXAMPLES
+%   PHZ = phz_plotTrials(PHZ,50,true)   >> plot trial #50 using
+%                                          the default smoothing
+%
+%   PHZ = phz_plotTrials(PHZ,[],'rms')  >> plot trial #1 using
+%                                          RMS smoothing
 
-function PHZ = phz_plotTrials(PHZ, varargin)
+% Copyright (C) 2017 Gabriel A. Nespoli, gabenespoli@gmail.com
+% 
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% 
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+% 
+% You should have received a copy of the GNU General Public License
+% along with this program.  If not, see http://www.gnu.org/licenses/.
 
-% defaults
-startTrial = 1;
-smoothing = false;
+function PHZ = phz_plotTrials(PHZ, startTrial, smoothing, verbose)
 
-% user-defined
+if nargout == 0 && nargin == 0, help phz_plotTrials, return, end
+if nargout == 0
+    warning('No output argument is specified. Rejection marks won''t be saved.')
+end
 
-% allow for preprocessing like smoothing
-% option to keep current rejections or reset them
+if nargin < 2 || isempty(startTrial), startTrial = 1; end
+if nargin < 3, smoothing = false; end
+if nargin < 4, verbose = true; end
 
-rej = false(size(PHZ.data,1),1);
-currentTrial = 1;
+if ischar(startTrial) 
+    switch lower(startTrial)
+        case 'reset'
+            if ismember('reject', fieldnames(PHZ.proc)) && ...
+                ismember('manual', fieldnames(PHZ.proc.reject))
+                PHZ.proc.reject = rmfield(PHZ.proc.reject, 'manual')
+                PHZ = phz_history(PHZ, 'All manual rejection marks were discarded.', verbose);
+            else
+                fprintf('There are no manual rejection marks to discard.\n')
+            end
 
+        case 'resetall'
+            if ismember('reject', fieldnames(PHZ.proc)) 
+                if ~strcmp(names{end}, 'reject')
+                    error(['Other processing has been done since threshold ',...
+                        'rejection. Cannot discard previous rejection marks.'])
+                else
+                    PHZ.proc.reject = rmfield(PHZ.proc.reject, {'threshold', 'units', 'ind'});
+                end
+            else
+                fprintf('There are no rejection marks to discard.\n')
+            end
+
+        otherwise
+            fprintf('Unknown string input to phz_plotTrials.\n')
+    end
+    return
+end
+
+% create manual rejection marks if none exists
+if ~ismember('reject', fieldnames(PHZ.proc)) || ...
+    ~ismember('manual', fieldnames(PHZ.proc.reject))
+    PHZ.proc.reject.manual = false(size(PHZ.data,1),1);
+end
+
+% prepare for while loop
+yl = [min(PHZ.data(:)) max(PHZ.data(:))];
+yScaleAll = true;
+currentTrial = startTrial;
 keepGoing = true;
+
 while keepGoing == true
     h = figure;
     plot(PHZ.times, PHZ.data(currentTrial,:));
-    title(getPlotTitle(rej, currentTrial));
+    if yScaleAll, ylim(yl), end
+    ylabel([PHZ.datatype, ' (', PHZ.units, ')']);
+    xlabel('Time (s)');
+    title({getPlotTitle(PHZ.proc.reject.manual, currentTrial);
+        getTrialTagTitle(PHZ.meta.tags, currentTrial)});
     
     [~,~,key] = ginput(1);
     
     switch key
         case {32, 114} % spacebar, r
-            rej = rejToggle(rej, currentTrial);
+            PHZ.proc.reject.manual = rejToggle(PHZ.proc.reject.manual, currentTrial);
             
-        case {29, 31, 106, 110} % right, down, j, n
+        case {29, 31, 106, 108, 110} % right, down, j, l, n
             currentTrial = currentTrial + 1;
             if currentTrial > size(PHZ.data,1), currentTrial = 1; end
             
-        case {28, 30, 107, 112} % left, up, k, p
+        case {28, 30, 104, 107, 112} % left, up, h, k, p
             currentTrial = currentTrial - 1;
             if currentTrial < 1, currentTrial = size(PHZ.data,1); end
             
@@ -44,6 +127,13 @@ while keepGoing == true
                 fprintf('Trial number out of range. Displaying trial #%i.', currentTrial)
             else
                 currentTrial = goto;
+            end
+
+        case 121 % y
+            if yScaleAll
+                yScaleAll = false;
+            else
+                yScaleAll = true;
             end
             
         case {27, 113} % escape, q
@@ -60,8 +150,17 @@ if rej(currentTrial)
 else
     rejStatus = '\color{blue}[INCLUDED]';
 end
-plotTitle = ['Trial #', num2str(currentTrial), ' ', rejStatus];
+plotTitle = ['Trial #', num2str(currentTrial), ' ', rejStatus, '\color{black}'];
 
+end
+
+function trialTagTitle = getTrialTagTitle(tags, currentTrial)
+trialTagTitle = '';
+for labels = {'participant','group','condition','session','trials'}
+    label = labels{1};
+    trialTagTitle = [trialTagTitle, label, '=', ...
+        char(tags.(label)(currentTrial)), '  '];
+    end
 end
 
 function rej = rejToggle(rej,i)
