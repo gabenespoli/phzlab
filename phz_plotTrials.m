@@ -48,6 +48,8 @@
 %
 %   +/= and -/_ = Increase and decrease font size of plot titles.
 %
+%   f = Enter specific font size in command window.
+%
 % OUTPUT
 %   PHZ.proc.rej.manual = [logical vector] Trials that have been
 %       manually marked for rejection.
@@ -226,6 +228,18 @@ while keepGoing
         case 102 % f
             fontsize = input(['Enter new font size (current = ', ...
                 num2str(fontsize), '): ']);
+
+        case {43, 61} % +, =
+            fontsize = fontsize + 2;
+            fprintf('Increasing font size to %i.\n', fontsize)
+
+        case {45, 95} % -, _
+            if fontsize > 2
+                fontsize = fontsize - 2;
+                fprintf('Decreasing font size to %i.\n', fontsize)
+            else
+                fprintf('Cannot decrease font size below %i.\n', fontsize)
+            end
 
         case {27, 113} % escape, q
             keepGoing = false;
