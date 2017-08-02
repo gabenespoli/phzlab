@@ -141,11 +141,20 @@ keepGoing = true;
 while keepGoing == true
     h = figure;
     plot(PHZ_plot.times, PHZ_plot.data(currentTrial,:));
-    if yScaleAll, ylim(getYL(PHZ_plot.data)), end
     ytitle = [PHZ.datatype, ' (', PHZ.units, ')'];
-    if smooth, ytitle = [ytitle, ' (smoothed: ',PHZ_plot.proc.smooth,')']; end
+    ytitle2 = '';
+    if yScaleAll
+        ylim(getYL(PHZ_plot.data))
+        ytitle2 = [ytitle2, ' [scale: all]'];
+    else
+        ylim(getYL(PHZ_plot.data(currentTrial,:)))
+        ytitle2 = [ytitle2, ' [scale: current]'];
+    end
+    if smooth
+        ytitle2 = [ytitle2, ' [smoothing: ',PHZ_plot.proc.smooth,']'];
+    end
 
-    ylabel(ytitle)
+    ylabel({ytitle; ytitle2})
     xlabel('Time (s)')
     title({getPlotTitle(PHZ.proc.reject.manual, currentTrial);
         getTrialTagTitle(PHZ.meta.tags, currentTrial)});
