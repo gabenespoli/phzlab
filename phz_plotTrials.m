@@ -143,7 +143,7 @@ while keepGoing == true
     plot(PHZ_plot.times, PHZ_plot.data(currentTrial,:));
     if yScaleAll, ylim(getYL(PHZ_plot.data)), end
     ytitle = [PHZ.datatype, ' (', PHZ.units, ')'];
-    if smooth, ytitle = [ytitle, ' (smoothed)']; end
+    if smooth, ytitle = [ytitle, ' (smoothed: ',PHZ_plot.proc.smooth,')']; end
 
     ylabel(ytitle)
     xlabel('Time (s)')
@@ -210,6 +210,9 @@ while keepGoing == true
         case {27, 113} % escape, q
             keepGoing = false;
             
+        otherwise
+            fprintf('Invalid input. Use ''q'' to quit.\n')
+
     end
     close(h)
 end
