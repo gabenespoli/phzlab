@@ -143,6 +143,7 @@ keepGoing = true;
 
 while keepGoing
 
+    % plot trial data
     h = figure;
     plot(PHZ_plot.times, PHZ_plot.data(currentTrial,:));
 
