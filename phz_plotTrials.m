@@ -1,8 +1,10 @@
 %PHZ_PLOTTRIALS  Plot single trials and manually mark for rejection.
+%   Keyboard controls are used to navigate between plots and 
+%   mark them for rejection.
 %
 % USAGE
 %   PHZ = phz_plotTrials(PHZ)
-%   PHZ = phz_plotTrials(PHZ, startTrial, smoothing)
+%   PHZ = phz_plotTrials(PHZ, startTrial)
 %
 % INPUT
 %   PHZ = [struct] PHZLAB data structure.
@@ -19,8 +21,29 @@
 %       If it is the string 'resetall', all rejection marks will
 %       be discarded, i.e. manual marks and threshold marks.
 %
-%   smoothing = [boolean|string] This will be used as input to 
-%       the phz_smoothing function. 
+% KEYBOARD CONTROLS
+%   right/down/j/l/n = Cycle trials forward.
+%
+%   left/up/h/k/p = Cycle trials backward.
+%
+%   g = Enter a specific trial number to jump to. Focus is brought
+%       to the command window for input.
+%
+%   space/r = Toggle rejection mark for the current trial.
+%
+%   y = Toggle y-axis scale. Default is to have a consistent scale
+%       for all trials (i.e., the range of the y-axis matches the
+%       range of the entire data set). Alternate is to scale the
+%       plot to the current trial.
+%
+%   s = Toggle smoothing. Default is no smoothing. Alternate is 
+%       to call phz_smooth.
+%
+%   S = Enter new smoothing parameters. This will bring focus to
+%       the command window and prompt for a smoothing type (i.e., 
+%       the win parameter in phz_smooth).
+%
+%   escape/q = Quit phz_plotTrials and close the plot window.
 %
 % OUTPUT
 %   PHZ.proc.rej.manual = [logical vector] Trials that have been
@@ -58,8 +81,7 @@ if nargout == 0
 end
 
 if nargin < 2, startTrial = []; end
-if nargin < 3, smoothing = false; end
-if nargin < 4, verbose = true; end
+if nargin < 3, verbose = true; end
 
 if ischar(startTrial) 
     switch lower(startTrial)
@@ -107,19 +129,27 @@ else
     currentTrial = startTrial;
 end
 
-% prepare for while loop
-yl = [min(PHZ.data(:)) max(PHZ.data(:))];
+% default plot parameters
 yScaleAll = true;
-keepGoing = true;
+smooth = false;
+smoothWin = 'mean0.05';
+fontsize = 12;
 
+% plot trial and wait for keyboard input
+PHZ_plot = PHZ; % make copy so we can change smoothing
+keepGoing = true;
 while keepGoing == true
     h = figure;
-    plot(PHZ.times, PHZ.data(currentTrial,:));
-    if yScaleAll, ylim(yl), end
-    ylabel([PHZ.datatype, ' (', PHZ.units, ')']);
-    xlabel('Time (s)');
+    plot(PHZ_plot.times, PHZ_plot.data(currentTrial,:));
+    if yScaleAll, ylim(getYL(PHZ_plot.data)), end
+    ytitle = [PHZ.datatype, ' (', PHZ.units, ')'];
+    if smooth, ytitle = [ytitle, ' (smoothed)']; end
+
+    ylabel(ytitle)
+    xlabel('Time (s)')
     title({getPlotTitle(PHZ.proc.reject.manual, currentTrial);
         getTrialTagTitle(PHZ.meta.tags, currentTrial)});
+    set(gca, 'Fontsize', fontsize)
 
     [~,~,key] = ginput(1);
     switch key
@@ -153,7 +183,30 @@ while keepGoing == true
             else
                 yScaleAll = true;
             end
-            
+
+        case 115 % s
+            if smooth
+                PHZ_plot = PHZ;
+                smooth = false;
+            else
+                PHZ_plot = phz_smooth(PHZ, smoothWin, false);
+                smooth = true;
+            end
+
+        case 83 % S (capital s)
+            tempWin = input('Enter a new smoothing parameter: ', 's');
+            try
+                PHZ_plot = phz_smooth(PHZ, tempWin, false);
+                smoothWin = tempWin;
+                smooth = true;
+            catch me
+                fprintf('Invalid smoothing parameter. Smoothing was not changed.')
+            end
+
+        case 102 % f
+            fontsize = input(['Enter new font size (current = ', ...
+                num2str(fontsize), '): ']);
+
         case {27, 113} % escape, q
             keepGoing = false;
             
@@ -191,4 +244,8 @@ end
 
 function PHZ = addView(PHZ, currentTrial)
 PHZ.proc.reject.views(currentTrial) = PHZ.proc.reject.views(currentTrial) + 1;
+end
+
+function yl = getYL(data)
+yl = [min(data(:)) max(data(:))];
 end
