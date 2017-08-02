@@ -16,40 +16,42 @@
 %
 %       If it is the string 'reset', all manual rejection marks 
 %       are discarded. Note that trials marked with threshold 
-%       rejection (i.e., with phz_reject) will be kept.
+%       rejection (i.e., with phz_reject) will not be discarded.
 %
 %       If it is the string 'resetall', all rejection marks will
-%       be discarded, i.e. manual marks and threshold marks.
+%       be discarded, i.e., manual marks and threshold marks.
 %
 % KEYBOARD CONTROLS
 %   right/down/j/l/n = Cycle trials forward.
 %
 %   left/up/h/k/p = Cycle trials backward.
 %
-%   g = Enter a specific trial number to jump to. Focus is brought
-%       to the command window for input.
+%   g = Jump to a specific trial. Enter trial number in the
+%       command window.
 %
 %   space/r = Toggle rejection mark for the current trial.
 %
 %   y = Toggle y-axis scale. Default is to have a consistent scale
 %       for all trials (i.e., the range of the y-axis matches the
 %       range of the entire data set). Alternate is to scale the
-%       plot to the current trial.
+%       plot to the range of the current trial.
 %
 %   s = Toggle smoothing. Default is no smoothing. Alternate is 
 %       to call phz_smooth.
 %
-%   S = Enter new smoothing parameters. This will bring focus to
-%       the command window and prompt for a smoothing type (i.e., 
-%       the win parameter in phz_smooth).
+%   S (shift-s) = Enter new smoothing parameters. This will bring
+%       focus to the command window and prompt for a smoothing type
+%       (i.e., the win parameter in phz_smooth).
 %
-%   f = Enter new fontsize for the plot in the command window.
+%   f = Change the font size of the plot titles. Enter a new value
+%       in the command window.
 %
-%   escape/q = Quit phz_plotTrials and close the plot window.
+%   escape/q = Quit phz_plotTrials. The plot window is closed.
 %
 % OUTPUT
 %   PHZ.proc.rej.manual = [logical vector] Trials that have been
 %       manually marked for rejection.
+%
 %   PHZ.proc.rej.views = [numeric] Number of times each trial
 %       has been viewed.
 %
@@ -122,25 +124,27 @@ if ~ismember('reject', fieldnames(PHZ.proc)) || ...
     PHZ.proc.reject.views = zeros(size(PHZ.data,1),1);
 end
 
-% default start at first unviewed trial
-if isempty(startTrial)
+% defaults
+if isempty(startTrial) % find first unviewed trial
     currentTrial = min(find(PHZ.proc.reject.views == 0));
 else
     currentTrial = startTrial;
 end
-
-% default plot parameters
 yScaleAll = true;
 smooth = false;
 smoothWin = 'mean0.05';
 fontsize = 12;
 
-% plot trial and wait for keyboard input
+% prepare for while loop
 PHZ_plot = PHZ; % make copy so we can change smoothing
 keepGoing = true;
-while keepGoing == true
+
+while keepGoing
+
     h = figure;
     plot(PHZ_plot.times, PHZ_plot.data(currentTrial,:));
+
+    % make y-axis title
     ytitle = [PHZ.datatype, ' (', PHZ.units, ')'];
     ytitle2 = '';
     if yScaleAll
@@ -154,17 +158,20 @@ while keepGoing == true
         ytitle2 = [ytitle2, ' [smoothing: ',PHZ_plot.proc.smooth,']'];
     end
 
+    % apply axis titles
     ylabel({ytitle; ytitle2})
     xlabel('Time (s)')
     title({getPlotTitle(PHZ.proc.reject.manual, currentTrial);
         getTrialTagTitle(PHZ.meta.tags, currentTrial)});
     set(gca, 'Fontsize', fontsize)
 
+    % wait for valid user input
     key = [];
     while isempty(key)
         [~,~,key] = ginput(1);
     end
 
+    % carry out user command
     switch key
         case {32, 114} % spacebar, r
             PHZ = addView(PHZ, currentTrial);
