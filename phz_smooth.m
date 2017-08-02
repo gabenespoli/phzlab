@@ -117,7 +117,7 @@ PHZ.data = temp(:,win:end);
 PHZ.times = PHZ.times(:,ceil(win / 2):(end - floor(win/2)));
 
 % add to PHZ.history and PHZ.proc
-PHZ.proc.smooth = [smoothtype,num2str(win)];
+PHZ.proc.smooth = [lower(smoothtype),num2str(win)];
 winStr = [smoothtype,' smoothing with a ',...
     num2str(win / PHZ.srate * 1000),...
     ' ms sliding window (',winStr,').'];
