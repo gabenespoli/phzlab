@@ -177,7 +177,6 @@ while keepGoing
     % carry out user command
     switch key
         case {32, 114} % spacebar, r
-            PHZ = addView(PHZ, currentTrial);
             PHZ.proc.reject.manual = rejToggle(PHZ.proc.reject.manual, currentTrial);
 
         case {29, 31, 106, 108, 110} % right, down, j, l, n
