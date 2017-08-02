@@ -80,6 +80,12 @@ if ischar(win)
         else
             win = 0.05; % default mean window in proportion of length
         end
+
+    else 
+        smoothtype = 'Mean';
+        winStr = ['mean',win];
+        win = str2num(win);
+
     end
 
 elseif isnumeric(win)
@@ -90,7 +96,7 @@ else error('Invalid input.')
 end
 
 % check win length
-if length(win) > 1 || win < 0, error('Invalid window length.'), end
+if isempty(win) || length(win) > 1 || win < 0, error('Invalid window length.'), end
 
 % convert win to samples
 if win < 1
