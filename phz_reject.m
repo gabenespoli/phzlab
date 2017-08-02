@@ -17,7 +17,7 @@
 %               keeping manual marks made with phz_plotTrials).
 %
 %               Use 'resetall' to unmark all trials for rejection
-%               (including those manual marks made with phz_plotTrials).
+%               (including those manual marks made with phz_plotTrials.
 %                       
 % OUTPUT  
 %   PHZ.proc.reject.threshold   = The value specified in THRESHOLD.
@@ -71,8 +71,7 @@ elseif ischar(threshold)
 
     elseif strcmpi(threshold, 'resetall')
         PHZ.proc = rmfield(PHZ.proc, 'reject');
-        PHZ = phz_history(PHZ, ['All trials marked for rejection ', ...
-            'were unmarked (including manual rejections).'], verbose);
+        PHZ = phz_history(PHZ, ['All rejection marks were discarded.', verbose);
         return
 
     elseif strcmpi(threshold, 'reset')
@@ -83,8 +82,7 @@ elseif ischar(threshold)
             else
                 PHZ.proc = rmfield(PHZ.proc, 'reject');
             end
-            PHZ = phz_history(PHZ, ['All trials marked for rejection ', ...
-                'were unmarked (not including manual rejections).'], verbose);
+            PHZ = phz_history(PHZ, ['All threshold rejection marks were discarded.', verbose);
         end
         return
 
