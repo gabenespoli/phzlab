@@ -82,7 +82,7 @@ elseif ischar(threshold)
             else
                 PHZ.proc = rmfield(PHZ.proc, 'reject');
             end
-            PHZ = phz_history(PHZ, ['All threshold rejection marks were discarded.', verbose);
+            PHZ = phz_history(PHZ, ['All threshold rejection marks were discarded.'], verbose);
         end
         return
 
