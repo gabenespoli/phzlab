@@ -22,6 +22,10 @@
 %       be discarded, i.e., manual marks and threshold marks.
 %
 % KEYBOARD CONTROLS
+%   escape/q = Quit phz_plotTrials. The plot window is closed.
+%
+%   space/r = Toggle rejection mark for the current trial.
+%
 %   right/down/j/l/n = Cycle trials forward.
 %
 %   left/up/h/k/p = Cycle trials backward.
@@ -29,24 +33,20 @@
 %   g = Jump to a specific trial. Enter trial number in the
 %       command window.
 %
-%   space/r = Toggle rejection mark for the current trial.
-%
-%   y = Toggle y-axis scale. Default is to have a consistent scale
+%   y = Toggle y-axis scale. Default is to have the same scale
 %       for all trials (i.e., the range of the y-axis matches the
 %       range of the entire data set). Alternate is to scale the
 %       plot to the range of the current trial.
 %
 %   s = Toggle smoothing. Default is no smoothing. Alternate is 
-%       to call phz_smooth.
+%       to call phz_smooth with its default parameters. This can
+%       be changed using S (shift-s; see below).
 %
 %   S (shift-s) = Enter new smoothing parameters. This will bring
 %       focus to the command window and prompt for a smoothing type
-%       (i.e., the win parameter in phz_smooth).
+%       (i.e., the `win` parameter in phz_smooth).
 %
-%   f = Change the font size of the plot titles. Enter a new value
-%       in the command window.
-%
-%   escape/q = Quit phz_plotTrials. The plot window is closed.
+%   +/= and -/_ = Increase and decrease font size of plot titles.
 %
 % OUTPUT
 %   PHZ.proc.rej.manual = [logical vector] Trials that have been
