@@ -56,17 +56,12 @@ if do_blsub || do_restore
         
         % check that no other processing has been done since phz_blsub
         names = fieldnames(PHZ.proc);
-        if ~ismember(names{end},{'blsub','rej'})
+        if ~ismember(names{end},{'blsub'})
             error(['Other processing has been done since baseline ',... 
                 'subtraction. Cannot undo previous baseline subtraction.'])
         end
         
-        if ismember('rej',fieldnames(PHZ.proc))
-            PHZ.data          = PHZ.data          + repmat(PHZ.proc.blsub.values(PHZ.proc.rej.data_locs),1,size(PHZ.data,2));
-            PHZ.proc.rej.data = PHZ.proc.rej.data + repmat(PHZ.proc.blsub.values(PHZ.proc.rej.locs),1,size(PHZ.proc.rej.data,2));
-        else
-            PHZ.data = PHZ.data + repmat(PHZ.proc.blsub.values,1,size(PHZ.data,2));
-        end
+        PHZ.data = PHZ.data + repmat(PHZ.proc.blsub.values,1,size(PHZ.data,2));
         
         PHZ.proc = rmfield(PHZ.proc,'blsub');
         PHZ = phz_history(PHZ,'Added back previously removed baseline.',verbose);
@@ -79,16 +74,8 @@ if do_blsub || do_restore
         PHZb = phz_region(PHZ,region,0);
         PHZ = getBLSUBstructure(PHZ);
         
-        if ismember('rej',fieldnames(PHZ.proc))
-            PHZ.proc.blsub.values = nan(length(PHZ.proc.rej.locs) + length(PHZ.proc.rej.data_locs),1);
-            PHZ.proc.blsub.values(PHZ.proc.rej.locs) = mean(PHZb.proc.rej.data,2);
-            PHZ.proc.blsub.values(PHZ.proc.rej.data_locs) = mean(PHZb.data,2);
-            PHZ.proc.rej.data = PHZ.proc.rej.data - repmat(PHZ.proc.blsub.values(PHZ.proc.rej.locs),[1 size(PHZ.proc.rej.data,2)]);
-            PHZ.data = PHZ.data - repmat(PHZ.proc.blsub.values(PHZ.proc.rej.data_locs),[1 size(PHZ.data,2)]);
-        else
-            PHZ.proc.blsub.values = mean(PHZb.data,2);
-            PHZ.data = PHZ.data - repmat(PHZ.proc.blsub.values,[1 size(PHZ.data,2)]);
-        end
+        PHZ.proc.blsub.values = mean(PHZb.data,2);
+        PHZ.data = PHZ.data - repmat(PHZ.proc.blsub.values,[1 size(PHZ.data,2)]);
         
         % make region endpoints
         if ischar(region)
