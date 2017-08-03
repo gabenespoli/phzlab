@@ -68,7 +68,6 @@
 %
 % EXAMPLES
 %   PHZ = phz_review(PHZ) >> plot the first unviewed trial
-%
 %   PHZ = phz_review(PHZ,50) >> plot trial #50
 
 % Copyright (C) 2017 Gabriel A. Nespoli, gabenespoli@gmail.com
@@ -235,14 +234,16 @@ while keepGoing
 
         case 83 % S (capital s)
             tempWin = input('Enter a new smoothing parameter: ', 's');
-            try
-                PHZ_plot = phz_smooth(PHZ, tempWin, false);
-                smoothWin = tempWin;
-                smooth = true;
-            catch
-                fprintf('Invalid smoothing parameter. Smoothing was not changed.')
+            if ~isempty(tempWin)
+                try
+                    PHZ_plot = phz_smooth(PHZ, tempWin, false);
+                    smoothWin = tempWin;
+                    smooth = true;
+                catch
+                    fprintf('Invalid smoothing parameter. Smoothing was not changed.\n')
+                end
             end
-
+            
         case 105 % i
             if showTags
                 showTags = false;
