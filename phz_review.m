@@ -57,10 +57,10 @@
 %   f = Enter specific font size in command window.
 %
 % OUTPUT
-%   PHZ.proc.rej.manual = [logical vector] Trials that have been
-%       manually marked for rejection.
+%   PHZ.proc.review.keep = [logical] Trials that have been
+%       manually marked for rejection. 1 = keep, 0 = reject.
 %
-%   PHZ.proc.rej.views = [numeric] Number of times each trial
+%   PHZ.proc.review.views = [numeric] Number of times each trial
 %       has been viewed.
 %
 % EXAMPLES
@@ -175,7 +175,7 @@ while keepGoing
     % carry out user command
     switch key
         case {32, 114} % spacebar, r
-            PHZ.proc.review.keep = keepToggle(PHZ.proc.review.keep, currentTrial);
+            PHZ.proc.review.keep = keepStatusToggle(PHZ.proc.review.keep, currentTrial);
 
         case 116 % t
             if isempty(rejectionThreshold)
@@ -326,11 +326,11 @@ for labels = {'participant','group','condition','session','trials'}
 end
 end
 
-function keepStatus = keepToggle(keepStatus,i)
-if keepStatus(i)
-    keepStatus(i) = false;
+function keepStatus = keepStatusToggle(keepStatus, currentTrial)
+if keepStatus(currentTrial)
+    keepStatus(currentTrial) = false;
 else
-    keepStatus(i) = true;
+    keepStatus(currentTrial) = true;
 end
 end
 
