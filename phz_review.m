@@ -117,7 +117,7 @@ end
 
 % defaults
 if isempty(startTrial) % find first unviewed trial
-    currentTrial = min(find(PHZ.proc.review.views == 0));
+    currentTrial = find(PHZ.proc.review.views == 0, 1);
 else
     currentTrial = startTrial;
 end
@@ -215,7 +215,7 @@ while keepGoing
 
         case 71 % G (capital g)
             PHZ = addView(PHZ, currentTrial);
-            currentTrial = randi(size(PHZ.data,1))
+            currentTrial = randi(size(PHZ.data,1));
 
         case 121 % y
             if yScaleAll
@@ -239,7 +239,7 @@ while keepGoing
                 PHZ_plot = phz_smooth(PHZ, tempWin, false);
                 smoothWin = tempWin;
                 smooth = true;
-            catch me
+            catch
                 fprintf('Invalid smoothing parameter. Smoothing was not changed.')
             end
 
@@ -295,7 +295,7 @@ if ismember('reject', names)
     end
 end
 
-if ismember('subset', names);
+if ismember('subset', names)
     subsetKeepStatus = true;
     foundAllSubsets = false;
     counter = 1;
@@ -329,7 +329,7 @@ trialTagTitle = '';
 for labels = {'participant','group','condition','session','trials'}
     label = labels{1};
     trialTagTitle = [trialTagTitle, label, '=', ...
-        char(tags.(label)(currentTrial)), '  '];
+        char(tags.(label)(currentTrial)), '  ']; %#ok<*AGROW>
 end
 end
 
