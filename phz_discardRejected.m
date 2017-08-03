@@ -24,3 +24,8 @@
 % - the proc fields that are actually dependant on each other
 %   such that it matters which order they are done in are:
 %   reject, blsub, norm, transform
+%
+% - make all these logical vector functions mark 0 for rejected
+%   and call the field 'keep'
+%
+% - in phz_reviewTrials show all types of rejection; show line for threshold rejection?
