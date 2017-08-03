@@ -18,9 +18,6 @@
 %       are discarded. Note that trials marked with threshold 
 %       rejection (i.e., with phz_reject) will not be discarded.
 %
-%       If it is the string 'resetall', all rejection marks will
-%       be discarded, i.e., manual marks and threshold marks.
-%
 % KEYBOARD CONTROLS
 %   escape/q = Quit phz_review The plot window is closed.
 %
@@ -32,6 +29,10 @@
 %
 %   g = Jump to a specific trial. Enter trial number in the
 %       command window.
+%
+%   t/i = Toggle display of trial tags/info. i.e., this will display
+%       the values of participant, group, condition, session, and
+%       trials for the current trial.
 %
 %   y = Toggle y-axis scale. Default is to have the same scale
 %       for all trials (i.e., the range of the y-axis matches the
@@ -212,7 +213,7 @@ while keepGoing
                 fprintf('Invalid smoothing parameter. Smoothing was not changed.')
             end
 
-        case 116 % t
+        case {105, 116} % i, t
             if showTags
                 showTags = false;
             else
