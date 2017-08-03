@@ -28,6 +28,9 @@
 %   g = Jump to a specific trial. Enter trial number in the
 %       command window.
 %
+%   G (shift-g) = Jump to a random trial. This can be useful for
+%       spot-checking the dataset.
+%
 %   space/r = Toggle rejection mark for the current trial.
 %
 %   t = Toggle the display of the rejection threshold. If the y-axis
@@ -209,6 +212,10 @@ while keepGoing
             else
                 currentTrial = goto;
             end
+
+        case 71 % G (capital g)
+            PHZ = addView(PHZ, currentTrial);
+            currentTrial = randi(size(PHZ.data,1))
 
         case 121 % y
             if yScaleAll
