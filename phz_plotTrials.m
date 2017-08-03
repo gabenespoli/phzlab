@@ -12,7 +12,7 @@
 %   startTrial = [numeric|'reset'] If numeric, this is the trial
 %       number to start at. Default is to start at the first 
 %       unviewed trial (the number of times each trial has been
-%       viewed is stored in PHZ.proc.reject.views).
+%       viewed is stored in PHZ.proc.review.views).
 %
 %       If it is the string 'reset', all manual rejection marks 
 %       are discarded. Note that trials marked with threshold 
@@ -120,10 +120,9 @@ elseif ~isnumeric(startTrial)
 end
 
 % create manual rejection marks if none exists
-if ~ismember('reject', fieldnames(PHZ.proc)) || ...
-    ~ismember('manual', fieldnames(PHZ.proc.reject))
-    PHZ.proc.reject.manual = false(size(PHZ.data,1),1);
-    PHZ.proc.reject.views = zeros(size(PHZ.data,1),1);
+if ~ismember('review', fieldnames(PHZ.proc))
+    PHZ.proc.review.keep = true(size(PHZ.data,1),1);
+    PHZ.proc.review.views = zeros(size(PHZ.data,1),1);
 end
 
 % defaults
@@ -136,6 +135,7 @@ yScaleAll = true;
 smooth = false;
 smoothWin = 'mean0.05';
 fontsize = 12;
+showTags = false;
 
 % prepare for while loop
 PHZ_plot = PHZ; % make copy so we can change smoothing
@@ -147,7 +147,14 @@ while keepGoing
     h = figure;
     plot(PHZ_plot.times, PHZ_plot.data(currentTrial,:));
 
-    % make y-axis title
+
+    % make titles and axis labels
+    plotTitle = ['Trial #', num2str(currentTrial)];
+    if showTags
+        plotTitle = [plotTitle; {getTrialTagTitle(PHZ.meta.tags, currentTrial)}];
+    end
+    plotTitle = [plotTitle; {getKeepStatusStr(PHZ, currentTrial)}];
+
     ytitle = [PHZ.datatype, ' (', PHZ.units, ')'];
     ytitle2 = '';
     if yScaleAll
@@ -164,8 +171,7 @@ while keepGoing
     % apply axis titles
     ylabel({ytitle; ytitle2})
     xlabel('Time (s)')
-    title({getPlotTitle(PHZ.proc.reject.manual, currentTrial);
-        getTrialTagTitle(PHZ.meta.tags, currentTrial)});
+    title(plotTitle)
     set(gca, 'Fontsize', fontsize)
 
     % wait for valid user input
@@ -177,7 +183,7 @@ while keepGoing
     % carry out user command
     switch key
         case {32, 114} % spacebar, r
-            PHZ.proc.reject.manual = rejToggle(PHZ.proc.reject.manual, currentTrial);
+            PHZ.proc.review.keep = keepToggle(PHZ.proc.review.keep, currentTrial);
 
         case {29, 31, 106, 108, 110} % right, down, j, l, n
             PHZ = addView(PHZ, currentTrial);
@@ -225,6 +231,13 @@ while keepGoing
                 fprintf('Invalid smoothing parameter. Smoothing was not changed.')
             end
 
+        case 116 % t
+            if showTags
+                showTags = false;
+            else
+                showTags = true;
+            end
+
         case 102 % f
             fontsize = input(['Enter new font size (current = ', ...
                 num2str(fontsize), '): ']);
@@ -252,13 +265,29 @@ while keepGoing
 end
 end
 
-function plotTitle = getPlotTitle(rej, currentTrial)
-if rej(currentTrial)
-    rejStatus =  '\color{red}[REJECTED]';
+function str = getKeepStatusStr(PHZ, currentTrial)
+str = 'review: ';
+if PHZ.proc.review.keep(currentTrial)
+    str = [str, '\color{blue}[INCLUDED]\color{black}'];
 else
-    rejStatus = '\color{blue}[INCLUDED]';
+    str = [str, '\color{red}[REJECTED]\color{black}'];
 end
-plotTitle = ['Trial #', num2str(currentTrial), ' ', rejStatus, '\color{black}'];
+
+if ismember('reject', fieldnames(PHZ.proc))
+    if PHZ.proc.reject.keep(currentTrial)
+        str = [str, 'reject: \color{blue}[INCLUDED]\color{black}'];
+    else
+        str = [str, 'reject: \color{red}[REJECTED]\color{black}'];
+    end
+end
+
+% TODO this has to be done after phz_subset has been changed
+% subsetInd = find(ismember(fieldnames(PHZ.proc), 'subset'));
+% if ~isempty(subsetInd)
+    % for i = subsetInd
+
+    % end
+% end
 
 end
 
@@ -271,16 +300,16 @@ for labels = {'participant','group','condition','session','trials'}
     end
 end
 
-function rej = rejToggle(rej,i)
-if rej(i)
-    rej(i) = false;
+function keepStatus = keepToggle(keepStatus,i)
+if keepStatus(i)
+    keepStatus(i) = false;
 else
-    rej(i) = true;
+    keepStatus(i) = true;
 end
 end
 
 function PHZ = addView(PHZ, currentTrial)
-PHZ.proc.reject.views(currentTrial) = PHZ.proc.reject.views(currentTrial) + 1;
+PHZ.proc.review.views(currentTrial) = PHZ.proc.review.views(currentTrial) + 1;
 end
 
 function yl = getYL(data)
