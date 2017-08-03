@@ -1,10 +1,10 @@
-%PHZ_PLOTTRIALS  Plot single trials and manually mark for rejection.
+%PHZ_REVIEW  Plot single trials and manually mark for rejection.
 %   Keyboard controls are used to navigate between plots and 
 %   mark them for rejection.
 %
 % USAGE
-%   PHZ = phz_plotTrials(PHZ)
-%   PHZ = phz_plotTrials(PHZ, startTrial)
+%   PHZ = phz_review(PHZ)
+%   PHZ = phz_review(PHZ, startTrial)
 %
 % INPUT
 %   PHZ = [struct] PHZLAB data structure.
@@ -22,7 +22,7 @@
 %       be discarded, i.e., manual marks and threshold marks.
 %
 % KEYBOARD CONTROLS
-%   escape/q = Quit phz_plotTrials. The plot window is closed.
+%   escape/q = Quit phz_review The plot window is closed.
 %
 %   space/r = Toggle rejection mark for the current trial.
 %
@@ -58,9 +58,9 @@
 %       has been viewed.
 %
 % EXAMPLES
-%   PHZ = phz_plotTrials(PHZ) >> plot the first unviewed trial
+%   PHZ = phz_review(PHZ) >> plot the first unviewed trial
 %
-%   PHZ = phz_plotTrials(PHZ,50) >> plot trial #50
+%   PHZ = phz_review(PHZ,50) >> plot trial #50
 
 % Copyright (C) 2017 Gabriel A. Nespoli, gabenespoli@gmail.com
 % 
@@ -77,9 +77,9 @@
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see http://www.gnu.org/licenses/.
 
-function PHZ = phz_plotTrials(PHZ, startTrial, verbose)
+function PHZ = phz_review(PHZ, startTrial, verbose)
 
-if nargout == 0 && nargin == 0, help phz_plotTrials, return, end
+if nargout == 0 && nargin == 0, help phz_review, return, end
 if nargout == 0
     warning('No output argument is specified. Rejection marks won''t be saved.')
 end
