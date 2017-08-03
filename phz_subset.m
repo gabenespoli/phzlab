@@ -66,7 +66,7 @@ if islogical(subset) || ...
     if length(subset) ~= size(PHZ.data,1)
         error('Logical vector must be the same length as the number of trials.')
     end
-    subsetInd = subset;
+    ind = subset;
     subsetInput = '';
     subsetStr = 'Restricted data by indices.';
 
