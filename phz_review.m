@@ -21,8 +21,6 @@
 % KEYBOARD CONTROLS
 %   escape/q = Quit phz_review The plot window is closed.
 %
-%   space/r = Toggle rejection mark for the current trial.
-%
 %   right/down/j/l/n = Cycle trials forward.
 %
 %   left/up/h/k/p = Cycle trials backward.
@@ -30,9 +28,16 @@
 %   g = Jump to a specific trial. Enter trial number in the
 %       command window.
 %
-%   t/i = Toggle display of trial tags/info. i.e., this will display
-%       the values of participant, group, condition, session, and
-%       trials for the current trial.
+%   space/r = Toggle rejection mark for the current trial.
+%
+%   t = Toggle the display of the rejection threshold. If the y-axis
+%       scale is set for all trials, the y-axis scale will be adjusted
+%       to include this threshold. If the y-axis scale is set for the 
+%       current trial, it will not.
+%
+%   i = Toggle display of trial info. i.e., this will display the
+%       values of the grouping variables participant, group, 
+%       condition, session, and trials for the current trial.
 %
 %   y = Toggle y-axis scale. Default is to have the same scale
 %       for all trials (i.e., the range of the y-axis matches the
@@ -118,6 +123,7 @@ smooth = false;
 smoothWin = 'mean0.05';
 fontsize = 12;
 showTags = false;
+rejectionThreshold = [];
 
 % prepare for while loop
 PHZ_plot = PHZ; % make copy so we can change smoothing
@@ -128,7 +134,11 @@ while keepGoing
     % plot trial data
     h = figure;
     plot(PHZ_plot.times, PHZ_plot.data(currentTrial,:));
-
+    if ~isempty(rejectionThreshold)
+        lineHandle = line([PHZ_plot.times(1) PHZ_plot.times(end)], ...
+            [rejectionThreshold rejectionThreshold]);
+        set(lineHandle, 'Color', 'r', 'LineWidth', 1)
+    end
 
     % make titles and axis labels
     plotTitle = ['Trial #', num2str(currentTrial)];
@@ -140,10 +150,10 @@ while keepGoing
     ytitle = [PHZ.datatype, ' (', PHZ.units, ')'];
     ytitle2 = '';
     if yScaleAll
-        ylim(getYL(PHZ_plot.data))
+        ylim(getYL(PHZ_plot.data, rejectionThreshold))
         ytitle2 = [ytitle2, ' [scale: all]'];
     else
-        ylim(getYL(PHZ_plot.data(currentTrial,:)))
+        ylim(getYL(PHZ_plot.data(currentTrial,:), []))
         ytitle2 = [ytitle2, ' [scale: current]'];
     end
     if smooth
@@ -166,6 +176,19 @@ while keepGoing
     switch key
         case {32, 114} % spacebar, r
             PHZ.proc.review.keep = keepToggle(PHZ.proc.review.keep, currentTrial);
+
+        case 116 % t
+            if isempty(rejectionThreshold)
+                if ismember('reject', fieldnames(PHZ.proc))
+                    if strcmpi(PHZ.proc.reject.units, 'SD')
+                        rejectionThreshold = std(PHZ.data(:)) * PHZ.proc.reject.threshold;
+                    else
+                        rejectionThreshold = PHZ.proc.reject.threshold;
+                    end
+                end
+            else
+                rejectionThreshold = [];
+            end
 
         case {29, 31, 106, 108, 110} % right, down, j, l, n
             PHZ = addView(PHZ, currentTrial);
@@ -213,7 +236,7 @@ while keepGoing
                 fprintf('Invalid smoothing parameter. Smoothing was not changed.')
             end
 
-        case {105, 116} % i, t
+        case 105 % i
             if showTags
                 showTags = false;
             else
@@ -265,7 +288,6 @@ if ismember('reject', names)
     end
 end
 
-
 if ismember('subset', names);
     subsetKeepStatus = true;
     foundAllSubsets = false;
@@ -301,7 +323,7 @@ for labels = {'participant','group','condition','session','trials'}
     label = labels{1};
     trialTagTitle = [trialTagTitle, label, '=', ...
         char(tags.(label)(currentTrial)), '  '];
-    end
+end
 end
 
 function keepStatus = keepToggle(keepStatus,i)
@@ -316,6 +338,16 @@ function PHZ = addView(PHZ, currentTrial)
 PHZ.proc.review.views(currentTrial) = PHZ.proc.review.views(currentTrial) + 1;
 end
 
-function yl = getYL(data)
-yl = [min(data(:)) max(data(:))];
+function yl = getYL(data, rejectionThreshold)
+ymin = min(data(:));
+ymax = max(data(:));
+if rejectionThreshold 
+    if rejectionThreshold > max(data(:))
+        ymax = rejectionThreshold;
+    end
+    if rejectionThreshold < min(data(:))
+        ymin = rejectionThreshold;
+    end
+end
+yl = [ymin ymax];
 end
