@@ -247,6 +247,8 @@ end
 end
 
 function str = getKeepStatusStr(PHZ, currentTrial)
+names = fieldnames(PHZ.proc);
+
 str = 'review: ';
 if PHZ.proc.review.keep(currentTrial)
     str = [str, '\color{blue}[INCLUDED]\color{black}'];
@@ -254,7 +256,7 @@ else
     str = [str, '\color{red}[REJECTED]\color{black}'];
 end
 
-if ismember('reject', fieldnames(PHZ.proc))
+if ismember('reject', names)
     if PHZ.proc.reject.keep(currentTrial)
         str = [str, ' reject: \color{blue}[INCLUDED]\color{black}'];
     else
@@ -262,14 +264,34 @@ if ismember('reject', fieldnames(PHZ.proc))
     end
 end
 
-% TODO this has to be done after phz_subset has been changed
-% subsetInd = find(ismember(fieldnames(PHZ.proc), 'subset'));
-% if ~isempty(subsetInd)
-    % for i = subsetInd
 
-    % end
-% end
+if ismember('subset', names);
+    subsetKeepStatus = true;
+    foundAllSubsets = false;
+    counter = 1;
+    while ~foundAllSubsets
+        if counter == 1
+            subsetNumStr = 'subset';
+        else
+            subsetNumStr = ['subset', num2str(counter)];
+        end
+        subsetInd = find(ismember(names, subsetNumStr));
+        if ~isempty(subsetInd)
+            if ~PHZ.proc.(names{subsetInd}).keep(currentTrial)
+                subsetKeepStatus = false;
+                break
+            end
+        else
+            foundAllSubsets = true;
+        end
+    end
 
+    if subsetKeepStatus
+        str = [str, ' subset(s): \color{blue}[INCLUDED]\color{black}'];
+    else
+        str = [str, ' subset(s): \color{red}[REJECTED]\color{black}'];
+    end
+end
 end
 
 function trialTagTitle = getTrialTagTitle(tags, currentTrial)
