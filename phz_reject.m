@@ -152,7 +152,7 @@ for i = 1:length(varargin)
 end
 
 totalNumTrials = size(PHZ.data,1);
-totalRejTrials = sum(PHZ.proc.reject.ind);
+totalRejTrials = sum(~PHZ.proc.reject.keep);
 
 rejrate = totalRejTrials / totalNumTrials;
 
