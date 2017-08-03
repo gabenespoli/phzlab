@@ -22,7 +22,8 @@
 % OUTPUT  
 %   PHZ.proc.reject.threshold   = The value specified in THRESHOLD.
 %   PHZ.proc.reject.units       = The units of the threshold value.
-%   PHZ.proc.reject.ind         = Indices of rejected trials.
+%   PHZ.proc.reject.keep        = Indices of rejected trials.
+%                                 0 = rejected; 1 = kept
 % 
 % EXAMPLES
 %   PHZ = phz_reject(PHZ,20)      >> Mark trials with a value > 20.
@@ -126,7 +127,7 @@ end
 % add info to proc structure
 PHZ.proc.reject.threshold = threshold;
 PHZ.proc.reject.units = units;
-PHZ.proc.reject.ind = ind;
+PHZ.proc.reject.keep = ~ind;
 
 % add to PHZ.history
 PHZ = phz_history(PHZ,['Threshold of ', historyThreshold, ' rejected ', ...
