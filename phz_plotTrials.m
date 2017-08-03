@@ -87,36 +87,17 @@ end
 if nargin < 2, startTrial = []; end
 if nargin < 3, verbose = true; end
 
-if ischar(startTrial) 
-    switch lower(startTrial)
-        case 'reset'
-            if ismember('reject', fieldnames(PHZ.proc)) && ...
-                ismember('manual', fieldnames(PHZ.proc.reject))
-                PHZ.proc.reject = rmfield(PHZ.proc.reject, 'manual')
-                PHZ = phz_history(PHZ, 'All manual rejection marks were discarded.', verbose);
-            else
-                fprintf('There are no manual rejection marks to discard.\n')
-            end
-
-        case 'resetall'
-            if ismember('reject', fieldnames(PHZ.proc)) 
-                if ~strcmp(names{end}, 'reject')
-                    error(['Other processing has been done since threshold ',...
-                        'rejection. Cannot discard previous rejection marks.'])
-                else
-                    PHZ.proc.reject = rmfield(PHZ.proc.reject, {'threshold', 'units', 'ind'});
-                end
-            else
-                fprintf('There are no rejection marks to discard.\n')
-            end
-
-        otherwise
-            fprintf('Unknown string input to phz_plotTrials.\n')
+if ischar(startTrial) && strcmpi(startTrial, 'reset')
+    if ismember('review', fieldnames(PHZ.proc))
+        PHZ.proc = rmfield(PHZ.proc, 'review');
+        PHZ = phz_history(PHZ, 'Manual rejection marks were discarded.', verbose);
+    else
+        fprintf('There are no manual rejection marks to discard.\n')
     end
-    return
 
 elseif ~isnumeric(startTrial)
     error('startTrial must be numeric, ''reset'', or ''resetall''.')
+
 end
 
 % create manual rejection marks if none exists
@@ -127,7 +108,7 @@ end
 
 % defaults
 if isempty(startTrial) % find first unviewed trial
-    currentTrial = min(find(PHZ.proc.reject.views == 0));
+    currentTrial = min(find(PHZ.proc.review.views == 0));
 else
     currentTrial = startTrial;
 end
@@ -275,9 +256,9 @@ end
 
 if ismember('reject', fieldnames(PHZ.proc))
     if PHZ.proc.reject.keep(currentTrial)
-        str = [str, 'reject: \color{blue}[INCLUDED]\color{black}'];
+        str = [str, ' reject: \color{blue}[INCLUDED]\color{black}'];
     else
-        str = [str, 'reject: \color{red}[REJECTED]\color{black}'];
+        str = [str, ' reject: \color{red}[REJECTED]\color{black}'];
     end
 end
 
