@@ -50,7 +50,9 @@
 %                   with a script.
 % 
 %   'save'        = [string] Enter a filename to save the created figure
-%                   to disk as a .png file.
+%                   to disk as a file. The filetype is determined from the
+%                   file extension. Supports png, pdf, and eps output. if 
+%                   no extension is given, .png is used.
 %   
 %   These are executed in the order that they appear in the function call. 
 %   See the help of each function for more details.
@@ -79,7 +81,7 @@
 % OUTPUT 
 %   A new figure is created and the specified plot is displayed.
 % 
-%   If 'filename' is specified, a .png file of the plot is saved.
+%   If 'filename' is specified, an image file of the plot is saved.
 % 
 %   Use phz_field to edit the order in which lines and bars are
 %   plotted, as well as their colour and line style.
@@ -390,7 +392,7 @@ end
 
 if pretty, set(gcf,'color','w'), end
 
-if ~isempty(filename), savefig(filename), end
+if ~isempty(filename), phzUtil_savefig(gcf, filename), end
 
 if do_close, close(gcf), end
 
@@ -557,23 +559,3 @@ ytitle{end+1} = ' '; % spacer to prevent overlapping with y ticks
 
 end
 
-function savefig(filename)
-
-background = get(gcf, 'color'); % save the original bg color for later use
-
-set(gcf,'InvertHardCopy','off');
-
-% add .png extension if not already
-[~,~,ext] = fileparts(filename);
-if ~strcmp(ext,'.png'), filename = [filename,'.png']; end
-
-% print file w/o transparency
-print('-dpng',filename);
-
-% read image data back in
-cdata = imread(filename);
-
-% write it back out - setting transparency info
-imwrite(cdata,filename,'png','BitDepth',16,'transparency',background)
-
-end
