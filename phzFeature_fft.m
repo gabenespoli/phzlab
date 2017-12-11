@@ -5,14 +5,21 @@
 %   [...] = phzFeature_fft(...,'Param1',Value1,etc.)
 % 
 % INPUT
-%   data          = [numeric] Matrix of where each row is a time-series 
-%                   trial.
+%   data          = [numeric] A trials-by-time array of data.
 % 
 %   srate         = [numeric] Sampling frequency of the data.
 % 
 %   units         = [string] The units of the data, to be adjusted if
 %                   power spectrum.
 % 
+%   'spectrum'    = ['amplitude'|'power'|'phase'|'complex'] Specifies the
+%                   type of spectrum to calculate. Default 'amplitude'.
+% 
+%   'wintype'     = ['hanning'|'none'] Type of windowing to apply to the
+%                   epoch. Default 'hanning'.
+% 
+%   'nfft'        = [numeric] Number of points in the FFT. Default is the
+%                   next power of two after the length of the epoch.
 % OUTPUT
 %   data          = [numeric] Matrix where each row is the spectrum of the
 %                   corresponding row in the input matrix.
@@ -23,17 +30,8 @@
 %   units         = [string] The units of the data, adjusted to include 
 %                   '^2' if power spectrum.
 % 
-%   featureTitle  = [string] Formatted title of type of spectrum for 
-%                   plotting.
+%   featureTitle  = [string] Formatted title of type of spectrum for plotting.
 % 
-%   'spectrum'    = ['amplitude'|'power'|'phase'|'complex'] Specifies the
-%                   type of spectrum to calculate. Default 'amplitude'.
-% 
-%   'wintype'     = ['hanning'|'none'] Type of windowing to apply to the
-%                   epoch. Default 'hanning'.
-% 
-%   'nfft'        = [numeric] Number of points in the FFT. Default is the
-%                   next power of two after the length of the epoch.
 
 % Copyright (C) 2016 Gabriel A. Nespoli, gabenespoli@gmail.com
 % 
