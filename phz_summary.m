@@ -62,7 +62,9 @@ keepVars = verifyKeepVars(keepVars);
 if ismember(keepVars,{'all'}), return, end
 preSummaryData = {};
 
-if ismember(keepVars{1},{'none'})
+PHZ = phz_discard(PHZ);
+
+if ismember(keepVars{1},{'none'}) % average across all trials
     PHZ.proc.summary.nParticipant = length(PHZ.participant);
     PHZ.proc.summary.nTrials = size(PHZ.data,1);
     PHZ.proc.summary.stdError = ste(PHZ.data);
