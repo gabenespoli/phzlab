@@ -271,7 +271,7 @@ end
 % reject
 % ------
 if ismember('reject',fieldnames(PHZ.proc))
-    PHZ.proc.reject.threshold = checkSingleNumber(PHZ.proc.reject.threshold,[name,'.proc.reject.threshold'],verbose);
+    checkSingleNumber(PHZ.proc.reject.threshold,[name,'.proc.reject.threshold']);
     PHZ.proc.reject.units     = verifyChar(PHZ.proc.reject.units,[name,'.proc.reject.units'],verbose);
     PHZ.proc.reject.keep      = verifyLogical(PHZ.proc.reject.keep,[name,'.proc.reject.keep'],verbose);
 end
