@@ -1,6 +1,4 @@
 function groupingVars = phzUtil_readFilename(filename,namestr)
-if isempty(namestr), return, end
-
 % create empty output
 groupingVars = struct(...
     'study',        '',...
