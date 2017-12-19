@@ -126,6 +126,8 @@ if ismember('blsub',fieldnames(PHZ.proc))
     PHZ.proc.blsub.values = '<collapsed>';
 end
 
+% the 'rej' field is not present in phzlab version >= 1
+% this section is kept for backwards compatibility
 if ismember('rej',fieldnames(PHZ.proc))
     PHZ.proc.rej.locs = '<collapsed>';
     PHZ.proc.rej.data = '<collapsed>';

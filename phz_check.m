@@ -239,7 +239,8 @@ end
 
 % rej
 % ---
-% this field is deprecated in favour of 'reject'. this section is kept for backwards compatibility
+% the 'rej' field is deprecated in favour of 'reject', in phzlab version >= 1
+% this section is kept for backwards compatibility
 if ismember('rej',fieldnames(PHZ.proc))
     if ~isstruct(PHZ.proc.rej)
         error([name,'.proc.rej should be a structure.']), end
