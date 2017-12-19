@@ -51,6 +51,7 @@
 % along with this program.  If not, see http://www.gnu.org/licenses/.
 
 function [PHZ, preSummaryData] = phz_summary(PHZ,keepVars,verbose)
+preSummaryData = {};
 
 if nargout == 0 && nargin == 0, help phz_summary, return, end
 if isempty(keepVars), return, end
@@ -61,7 +62,6 @@ PHZ = phz_check(PHZ); % (make ordinal if there are new manually-made orders i.e.
 keepVars = verifyKeepVars(keepVars);
 if ismember(keepVars,{'all'}), return, end
 PHZ.proc.summary.keepVars = keepVars;
-preSummaryData = {};
 
 if ismember(keepVars{1},{'none'})
     PHZ.proc.summary.nParticipant = length(PHZ.participant);
