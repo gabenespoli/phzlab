@@ -10,12 +10,12 @@
 %   keepVars  = A string or a cell array of strings of grouping
 %               variables that you would like to keep. All other 
 %               grouping variables (i.e., those not listed in 
-%               KEEPVARS will be averaged across. KEEPVARS can be a 
-%               combination of 'participant', 'group', 'session', and
-%               'trials'. Use 'all' or [] (empty) to retain all trials
+%               KEEPVARS) will be averaged across (collapsed). KEEPVARS
+%               can be combination of 'participant', 'group', 'session',
+%               and 'trials'. Use 'all' or [] (empty) to retain all trials
 %               (i.e., do nothing) or 'none' to average all trials together
-%               (i.e., discard all grouping variables. 'all' and 'none' 
-%               cannot be used with other KEEPVARS.
+%               (i.e., discard all grouping variables). 'all' and 'none' 
+%               cannot be used in combination with other KEEPVARS.
 % 
 % OUTPUT
 %   PHZ.data                      = The data summarized by KEEPVARS.
@@ -61,9 +61,10 @@ PHZ = phz_check(PHZ); % (make ordinal if there are new manually-made orders i.e.
 
 keepVars = verifyKeepVars(keepVars);
 if ismember(keepVars,{'all'}), return, end
-PHZ.proc.summary.keepVars = keepVars;
 
-if ismember(keepVars{1},{'none'})
+PHZ = phz_discard(PHZ, verbose);
+
+if ismember(keepVars{1},{'none'}) % average across all trials
     PHZ.proc.summary.nParticipant = length(PHZ.participant);
     PHZ.proc.summary.nTrials = size(PHZ.data,1);
     PHZ.proc.summary.stdError = ste(PHZ.data);
@@ -80,12 +81,13 @@ else % get categories to collapse across
     end
     varTypes = unique(varInd); % this will be in the proper spec order because they are ordinal categorical arrays
 
-    % loop categories and average
+    % make containers
     summaryData = nan(length(varTypes),size(PHZ.data,2));
     PHZ.proc.summary.stdError = nan(size(summaryData));
     PHZ.proc.summary.nParticipant = nan(length(varTypes),1);
     PHZ.proc.summary.nTrials = nan(length(varTypes),1);
 
+    % loop categories and average
     for i = 1:length(varTypes)
         % preSummaryData = PHZ;
         preSummaryData{i} = PHZ.data(varInd == varTypes(i),:);
@@ -124,6 +126,8 @@ if ismember('blsub',fieldnames(PHZ.proc))
     PHZ.proc.blsub.values = '<collapsed>';
 end
 
+% the 'rej' field is not present in phzlab version >= 1
+% this section is kept for backwards compatibility
 if ismember('rej',fieldnames(PHZ.proc))
     PHZ.proc.rej.locs = '<collapsed>';
     PHZ.proc.rej.data = '<collapsed>';
@@ -136,6 +140,7 @@ if ismember('rej',fieldnames(PHZ.proc))
 end
 
 if isempty(keepVars), keepVars = {''}; end
+PHZ.proc.summary.keepVars = keepVars;
 PHZ = phz_history(PHZ,['Summarized data by ''',strjoin(keepVars),'''.'],verbose);
 
 end

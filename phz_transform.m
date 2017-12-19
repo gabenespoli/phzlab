@@ -65,19 +65,11 @@ if length(transform) > 2
     warning('Transform cell array has length > 2. Only using first 2 elements.')
 end
 
-if ismember('rej',fieldnames(PHZ.proc))
-    do_rej = true;
-else
-    do_rej = false;
-end
-
 % apply transformation
 if isnumeric(transform{1})
     
     transformStr = ['Multiplied by ',num2str(transform{1}),'.'];
     PHZ.data = PHZ.data * transform{1};
-    if do_rej
-        PHZ.proc.rej.data = PHZ.proc.rej.data * transform{1}; end
     
 else
     
@@ -88,38 +80,28 @@ else
                 error('Cannot compute square root of negative values.'), end
             transformStr = 'Square root transformation.';
             PHZ.data = sqrt(PHZ.data);
-            if do_rej
-                PHZ.proc.rej.data = sqrt(PHZ.proc.rej.data); end
             
         case {'^2','square'}
             transformStr = 'Squared each data point.';
             PHZ.data = PHZ.data .^ 2;
-            if do_rej
-                PHZ.proc.rej.data = PHZ.proc.rej.data .^ 2; end
             
         case 'log'
             if any(PHZ.data < 0)
                 error('Cannot compute logarithm of negative values.'), end
             transformStr = 'Natural logarithm transformation.';
             PHZ.data = log(PHZ.data);
-            if do_rej
-                PHZ.proc.rej.data = log(PHZ.proc.rej.data); end
             
         case 'log10'
             if any(PHZ.data < 0)
                 error('Cannot compute logarithm of negative values.'), end
             transformStr = 'Base 10 logarithm transformation.';
             PHZ.data = log10(PHZ.data);
-            if do_rej
-                PHZ.proc.rej.data = log10(PHZ.proc.rej.data); end
             
         case 'log2'
             if any(PHZ.data < 0)
                 error('Cannot compute logarithm of negative values.'), end
             transformStr = 'Base 2 logarithm transformation.';
             PHZ.data = log2(PHZ.data);
-            if do_rej
-                PHZ.proc.rej.data = log2(PHZ.proc.rej.data); end
             
         otherwise, error('Unknown transformation.')
     end

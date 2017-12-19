@@ -205,13 +205,14 @@ while keepGoing
 
         case 103 % g
             PHZ = addView(PHZ, currentTrial);
-            goto = input(['Enter trial number (1-', ...
-                num2str(size(PHZ.data,1)), '): ']);
-            if goto < 1 || goto > size(PHZ.data,1)
-                fprintf('Trial number out of range. Displaying trial #%i.', currentTrial)
-            else
-                currentTrial = goto;
-            end
+            goto = input(['Enter trial number (1-', num2str(size(PHZ.data,1)), '): ']);
+            if ~isempty(goto)
+                if goto < 1 || goto > size(PHZ.data,1)
+                    fprintf('Trial number out of range. Displaying trial #%i.', currentTrial)
+                else
+                    currentTrial = goto;
+                end
+            end 
 
         case 71 % G (capital g)
             PHZ = addView(PHZ, currentTrial);
@@ -235,14 +236,16 @@ while keepGoing
 
         case 83 % S (capital s)
             tempWin = input('Enter a new smoothing parameter: ', 's');
-            try
-                PHZ_plot = phz_smooth(PHZ, tempWin, false);
-                smoothWin = tempWin;
-                smooth = true;
-            catch
-                fprintf('Invalid smoothing parameter. Smoothing was not changed.')
+            if ~isempty(tempWin)
+                try
+                    PHZ_plot = phz_smooth(PHZ, tempWin, false);
+                    smoothWin = tempWin;
+                    smooth = true;
+                catch
+                    fprintf('Invalid smoothing parameter. Smoothing was not changed.\n')
+                end
             end
-
+            
         case 105 % i
             if showTags
                 showTags = false;
@@ -295,24 +298,13 @@ if ismember('reject', names)
     end
 end
 
-if ismember('subset', names)
+ind = find(contains(names,'subset'));
+if ~isempty(ind)
     subsetKeepStatus = true;
-    foundAllSubsets = false;
-    counter = 1;
-    while ~foundAllSubsets
-        if counter == 1
-            subsetNumStr = 'subset';
-        else
-            subsetNumStr = ['subset', num2str(counter)];
-        end
-        subsetInd = find(ismember(names, subsetNumStr));
-        if ~isempty(subsetInd)
-            if ~PHZ.proc.(names{subsetInd}).keep(currentTrial)
-                subsetKeepStatus = false;
-                break
-            end
-        else
-            foundAllSubsets = true;
+    for i = 1:length(ind)
+        if PHZ.proc.(names{ind(i)}).keep(currentTrial) == false
+            subsetKeepStatus = false;
+            break
         end
     end
 

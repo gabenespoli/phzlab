@@ -61,13 +61,7 @@ if nargin < 3, verbose = true; end
 
 if do_norm || do_restore
     
-    if ismember('rej',fieldnames(PHZ.proc))
-        ind = PHZ.proc.rej.data_locs;
-        indrej = PHZ.proc.rej.locs;
-    else
-        ind = 1:size(PHZ.data,1);
-        indrej = [];
-    end
+    ind = 1:size(PHZ.data,1);
     
     if do_restore
         
@@ -80,10 +74,8 @@ if do_norm || do_restore
         
         if length(PHZ.proc.norm.mean) == 1
             PHZ.data = (PHZ.data .* PHZ.proc.norm.stDev(ind)) + PHZ.proc.norm.mean(ind);
-            if ~isempty(indrej), PHZ.proc.rej.data = (PHZ.proc.rej.data .* PHZ.proc.norm.stDev(indrej)) + PHZ.proc.norm.mean(indrej); end
         else
             PHZ.data = (PHZ.data .* repmat(PHZ.proc.norm.stDev(ind),1,size(PHZ.data,2))) + repmat(PHZ.proc.norm.mean(ind),1,size(PHZ.data,2));
-            if ~isempty(indrej), PHZ.proc.rej.data = (PHZ.proc.rej.data .* repmat(PHZ.proc.norm.stDev(indrej),1,size(PHZ.data,2))) + repmat(PHZ.proc.norm.mean(indrej),1,size(PHZ.data,2)); end
         end
         PHZ.units = PHZ.proc.norm.oldUnits;
         PHZ.proc = rmfield(PHZ.proc,'norm');
@@ -107,14 +99,12 @@ if do_norm || do_restore
             PHZ.proc.norm.mean = mean(PHZ.data,2);
             PHZ.proc.norm.stDev = std(PHZ.data,[],2);
             PHZ.data = (PHZ.data - repmat(PHZ.proc.norm.mean(ind),1,size(PHZ.data,2))) ./ repmat(PHZ.proc.norm.stDev(ind),1,size(PHZ.data,2));
-            if ~isempty(indrej), PHZ.data = (PHZ.data - repmat(PHZ.proc.norm.mean(indrej),1,size(PHZ.data,2))) ./ repmat(PHZ.proc.norm.stDev(indrej),1,size(PHZ.data,2)); end
             
         elseif strcmp(normtype,'all') || length(PHZ.(normtype)) == 1
             normtype = 'all trials';
             PHZ.proc.norm.mean = mean(PHZ.data(:)); % single value
             PHZ.proc.norm.stDev = std(PHZ.data(:));
             PHZ.data = (PHZ.data - PHZ.proc.norm.mean(ind)) ./ PHZ.proc.norm.stDev(ind);
-            if ~isempty(indrej), PHZ.proc.rej.data = (PHZ.proc.rej.data - PHZ.proc.norm.mean(indrej)) ./ PHZ.proc.norm.stDev(indrej); end
             
         else
             PHZ.proc.norm.mean = nan(size(PHZ.meta.tags.(normtype)));

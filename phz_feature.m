@@ -20,6 +20,12 @@
 %               participants are kept separate for this averaging.
 %               See phz_summary for more details.
 %
+%   'discard' = [1|0] Calls phz_discard.m to discard trials that were
+%               marked for rejection before calculating the feature.
+%               Enter 1 to discard or 0 to keep all trials regardless
+%               of trials marked for discarding (i.e., from phz_reject,
+%               phz_review, or phz_subset).
+%
 %   Time-domain features:
 %   'mean'        = Average value.
 %
@@ -79,10 +85,6 @@
 %
 %   'rt','rt2',...    = Reaction time in PHZ.resp.q1_rt, q2, etc.
 %
-%   Note: For all features except 'acc' and 'rt', data are returned for
-%         non-rejected trials. For 'acc' and 'rt', all trials are included
-%         regardless of whether or not they are rejected.
-%
 % OUTPUT
 %   PHZ.data            = The data of the extracted feature for each trial.
 %   PHZ.proc.feature    = The value specified in FEATURE.
@@ -114,6 +116,7 @@ if nargout == 0 && nargin == 0, help phz_feature, return, end
 % defaults
 region = [];
 keepVars = [];
+do_discard = true;
 verbose = true;
 
 % user-defined
@@ -121,6 +124,7 @@ for i = 1:2:length(varargin)
     switch varargin{i}
         case 'region',               region = varargin{i+1};
         case {'summary','keepvars'}, keepVars = varargin{i+1};
+        case 'discard',              do_discard = varargin{i+1};
         case 'verbose',              verbose = varargin{i+1};
     end
 end
@@ -129,6 +133,10 @@ if isempty(keepVars), keepVars = ''; end
 % parse feature input
 if isempty(feature), feature = 'time'; end
 [PHZ,featureStr,val] = parseFeature(PHZ,feature);
+
+if do_discard
+    PHZ = phz_discard(PHZ, verbose);
+end
 
 % restrict to region
 if isempty(region) && isstruct(PHZ.region) % PHZ.region = 'whole epoch';
@@ -195,7 +203,6 @@ switch lower(featureStr)
         
     case {'acc','acc1','acc2','acc3','acc4','acc5'}
         featureTitle = 'Accuracy';
-        PHZ = phz_rej(PHZ,0,0); % restore all metadata
         if strcmp(feature,'acc'), feature = 'acc1'; end
         PHZ.data = PHZ.resp.(['q',feature(4),'_acc']);
         if all(ismember(PHZ.data,[0 1]))
@@ -208,7 +215,6 @@ switch lower(featureStr)
     case {'rt', 'rt1', 'rt2', 'rt3', 'rt4', 'rt5'}
         featureTitle = 'Reaction Time';
         PHZ.units = 's';
-        PHZ = phz_rej(PHZ,0,0); % restore all metadata
         if strcmp(feature,'rt'), feature = 'rt1'; end
         PHZ.data = PHZ.resp.(['q',feature(3),'_rt']);
         
@@ -323,11 +329,14 @@ if size(PHZ.data,2) == 1
     if ismember('freqs',fieldnames(PHZ)), PHZ = rmfield(PHZ,'freqs'); end
 end
 
-if ismember('rej',fieldnames(PHZ.proc))
+if ismember('rej',fieldnames(PHZ.proc)) % phzlab version < 1
     PHZ.proc.rej.data = []; end
 
-if ismember('blc',fieldnames(PHZ.proc))
+if ismember('blc',fieldnames(PHZ.proc)) % phzlab version < 1
     PHZ.proc.blc.values = []; end
+
+if ismember('blsub',fieldnames(PHZ.proc)) % phzlab version > 1
+    PHZ.proc.blsub.values = []; end
 
 if ismember('norm',fieldnames(PHZ.proc))
     PHZ.proc.norm.mean = []; PHZ.proc.norm.stDev = []; end

@@ -12,7 +12,6 @@
 % 
 % OUTPUT
 %   PHZ.data          = Data for specified region only.
-%   PHZ.proc.rej.data = Data for specified region only.
 %   PHZ.region        = Value specified in REGION.
 % 
 % EXAMPLES
@@ -84,9 +83,6 @@ if isempty(region), error('Region is empty.'), end
 % restrict PHZ.data to specified region
 PHZ.data = PHZ.data(:,region);
 PHZ.(indField) = PHZ.(indField)(region);
-if ismember('rej',fieldnames(PHZ.proc)), 
-    PHZ.proc.rej.data = PHZ.proc.rej.data(:,region);
-end
 
 % cleanup PHZ fields
 PHZ.region = regionLabel;
