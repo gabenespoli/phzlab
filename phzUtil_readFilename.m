@@ -10,6 +10,8 @@ groupingVars = struct(...
     'condition',    '',...
     'session',      '');
 
+if isempty(namestr), return, end
+
 % find out which grpvars are in namestr & their order & their start/ends
 vars = {'study','datatype','participant','group','condition','session'};
 varsbeg = sort(cell2mat(regexp(namestr,vars,'start')));
