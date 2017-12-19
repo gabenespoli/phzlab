@@ -45,8 +45,10 @@ p = unique(FFR.pols);
 if length(p) == 2
     pol1=FFR.data(FFR.pols == p(1),:);
     pol2=FFR.data(FFR.pols == p(2),:);
-else
+elseif length(p) == 1
     pol1=FFR.data;
+else
+    error('There are an unusual number of polarities. Cannot calculate ITRC.')
 end
 
 % create output container
