@@ -10,12 +10,12 @@
 %   keepVars  = A string or a cell array of strings of grouping
 %               variables that you would like to keep. All other 
 %               grouping variables (i.e., those not listed in 
-%               KEEPVARS will be averaged across. KEEPVARS can be a 
-%               combination of 'participant', 'group', 'session', and
-%               'trials'. Use 'all' or [] (empty) to retain all trials
+%               KEEPVARS) will be averaged across (collapsed). KEEPVARS
+%               can be combination of 'participant', 'group', 'session',
+%               and 'trials'. Use 'all' or [] (empty) to retain all trials
 %               (i.e., do nothing) or 'none' to average all trials together
-%               (i.e., discard all grouping variables. 'all' and 'none' 
-%               cannot be used with other KEEPVARS.
+%               (i.e., discard all grouping variables). 'all' and 'none' 
+%               cannot be used in combination with other KEEPVARS.
 % 
 % OUTPUT
 %   PHZ.data                      = The data summarized by KEEPVARS.
@@ -86,6 +86,7 @@ else % get categories to collapse across
     PHZ.proc.summary.nParticipant = nan(length(varTypes),1);
     PHZ.proc.summary.nTrials = nan(length(varTypes),1);
 
+    % loop categories and average
     for i = 1:length(varTypes)
         % preSummaryData = PHZ;
         preSummaryData{i} = PHZ.data(varInd == varTypes(i),:);
