@@ -81,7 +81,7 @@ else % get categories to collapse across
     end
     varTypes = unique(varInd); % this will be in the proper spec order because they are ordinal categorical arrays
 
-    % loop categories and average
+    % make containers
     summaryData = nan(length(varTypes),size(PHZ.data,2));
     PHZ.proc.summary.stdError = nan(size(summaryData));
     PHZ.proc.summary.nParticipant = nan(length(varTypes),1);
