@@ -239,6 +239,7 @@ end
 
 % rej
 % ---
+% this field is deprecated in favour of 'reject'. this section is kept for backwards compatibility
 if ismember('rej',fieldnames(PHZ.proc))
     if ~isstruct(PHZ.proc.rej)
         error([name,'.proc.rej should be a structure.']), end
@@ -264,6 +265,21 @@ if ismember('rej',fieldnames(PHZ.proc))
         if ~strcmp(PHZ.proc.rej.trials,'<collapsed>'),       error('Problem with PHZ.proc.rej and/or PHZ.proc.summary.'), end
         if ~strcmp(PHZ.proc.rej.data,'<collapsed>'),         error('Problem with PHZ.proc.rej and/or PHZ.proc.summary.'), end
     end
+end
+
+% reject
+% ------
+if ismember('reject',fieldnames(PHZ.proc))
+    PHZ.proc.reject.threshold = checkSingleNumber(PHZ.proc.reject.threshold,[name,'.proc.reject.threshold'],verbose);
+    PHZ.proc.reject.units     = verifyChar(PHZ.proc.reject.units,[name,'.proc.reject.units'],verbose);
+    PHZ.proc.reject.keep      = verifyLogical(PHZ.proc.reject.keep,[name,'.proc.reject.keep'],verbose);
+end
+
+% review
+% ------
+if ismember('review',fieldnames(PHZ.proc))
+    PHZ.proc.review.keep  = verifyLogical(PHZ.proc.reject.keep,[name,'.proc.reject.keep'],verbose);
+    PHZ.proc.review.views = verifyNumeric(PHZ.proc.reject.threshold,[name,'.proc.reject.threshold'],verbose);
 end
 
 % blsub
@@ -350,6 +366,18 @@ try
     if ischar(C),           C = str2double(C);  end
     % if verbose, disp(['- Changed ',name,' to a double.']), end
 catch, error([name,' should be a numeric array.'])
+end
+end
+
+function C = verifyLogical(C,name,verbose)
+if logical(C), return, end
+try
+    if iscategorical(C),    C = cellstr(C);     end
+    if iscell(C),           C = C{:};           end
+    if ischar(C),           C = str2double(C);  end
+    if isnumeric(C),        C = logical(C);     end
+    % if verbose, disp(['- Changed ',name,' to a logical']), end
+catch, error([name,' should be a logical array.'])
 end
 end
 
