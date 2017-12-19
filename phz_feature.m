@@ -195,7 +195,6 @@ switch lower(featureStr)
         
     case {'acc','acc1','acc2','acc3','acc4','acc5'}
         featureTitle = 'Accuracy';
-        PHZ = phz_rej(PHZ,0,0); % restore all metadata
         if strcmp(feature,'acc'), feature = 'acc1'; end
         PHZ.data = PHZ.resp.(['q',feature(4),'_acc']);
         if all(ismember(PHZ.data,[0 1]))
@@ -208,7 +207,6 @@ switch lower(featureStr)
     case {'rt', 'rt1', 'rt2', 'rt3', 'rt4', 'rt5'}
         featureTitle = 'Reaction Time';
         PHZ.units = 's';
-        PHZ = phz_rej(PHZ,0,0); % restore all metadata
         if strcmp(feature,'rt'), feature = 'rt1'; end
         PHZ.data = PHZ.resp.(['q',feature(3),'_rt']);
         
