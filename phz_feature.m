@@ -20,6 +20,12 @@
 %               participants are kept separate for this averaging.
 %               See phz_summary for more details.
 %
+%   'discard' = [1|0] Calls phz_discard.m to discard trials that were
+%               marked for rejection before calculating the feature.
+%               Enter 1 to discard or 0 to keep all trials regardless
+%               of trials marked for discarding (i.e., from phz_reject,
+%               phz_review, or phz_subset).
+%
 %   Time-domain features:
 %   'mean'        = Average value.
 %
@@ -110,6 +116,7 @@ if nargout == 0 && nargin == 0, help phz_feature, return, end
 % defaults
 region = [];
 keepVars = [];
+do_discard = true;
 verbose = true;
 
 % user-defined
@@ -117,6 +124,7 @@ for i = 1:2:length(varargin)
     switch varargin{i}
         case 'region',               region = varargin{i+1};
         case {'summary','keepvars'}, keepVars = varargin{i+1};
+        case 'discard',              do_discard = varargin{i+1};
         case 'verbose',              verbose = varargin{i+1};
     end
 end
@@ -125,6 +133,10 @@ if isempty(keepVars), keepVars = ''; end
 % parse feature input
 if isempty(feature), feature = 'time'; end
 [PHZ,featureStr,val] = parseFeature(PHZ,feature);
+
+if do_discard
+    PHZ = phz_discard(PHZ, verbose);
+end
 
 % restrict to region
 if isempty(region) && isstruct(PHZ.region) % PHZ.region = 'whole epoch';
