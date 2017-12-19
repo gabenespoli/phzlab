@@ -7,7 +7,7 @@
 %   PHZ = phz_discard(PHZ)
 %
 % INPUT
-%   PHZ       = [struct] PHZLAB data structure.
+%   PHZ = [struct] PHZLAB data structure.
 %   
 %   At least one of the following fields should be populated using
 %   the appropriate function:
