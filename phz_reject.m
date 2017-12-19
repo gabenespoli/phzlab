@@ -13,11 +13,9 @@
 %               '0.05sd'). A trial will be rejected if any value exceeds 
 %               a THRESHOLD number of SD's of all trials.
 %
-%               Use 'reset' to unmark all trials for rejection (but
-%               keeping manual marks made with phz_plotTrials).
-%
-%               Use 'resetall' to unmark all trials for rejection
-%               (including those manual marks made with phz_review.)
+%               Use 'reset' to unmark all trials that were marked for
+%               rejection based on threshold. Note that this will not
+%               remove rejection marks made using phz_review.
 %                       
 % OUTPUT  
 %   PHZ.proc.reject.threshold   = The value specified in THRESHOLD.
@@ -70,21 +68,9 @@ elseif ischar(threshold)
         units = 'SD';
         threshold = str2double(threshold(1:end-2));
 
-    elseif strcmpi(threshold, 'resetall')
-        PHZ.proc = rmfield(PHZ.proc, 'reject');
-        PHZ = phz_history(PHZ, 'All rejection marks were discarded.', verbose);
-        return
-
     elseif strcmpi(threshold, 'reset')
-        if ismember('reject', names)
-            if ismember('manual', fieldnames(PHZ.proc.reject))
-                PHZ.proc.reject = rmfield(PHZ.proc.reject, ...
-                    {'threshold', 'units', 'ind'});
-            else
-                PHZ.proc = rmfield(PHZ.proc, 'reject');
-            end
-            PHZ = phz_history(PHZ, 'All threshold rejection marks were discarded.', verbose);
-        end
+        PHZ.proc = rmfield(PHZ.proc, 'reject');
+        PHZ = phz_history(PHZ, 'Threshold rejection marks were discarded.', verbose);
         return
 
     else
