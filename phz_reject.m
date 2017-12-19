@@ -17,7 +17,7 @@
 %               keeping manual marks made with phz_plotTrials).
 %
 %               Use 'resetall' to unmark all trials for rejection
-%               (including those manual marks made with phz_plotTrials.
+%               (including those manual marks made with phz_review.)
 %                       
 % OUTPUT  
 %   PHZ.proc.reject.threshold   = The value specified in THRESHOLD.
@@ -58,7 +58,7 @@ if nargin < 3, verbose = true; end
 names = fieldnames(PHZ.proc);
 if ismember('reject', names) && ~strcmp(names{end}, 'reject')
     error(['Other processing has been done since threshold ',...
-        'rejection. Cannot undo previous rejections.'])
+           'rejection. Cannot undo previous rejections.'])
 end
 
 % get threshold value and rejection type
@@ -72,7 +72,7 @@ elseif ischar(threshold)
 
     elseif strcmpi(threshold, 'resetall')
         PHZ.proc = rmfield(PHZ.proc, 'reject');
-        PHZ = phz_history(PHZ, ['All rejection marks were discarded.'], verbose);
+        PHZ = phz_history(PHZ, 'All rejection marks were discarded.', verbose);
         return
 
     elseif strcmpi(threshold, 'reset')
@@ -83,9 +83,12 @@ elseif ischar(threshold)
             else
                 PHZ.proc = rmfield(PHZ.proc, 'reject');
             end
-            PHZ = phz_history(PHZ, ['All threshold rejection marks were discarded.'], verbose);
+            PHZ = phz_history(PHZ, 'All threshold rejection marks were discarded.', verbose);
         end
         return
+
+    else
+        error('Problem with THRESHOLD.')
 
     end
 
