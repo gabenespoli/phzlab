@@ -81,7 +81,7 @@ end
 PHZ.proc.discard.procs = procs;
 PHZ.proc.discard.keep = keep;
 
-historyStr = ['Discarded trials by ',procs,'.'];
+historyStr = ['Discarded trials by ''',procs,'''.'];
 PHZ = phz_history(PHZ, historyStr, verbose);
 
 end
