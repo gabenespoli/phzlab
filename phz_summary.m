@@ -60,7 +60,6 @@ PHZ = phz_check(PHZ); % (make ordinal if there are new manually-made orders i.e.
 
 keepVars = verifyKeepVars(keepVars);
 if ismember(keepVars,{'all'}), return, end
-PHZ.proc.summary.keepVars = keepVars;
 preSummaryData = {};
 
 if ismember(keepVars{1},{'none'})
@@ -137,6 +136,7 @@ if ismember('rej',fieldnames(PHZ.proc))
 end
 
 if isempty(keepVars), keepVars = {''}; end
+PHZ.proc.summary.keepVars = keepVars;
 PHZ = phz_history(PHZ,['Summarized data by ''',strjoin(keepVars),'''.'],verbose);
 
 end
