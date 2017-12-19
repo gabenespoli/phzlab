@@ -329,11 +329,14 @@ if size(PHZ.data,2) == 1
     if ismember('freqs',fieldnames(PHZ)), PHZ = rmfield(PHZ,'freqs'); end
 end
 
-if ismember('rej',fieldnames(PHZ.proc))
+if ismember('rej',fieldnames(PHZ.proc)) % phzlab version < 1
     PHZ.proc.rej.data = []; end
 
-if ismember('blc',fieldnames(PHZ.proc))
+if ismember('blc',fieldnames(PHZ.proc)) % phzlab version < 1
     PHZ.proc.blc.values = []; end
+
+if ismember('blsub',fieldnames(PHZ.proc)) % phzlab version > 1
+    PHZ.proc.blsub.values = []; end
 
 if ismember('norm',fieldnames(PHZ.proc))
     PHZ.proc.norm.mean = []; PHZ.proc.norm.stDev = []; end
