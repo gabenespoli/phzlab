@@ -138,7 +138,7 @@ while ~foundMarkers
     
     % adjust markerTimes to be more precise
     if foundMarkers
-        if ~isempty(waveform), times = xcorrPrecision(data,times,waveform,win); end
+        if ~isempty(waveform),  times = xcorrPrecision(data,times,waveform,win);     end
         if ~isempty(maxRegion), times = adjustMarkerMaxRegion(data,times,maxRegion); end
     end
     
@@ -203,7 +203,8 @@ while askAgain
                 times = [];
                 askAgain = false;
                 foundMarkers = false;
-            else disp('Invalid input.')
+            else
+                disp('Invalid input.')
             end
     end
 end
@@ -229,8 +230,11 @@ for i = 1:length(times)
     [r1,lag1] = xcorr(currentMarker,waveform);
     [r2,lag2] = xcorr(currentMarker,waveform * -1);
     
-    if max(r1) > max(r2), [~,ind] = max(r1); lag = lag1;
-    else [~,ind] = max(r2); lag = lag2;
+    if max(r1) > max(r2)
+        [~,ind] = max(r1);
+        lag = lag1;
+    else
+        [~,ind] = max(r2); lag = lag2;
     end
     
     if lag(ind) ~= 0
@@ -260,8 +264,12 @@ end
 function h = plotMarkerChannel(data,srate,threshold,times,plotMarkerTimes)
 disp('Plotting audio marker channel...')
 
-if isempty(srate), srate = 1; xtitle = 'Time (samples)';
-else xtitle = 'Time (s)'; end
+if isempty(srate)
+    srate = 1;
+    xtitle = 'Time (samples)';
+else
+    xtitle = 'Time (s)';
+end
 x = (0:1:length(data)-1)/srate;
 
 h = figure('units','normalized','outerposition',[0 0 1 1]);
@@ -294,18 +302,30 @@ if plotMarkerTimes
         end
         
         % make axis for threshold info
-        ax2 = axes('Position',get(ax1,'Position'),'Color','none','box','off');
+        ax2 = axes('Position',get(ax1,'Position'),...
+                   'Color','none',...
+                   'box','off');
         ylabel(ax2,'Threshold')
-        set(ax2,'YAxisLocation','Right','FontSize',16,...
-            'XLim',get(ax1,'XLim'),'YLim',get(ax1,'YLim'),...
-            'XTick',[],'YTick',threshold)
+        set(ax2,...
+            'YAxisLocation','Right',...
+            'FontSize',16,...
+            'XLim',get(ax1,'XLim'),...
+            'YLim',get(ax1,'YLim'),...
+            'XTick',[],...
+            'YTick',threshold)
         
         % make axis for marker info
-        ax3 = axes('Position',get(ax1,'Position'),'Color','none','box','off');
+        ax3 = axes('Position',get(ax1,'Position'),...
+                   'Color','none',...
+                   'box','off');
         xlabels = 1:length(times);
-        set(ax3,'XAxisLocation','Top','FontSize',8,...
-            'XLim',get(ax1,'XLim'),'YLim',get(ax1,'YLim'),...
-            'XTick',times,'YTick',[],...
+        set(ax3,...
+            'XAxisLocation','Top',...
+            'FontSize',8,...
+            'XLim',get(ax1,'XLim'),...
+            'YLim',get(ax1,'YLim'),...
+            'XTick',times,...
+            'YTick',[],...
             'XTickLabel',cellstr(num2str(xlabels(:))))
         
     end
