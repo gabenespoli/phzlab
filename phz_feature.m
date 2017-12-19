@@ -79,10 +79,6 @@
 %
 %   'rt','rt2',...    = Reaction time in PHZ.resp.q1_rt, q2, etc.
 %
-%   Note: For all features except 'acc' and 'rt', data are returned for
-%         non-rejected trials. For 'acc' and 'rt', all trials are included
-%         regardless of whether or not they are rejected.
-%
 % OUTPUT
 %   PHZ.data            = The data of the extracted feature for each trial.
 %   PHZ.proc.feature    = The value specified in FEATURE.
