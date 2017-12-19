@@ -14,7 +14,7 @@
 %               the first region in PHZ.region.
 %
 % OUTPUT  
-%   PHZ.data              = Baseline-subtracted data.
+%   PHZ.data                = Baseline-subtracted data.
 %   PHZ.proc.blsub.region   = Start and end times of blsub region used.
 %   PHZ.proc.blsub.values   = Mean of baseline region for each trial.
 %
@@ -81,7 +81,8 @@ if do_blsub || do_restore
         if ischar(region)
             regionStr = [region,' ',phzUtil_num2strRegion(PHZ.region.(region))];
             region = PHZ.region.(region);
-        else regionStr = phzUtil_num2strRegion(region);
+        else
+            regionStr = phzUtil_num2strRegion(region);
         end
         PHZ.proc.blsub.region = region;
         
