@@ -13,7 +13,7 @@
 %               Must be the same length as the number of epochs.
 %
 %   labelType = ['seq'|'alt'] Adds either sequentially-numbered ('seq') or
-%               alternating 1's and 2's ('alt') trials. Default is 'seq'.
+%               alternating 1's and 0's ('alt') trials. Default is 'seq'.
 % 
 %   rminds    = [numeric|logical] Indices of labels to remove before
 %               applying the labels. This is useful if epochs could not be
@@ -63,9 +63,9 @@ if ischar(labels)
         
         case {'alt','alternating'}
             if ~mod(numTrials,2) % (if PHZ.trials is even)
-                PHZ.meta.tags.trials = repmat([1;2],[numTrials/2,1]);
+                PHZ.meta.tags.trials = repmat([1;0],[numTrials/2,1]);
             else % (PHZ.trials is odd)
-                PHZ.meta.tags.trials = [repmat([1;2],[(numTrials/2)-0.5,1]); 1];
+                PHZ.meta.tags.trials = [repmat([1;0],[(numTrials/2)-0.5,1]); 1];
             end
             
             PHZ.meta.tags.trials(rminds) = [];
