@@ -112,7 +112,7 @@ else
 end
 
 % add to history
-subsetStr = [subsetStr, ' / ', msg];
+subsetStr = [subsetStr, ' ', msg];
 PHZ = phz_history(PHZ,subsetStr,verbose);
 procName = phzUtil_getUniqueProcName(PHZ,'subset');
 PHZ.proc.(procName).message = msg;
