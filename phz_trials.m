@@ -28,6 +28,7 @@
 % OUTPUT
 %
 %
+%
 % EXAMPLES
 %
 
@@ -108,19 +109,18 @@ if ~isempty(equalVar)
 
     PHZ = phz_discard(PHZ,verbose);
 
-    cats = PHZ.trials;
-    numTrials = nan(1,length(cats));
-    for i = 1:length(cats)
-        numTrials(i) = length(PHZ.meta.tags.(equalVar)(PHZ.meta.tags.(equalVar)==cats(i)));
+    numTrials = nan(1,length(PHZ.trials));
+    for i = 1:length(PHZ.trials)
+        numTrials(i) = length(PHZ.meta.tags.(equalVar)(PHZ.meta.tags.(equalVar)==PHZ.trials(i)));
     end
 
     if sum(diff(numTrials))
         maxTrials = min(numTrials);
         ind = true(length(PHZ.meta.tags.(equalVar)), 1); % mark all trials for inclusion
-        for i = 1:length(cats)
+        for i = 1:length(PHZ.trials)
             if numTrials(i) > maxTrials
                 % get indices for this label
-                labelInd = find(PHZ.meta.tags.(equalVar)==cats(i));
+                labelInd = find(PHZ.meta.tags.(equalVar)==PHZ.trials(i));
                 % randomly select indices to drop
                 sel = randperm(length(labelInd), numTrials(i) - maxTrials);
                 % get the label indices of the selected indices (it's pretty meta, i know)
