@@ -11,7 +11,7 @@
 %               epoch. These labels will form the 'trials' grouping variable.
 %               Must be the same length as the number of epochs.
 %
-%             = ['seq'|'alt'] If the value of 'labels' is a string, it adds
+%               ['seq'|'alt'] If the value of 'labels' is a string, it adds
 %               either sequentially-numbered ('seq') or alternating 
 %               1's and 0's ('alt') trials.
 %
@@ -19,15 +19,11 @@
 %               'condition', 'session', or 'trial'. If the numbers of trials
 %               with each label is unequal, then trials are removed at random
 %               (from the label(s) with more trials) until all groups have an
-%               equal number of trials.
+%               equal number of trials. Note that trials which were marked for
+%               rejection will be discarded before performing equalization.
+%               Then trials will be equalized using phz_subset.
 % 
-%   'plot'    = [0|1] Enter 1 (true) to draw a bar plot showing the number of 
-%               trials assigned to each label of the given grouping variable.
-%               If phz_trials is called with one input (PHZ), then do_plot
-%               defaults to 1 (draw the plot). If other input is given, it
-%               defatuls to 0 (don't draw the plot).
-%
-%   Note that processing is always done in this order: labels, equal, plot.
+%   Note that labels are always added before equalizing.
 %
 % OUTPUT
 %
@@ -55,17 +51,13 @@ function PHZ = phz_trial(PHZ,varargin)
 if nargout == 0 && nargin == 0, help phz_trials, return, end
 
 labels = [];
-equal = '';
-if nargin == 1, do_plot = true;
-else,           do_plot = false;
-end
+equalVar = '';
 verbose = true;
 
 for i = 1:2:length(varargin)
     switch(lower(varargin{i}))
         case 'labels',              labels = varargin{i+1};
-        case {'equal','do_equal'},  do_equal = varargin{i+1};
-        case {'plot','do_plot'},    do_plot = varargin{i+1};
+        case {'equal','equalVar'},  equalVar = varargin{i+1};
         case 'verbose',             verbose = varargin{i+1};
     end
 end
@@ -106,7 +98,43 @@ if ~isempty(labels)
 end
 
 % equalize number of trials in each label of a grouping variable
+if ~isempty(equalVar)
 
-% plot - bar plot showing number of trials in each label of a grouping variable
+    grpVars = {'participant','group','condition','session','trials'};
+    if ~ismember(equalVar, grpVars)
+        disp('Invalid value for equalVar. Aborting...')
+        return
+    end
+
+    PHZ = phz_discard(PHZ,verbose);
+
+    cats = PHZ.trials;
+    numTrials = nan(1,length(cats));
+    for i = 1:length(cats)
+        numTrials(i) = length(PHZ.meta.tags.(equalVar)(PHZ.meta.tags.(equalVar)==cats(i)));
+    end
+
+    if sum(diff(numTrials))
+        maxTrials = min(numTrials);
+        ind = true(length(PHZ.meta.tags.(equalVar)), 1); % mark all trials for inclusion
+        for i = 1:length(cats)
+            if numTrials(i) > maxTrials
+                % get indices for this label
+                labelInd = find(PHZ.meta.tags.(equalVar)==cats(i));
+                % randomly select indices to drop
+                sel = randperm(length(labelInd), numTrials(i) - maxTrials);
+                % get the label indices of the selected indices (it's pretty meta, i know)
+                rminds = labelInd(sel);
+                % mark those indices for removal
+                ind(rminds) = false;
+            end
+        end
+        str = ['Equalized the number of labels in ', equalVar, ' to be the same (', num2str(maxTrials), ').'];
+        PHZ = phz_subset(PHZ, ind, str, verbose);
+        
+    else
+        disp('All labels already have the same number of epochs.')
+    end
+end
 
 end
