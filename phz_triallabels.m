@@ -7,12 +7,6 @@
 % INPUT
 %   PHZ       = [struct] PHZLAB data structure.
 %
-%   'rminds'  = [numeric|logical] Indices of trials to remove before
-%               applying the labels. This is useful if epochs could not be
-%               extracted or a trial was dropped, but you would like to
-%               retain the original ordering (i.e., skipping a trial
-%               label).
-%
 %   'labels'  = [numeric|cell of strings] Numeric or text labels for each
 %               epoch. These labels will form the 'trials' grouping variable.
 %               Must be the same length as the number of epochs.
@@ -33,8 +27,7 @@
 %               defaults to 1 (draw the plot). If other input is given, it
 %               defatuls to 0 (don't draw the plot).
 %
-%   Note that processing is always done in this order: 
-%       rminds, labels, equal, plot.
+%   Note that processing is always done in this order: labels, equal, plot.
 %
 % OUTPUT
 %
@@ -63,7 +56,6 @@ if nargout == 0 && nargin == 0, help phz_triallabels, return, end
 
 labels = [];
 equal = '';
-rminds = [];
 if nargin == 1, do_plot = true;
 else,           do_plot = false;
 end
@@ -73,14 +65,10 @@ for i = 1:2:length(varargin)
     switch(lower(varargin{i}))
         case 'labels',              labels = varargin{i+1};
         case {'equal','do_equal'},  do_equal = varargin{i+1};
-        case 'rminds',              rminds = varargin{i+1};
         case {'plot','do_plot'},    do_plot = varargin{i+1};
         case 'verbose',             verbose = varargin{i+1};
     end
 end
-
-% remove specified trials
-numTrials = size(PHZ.data,1) + length(rminds);
 
 % add trial labels
 if ~isempty(labels)
@@ -88,7 +76,6 @@ if ~isempty(labels)
         switch lower(labels)
             case {'seq','sequential'}
                 PHZ.meta.tags.trials = 1:numTrials;
-                PHZ.meta.tags.trials(rminds) = [];
                 PHZ = phz_history(PHZ,'Added sequential trial labels (i.e., 1, 2, 3, etc.).',verbose);
             
             case {'alt','alternating'}
@@ -98,7 +85,6 @@ if ~isempty(labels)
                     PHZ.meta.tags.trials = [repmat([1;0],[(numTrials/2)-0.5,1]); 1];
                 end
                 
-                PHZ.meta.tags.trials(rminds) = [];
                 PHZ = phz_history(PHZ,'Added alternating trial labels (i.e., 0, 1, 0, 1, etc.).',verbose);        
                 
             otherwise
@@ -112,8 +98,7 @@ if ~isempty(labels)
         end
         
         PHZ.meta.tags.trials = labels;
-        PHZ.meta.tags.trials(rminds) = [];
-        PHZ = phz_history(PHZ,'Added custom trial labels.',verbose);
+        PHZ = phz_history(PHZ,'Added or changed trial labels.',verbose);
         
     end
 end
