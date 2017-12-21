@@ -59,7 +59,7 @@ if ischar(labels)
         case {'seq','sequential'}
             PHZ.meta.tags.trials = 1:numTrials;
             PHZ.meta.tags.trials(rminds) = [];
-            PHZ = phz_history(PHZ,'Added sequential trial labels.',verbose);
+            PHZ = phz_history(PHZ,'Added sequential trial labels (i.e., 1, 2, 3, etc.).',verbose);
         
         case {'alt','alternating'}
             if ~mod(numTrials,2) % (if PHZ.trials is even)
@@ -69,7 +69,7 @@ if ischar(labels)
             end
             
             PHZ.meta.tags.trials(rminds) = [];
-            PHZ = phz_history(PHZ,'Added alternating trial labels.',verbose);        
+            PHZ = phz_history(PHZ,'Added alternating trial labels (i.e., 0, 1, 0, 1, etc.).',verbose);        
             
         otherwise
             error(['Unknown trial labels type ''',labels,'''.'])
