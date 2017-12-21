@@ -3,6 +3,7 @@
 %
 % USAGE    
 %   PHZ = phz_subset(PHZ, subset)
+%   PHZ = phz_subset(PHZ, subset, message)
 %
 % INPUT
 %   PHZ       = [struct] PHZLAB data structure.
@@ -21,7 +22,12 @@
 %               greater than the number of trials. Values that are 
 %               specified are included.
 %
+%   message   = [string] Message to include in the PHZ.proc structure,
+%               usually to log the reason for this subset.
+%
 % OUTPUT
+%   PHZ.proc.subset.message = The string in MESSAGE.
+%
 %   PHZ.proc.subset.input = If cell array input, it is copied here 
 %               for reference.
 %
@@ -52,11 +58,23 @@
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see http://www.gnu.org/licenses/.
 
-function PHZ = phz_subset(PHZ, subset, verbose)
+function PHZ = phz_subset(PHZ, subset, varargin)
 
 if nargout == 0 && nargin == 0, help phz_subset, return, end
 if isempty(subset), return, end
-if nargin < 3, verbose = true; end
+
+msg = '';
+verbose = true;
+
+if nargin > 2
+    for i = 1:length(varargin)
+        if isnumeric(varargin{i}) || islogical(varargin{i})
+            verbose = varargin{i};
+        elseif ischar(varargin{i})
+            msg = varargin{i};
+        end
+    end
+end
 
 % get indices to keep
 if islogical(subset) || ...
@@ -94,8 +112,10 @@ else
 end
 
 % add to history
+subsetStr = [subsetStr, ' / ', msg];
 PHZ = phz_history(PHZ,subsetStr,verbose);
 procName = phzUtil_getUniqueProcName(PHZ,'subset');
+PHZ.proc.(procName).message = msg;
 PHZ.proc.(procName).input = subsetInput;
 PHZ.proc.(procName).keep = ind;
 
