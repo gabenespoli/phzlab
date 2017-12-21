@@ -86,7 +86,14 @@ extractWindow = convertToSamples(extractWindow,winUnits,PHZ.srate);
 [PHZ.data,rminds] = extractEpochs(PHZ.data,times,extractWindow);
 PHZ.times = (extractWindow(1):1:extractWindow(2)) / PHZ.srate; % convert times to seconds
 
-PHZ = phz_history(PHZ,'Extracted epochs from data.',verbose);
+if isempty(rminds)
+    PHZ = phz_history(PHZ,'Extracted epochs from data.',verbose);
+else
+    PHZ = phz_history(PHZ,'Extracted epochs from data. ',...
+        'Some epochs were not extracted because they were too long ',...
+        'for the size of the data file.',verbose);
+    PHZ = phz_subset(PHZ,rminds,'verbose',verbose);
+end
 
 PHZ = phz_triallabels(PHZ,labels,'rminds',rminds,'verbose',verbose);
 
