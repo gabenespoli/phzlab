@@ -26,11 +26,13 @@
 %   Note that labels are always added before equalizing.
 %
 % OUTPUT
+%   PHZ.meta.tags.trials = If 'labels' is used, this field is filled with
+%               the specified trial labels.
 %
-%
-%
-% EXAMPLES
-%
+%   PHZ.data and PHZ.meta.tags.() = If 'equal' is used, all trials which
+%               were marked for rejection are discarded using phz_discard,
+%               and phz_subset is used to mark trials for rejection in order
+%               to equalize the number of labels.
 
 % Copyright (C) 2016 Gabriel A. Nespoli, gabenespoli@gmail.com
 %
