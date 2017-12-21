@@ -52,7 +52,7 @@
 
 function PHZ = phz_trial(PHZ,varargin)
 
-if nargout == 0 && nargin == 0, help phz_triallabels, return, end
+if nargout == 0 && nargin == 0, help phz_trials, return, end
 
 labels = [];
 equal = '';
