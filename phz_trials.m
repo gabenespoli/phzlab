@@ -70,6 +70,8 @@ for i = 1:2:length(varargin)
     end
 end
 
+numTrials = size(PHZ.data,1);
+
 % add trial labels
 if ~isempty(labels)
     if ischar(labels)
