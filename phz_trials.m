@@ -70,21 +70,21 @@ for i = 1:2:length(varargin)
     end
 end
 
-numTrials = size(PHZ.data,1);
+totTrials = size(PHZ.data,1);
 
 % add trial labels
 if ~isempty(labels)
     if ischar(labels)
         switch lower(labels)
             case {'seq','sequential'}
-                PHZ.meta.tags.trials = 1:numTrials;
+                PHZ.meta.tags.trials = 1:totTrials;
                 PHZ = phz_history(PHZ,'Added sequential trial labels (i.e., 1, 2, 3, etc.).',verbose);
             
             case {'alt','alternating'}
-                if ~mod(numTrials,2) % (if PHZ.trials is even)
-                    PHZ.meta.tags.trials = repmat([1;0],[numTrials/2,1]);
+                if ~mod(totTrials,2) % (if PHZ.trials is even)
+                    PHZ.meta.tags.trials = repmat([1;0],[totTrials/2,1]);
                 else % (PHZ.trials is odd)
-                    PHZ.meta.tags.trials = [repmat([1;0],[(numTrials/2)-0.5,1]); 1];
+                    PHZ.meta.tags.trials = [repmat([1;0],[(totTrials/2)-0.5,1]); 1];
                 end
                 
                 PHZ = phz_history(PHZ,'Added alternating trial labels (i.e., 0, 1, 0, 1, etc.).',verbose);        
@@ -94,13 +94,13 @@ if ~isempty(labels)
         end
         
     else
-        if ~isequal(length(labels),numTrials)
+        if ~isequal(length(labels),totTrials)
             error(['The number of labels (',num2str(length(labels)),...
-                ') does not match the number of trials (',num2str(numTrials),').'])
+                ') does not match the number of trials (',num2str(totTrials),').'])
         end
         
         PHZ.meta.tags.trials = labels;
-        PHZ = phz_history(PHZ,'Added or changed trial labels.',verbose);
+        PHZ = phz_history(PHZ,'Adjusted trial labels.',verbose);
         
     end
 end
