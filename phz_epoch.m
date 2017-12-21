@@ -1,4 +1,4 @@
-%PHZ_EPOCH  Split a PHZ structure into trials.
+%PHZ_EPOCH  Split a PHZ structure into epochs.
 %
 % USAGE
 %   PHZ = phz_epoch(PHZ,win,times)
@@ -19,10 +19,6 @@
 %                   file containing the epoch times. If empty, phz_epoch 
 %                   attempts to open the raw data file to get the epoch 
 %                   times from there. Default units is samples.
-% 
-%   'labels'      = Calls phz_triallabels to label each epoch. See the help
-%                   for phz_triallabels for more information. Default is to
-%                   label sequentially.
 % 
 %   'winUnits'    = [string] Specifies the units of the values in 
 %                   EXTRACTWINDOW. Options are 'samples', 's'/'seconds', 
@@ -68,7 +64,6 @@ verbose = true;
 % user-defined
 for i = 1:2:length(varargin)
     switch lower(varargin{i})
-        case 'labels',              labels = varargin{i+1};
         case 'winunits',            winUnits = varargin{i+1};
         case 'timeunits',           timeUnits = varargin{i+1};
         case 'verbose',             verbose = varargin{i+1};
@@ -95,8 +90,6 @@ else
     PHZ = phz_subset(PHZ,rminds,'verbose',verbose);
 end
 
-PHZ = phz_triallabels(PHZ,labels,'rminds',rminds,'verbose',verbose);
-
 end
 
 function [epochs,rminds] = extractEpochs(data,times,extractWindow)
@@ -104,13 +97,13 @@ function [epochs,rminds] = extractEpochs(data,times,extractWindow)
 disp('  Extracting epochs...')
 
 epochs = zeros(length(times),extractWindow(2) - extractWindow(1) + 1);
-
 rminds = [];
 w = '';
-for i = 1:length(times) % loop through trials
+
+for i = 1:length(times) % loop through epochs
     w = phzUtil_progressbar(w,i/length(times));
     
-    % skip trials for which the epoch window is too large for the datafile
+    % skip epochs for which the epoch window is too large for the datafile
     if (times(i) + extractWindow(1) < 1) || (times(i) + extractWindow(2) > size(data,2))
         warning(['Removing trial ',num2str(i),' because it is too close to ',...
             'edge of the datafile for the requested extraction window.'])
