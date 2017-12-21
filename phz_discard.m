@@ -40,7 +40,7 @@
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see http://www.gnu.org/licenses/.
 
-function PHZ = phz_discard(PHZ, verbose)
+function [PHZ, keep] = phz_discard(PHZ, verbose)
 
 if nargin == 0 && nargout == 0, help phz_discard, return, end
 if nargin < 2, verbose = true; end
@@ -54,6 +54,11 @@ keep = true(size(PHZ.data,1), 1);
 %   then it will be discarded
 names = fieldnames(PHZ.proc);
 ind = find(contains(names,{'reject', 'review', 'subset'}));
+
+if length(ind) == 0
+    return
+end
+
 for i = 1:length(ind)
     keep = keep & PHZ.proc.(names{ind(i)}).keep;
 end
