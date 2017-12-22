@@ -55,7 +55,8 @@ keep = true(size(PHZ.data,1), 1);
 names = fieldnames(PHZ.proc);
 ind = find(contains(names,{'reject', 'review', 'subset'}));
 
-if length(ind) == 0
+if isempty(ind)
+    disp('  Nothing to discard.')
     return
 end
 
