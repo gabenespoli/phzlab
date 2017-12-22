@@ -49,7 +49,7 @@
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see http://www.gnu.org/licenses/.
 
-function PHZ = phz_trial(PHZ,varargin)
+function PHZ = phz_trials(PHZ,varargin)
 
 if nargout == 0 && nargin == 0, help phz_trials, return, end
 
