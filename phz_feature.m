@@ -24,7 +24,7 @@
 %               marked for rejection before calculating the feature.
 %               Enter 1 to discard or 0 to keep all trials regardless
 %               of trials marked for discarding (i.e., from phz_reject,
-%               phz_review, or phz_subset).
+%               phz_review, or phz_subset). Default 1.
 %
 %   Time-domain features:
 %   'mean'        = Average value.
