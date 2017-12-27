@@ -89,8 +89,7 @@ else % get categories to collapse across
 
     % loop categories and average
     for i = 1:length(varTypes)
-        % preSummaryData = PHZ;
-        preSummaryData{i} = PHZ.data(varInd == varTypes(i),:);
+        preSummaryData{i} = PHZ.data(varInd == varTypes(i),:); %#ok<AGROW>
         PHZ.proc.summary.nParticipant(i) = length(unique(PHZ.meta.tags.participant(varInd == varTypes(i))));
         PHZ.proc.summary.nTrials(i) = size(preSummaryData{i},1);
         PHZ.proc.summary.stdError(i,:) = ste(preSummaryData{i});
