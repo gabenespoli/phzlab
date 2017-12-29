@@ -131,11 +131,16 @@ rejectionThreshold = [];
 % prepare for while loop
 PHZ_plot = PHZ; % make copy so we can change smoothing
 keepGoing = true;
+pos = [];
 
 while keepGoing
 
     % plot trial data
-    h = figure;
+    if isempty(pos)
+        h = figure;
+    else
+        h = figure('Position', pos); % use window position from last loop
+    end
     plot(PHZ_plot.times, PHZ_plot.data(currentTrial,:));
     if ~isempty(rejectionThreshold)
         lineHandle = line([PHZ_plot.times(1) PHZ_plot.times(end)], ...
@@ -276,6 +281,7 @@ while keepGoing
             fprintf('Invalid input. Use ''q'' to quit.\n')
 
     end
+    pos = get(h, 'Position');
     close(h)
 end
 end
