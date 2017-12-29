@@ -279,8 +279,8 @@ end
 % review
 % ------
 if ismember('review',fieldnames(PHZ.proc))
-    PHZ.proc.review.keep  = verifyLogical(PHZ.proc.reject.keep,[name,'.proc.reject.keep'],verbose);
-    PHZ.proc.review.views = verifyNumeric(PHZ.proc.reject.threshold,[name,'.proc.reject.threshold'],verbose);
+    PHZ.proc.review.keep  = verifyLogical(PHZ.proc.review.keep,[name,'.proc.review.keep'],verbose);
+    PHZ.proc.review.views = verifyNumeric(PHZ.proc.review.views,[name,'.proc.review.views'],verbose);
 end
 
 % blsub
