@@ -280,6 +280,8 @@ end
 % ------
 if ismember('review',fieldnames(PHZ.proc))
     PHZ.proc.review.keep  = verifyLogical(PHZ.proc.review.keep,[name,'.proc.review.keep'],verbose);
+end
+if ismember('views',fieldnames(PHZ.meta.tags))
     PHZ.proc.review.views = verifyNumeric(PHZ.proc.review.views,[name,'.proc.review.views'],verbose);
 end
 

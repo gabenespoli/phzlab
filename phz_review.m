@@ -12,7 +12,7 @@
 %   startTrial = [numeric|'reset'] If numeric, this is the trial
 %       number to start at. Default is to start at the first 
 %       unviewed trial (the number of times each trial has been
-%       viewed is stored in PHZ.proc.review.views).
+%       viewed is stored in PHZ.meta.tags.views).
 %
 %       If it is the string 'reset', all manual rejection marks 
 %       are discarded. Note that trials marked with threshold 
@@ -63,7 +63,7 @@
 %   PHZ.proc.review.keep = [logical] Trials that have been
 %       manually marked for rejection. 1 = keep, 0 = reject.
 %
-%   PHZ.proc.review.views = [numeric] Number of times each trial
+%   PHZ.meta.tags.views = [numeric] Number of times each trial
 %       has been viewed.
 %
 % EXAMPLES
@@ -112,12 +112,14 @@ end
 % create manual rejection marks if none exists
 if ~ismember('review', fieldnames(PHZ.proc))
     PHZ.proc.review.keep = true(size(PHZ.data,1),1);
-    PHZ.proc.review.views = zeros(size(PHZ.data,1),1);
+end
+if ~ismember('views', fieldnames(PHZ.meta.tags))
+    PHZ.meta.tags.views = zeros(size(PHZ.data,1),1);
 end
 
 % defaults
 if isempty(startTrial) % find first unviewed trial
-    currentTrial = find(PHZ.proc.review.views == 0, 1);
+    currentTrial = find(PHZ.meta.tags.views == 0, 1);
 else
     currentTrial = startTrial;
 end
@@ -284,6 +286,12 @@ while keepGoing
     pos = get(h, 'Position');
     close(h)
 end
+
+% if no trials are marked, remove the review proc field
+if all(PHZ.proc.review.keep)
+    PHZ.proc = rmfield(PHZ.proc, 'review');
+end
+
 end
 
 function str = getKeepStatusStr(PHZ, currentTrial)
@@ -340,7 +348,7 @@ end
 end
 
 function PHZ = addView(PHZ, currentTrial)
-PHZ.proc.review.views(currentTrial) = PHZ.proc.review.views(currentTrial) + 1;
+PHZ.meta.tags.views(currentTrial) = PHZ.meta.tags.views(currentTrial) + 1;
 end
 
 function yl = getYL(data, rejectionThreshold)
