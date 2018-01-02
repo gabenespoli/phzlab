@@ -180,13 +180,11 @@ while askAgain
             askAgain = false;
             
         case 'p'
-%             if ishandle(h), close(h), end
-            h = plotMarkerChannel(data,srate,threshold,times,false);
+            plotMarkerChannel(data,srate,threshold,times,false);
             askAgain = true;
             
         case 'm'
-%             if ishandle(h), close(h), end
-            h = plotMarkerChannel(data,srate,threshold,times,true);
+            plotMarkerChannel(data,srate,threshold,times,true);
             askAgain = true;
             
         case 'r'
