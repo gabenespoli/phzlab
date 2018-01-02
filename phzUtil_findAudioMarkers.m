@@ -20,14 +20,6 @@
 %                       around each marker to search for a maximum and set
 %                       that point as the marker instead. In samples.
 %
-%   'waveform'        = [numeric] Vector of the waveform of the audio
-%                       stimulus. 'markerWindow' must also be specified.
-%                       After the marker time is found, a cross-correlation
-%                       is calculated between DATA and MARKERWAVEFORM,
-%                       within the MARKERWINDOW. The marker time is
-%                       adjusted to the location of the maximum
-%                       cross-correlation.
-%
 %   'window'          = [numeric] A 1-by-2 vector specifying the times
 %                       around the marker time with which to calculate the
 %                       cross-correlation. In samples.
@@ -51,9 +43,28 @@
 %                       units of the plot from samples to seconds. Output
 %                       times are still in samples.
 %
+%   'stimulus'        = [numeric] Vector of the waveform of the audio
+%                       stimulus. 'markerWindow' must also be specified.
+%                       After the marker time is found, a cross-correlation
+%                       is calculated between DATA and MARKERWAVEFORM,
+%                       within the MARKERWINDOW, for both regular and
+%                       inverted (multiplied by -1) versions of the waveform. 
+%                       The marker time is adjusted to the location of the 
+%                       maximum cross-correlation among the two versions of
+%                       the stimulus. The xcorrInfo output arg contains the
+%                       results of this process. This function is intended
+%                       for use with auditory brainstem response (ABR) data.
+%
 % OUTPUT
 %   times             = [numeric] Indices of start times of markers
 %                       (i.e., units are samples).
+%
+%   xcorrInfo         = [struct] with fields that are the same length as
+%                       TIMES. The field 'r' is the value of the maximum
+%                       cross-correlation, 'lag' is the latency in samples
+%                       of r, and labels is a categorical corresponding to
+%                       the version of the stimulus (i.e., 'regular' or
+%                       'inverted').
 
 % Copyright (C) 2016 Gabriel A. Nespoli, gabenespoli@gmail.com
 % 
@@ -70,7 +81,7 @@
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see http://www.gnu.org/licenses/.
 
-function times = phzUtil_findAudioMarkers(data,threshold,timeBetween,varargin)
+function [times, xcorrInfo] = phzUtil_findAudioMarkers(data,threshold,timeBetween,varargin)
 if nargin == 0 && nargout == 0, help phzUtil_findAudioMarkers, return, end
 if threshold <= 0, error('Threshold must be greater than zero'), end
 
@@ -86,15 +97,15 @@ srate = [];
 
 for i = 1:2:length(varargin)
     switch lower(varargin{i})
-        case 'maxregion',           maxRegion = varargin{i+1};
-        case 'waveform',            waveform = varargin{i+1};
-        case {'window','win'},      win = varargin{i+1};
+        case 'maxregion',               maxRegion = varargin{i+1};
+        case {'stimulus','waveform'},   waveform = varargin{i+1};
+        case {'window','win'},          win = varargin{i+1};
             
-        case 'nummarkers',          numMarkers = varargin{i+1};
-        case 'nummarkersprompt',    numMarkersPrompt = varargin{i+1};
-        case 'plotmarkers',         plotMarkers = varargin{i+1};
+        case 'nummarkers',              numMarkers = varargin{i+1};
+        case 'nummarkersprompt',        numMarkersPrompt = varargin{i+1};
+        case 'plotmarkers',             plotMarkers = varargin{i+1};
             
-        case 'srate',               srate = varargin{i+1};
+        case 'srate',                   srate = varargin{i+1};
         
         otherwise, warning(['Unknown parameter ''',varargin{i},'''.'])
     end
@@ -104,6 +115,7 @@ end
 foundMarkers = false;
 returnFlag = false;
 times = [];
+xcorrInfo = struct();
 
 while ~foundMarkers
     
@@ -138,7 +150,7 @@ while ~foundMarkers
     
     % adjust markerTimes to be more precise
     if foundMarkers
-        if ~isempty(waveform),  times = xcorrPrecision(data,times,waveform,win);     end
+        if ~isempty(waveform),  [times, xcorrInfo] = xcorrPrecision(data,times,waveform,win);     end
         if ~isempty(maxRegion), times = adjustMarkerMaxRegion(data,times,maxRegion); end
     end
     
@@ -206,37 +218,66 @@ while askAgain
 end
 end
 
-function times = xcorrPrecision(data,times,waveform,win)
+function [times, xcorrInfo] = xcorrPrecision(data, times, waveform, win)
 disp('Using marker waveform and cross-correlation to optimize marker times...')
 str = '';
+r = nan(size(times));
+lag = nan(size(times));
+labels = cell(size(times));
 for i = 1:length(times)
     str = phzUtil_progressbar(str,i/length(times));
-    
+
     % skip trials for which the epoch window is too large for the datafile
-    if (times(i) + win(1) < 1) || (times(i) + win(2) > size(data,2))
-        warning(['Skipping trial ',num2str(i),' because it is too close to ',...
-            'edge of the datafile for the requested window.'])
+    if (times(i) + win(1) < 1) || (times(i) + win(2) > size(data, 2))
+        warning(['Skipping trial ', num2str(i), ' because it is too ',...
+            'close to edge of the datafile for the requested window.'])
         continue
     end
-    
+
     % get current marker with extractWindow
-    currentMarker = data(times(i)+win(1):times(i)+win(2));
-    
+    currentMarker = data(times(i) + win(1):times(i) + win(2));
+
     % find highest cross-correlation (both polarities)
-    [r1,lag1] = xcorr(currentMarker,waveform);
-    [r2,lag2] = xcorr(currentMarker,waveform * -1);
-    
-    if max(r1) > max(r2)
-        [~,ind] = max(r1);
-        lag = lag1;
-    else
-        [~,ind] = max(r2); lag = lag2;
+    [r1, lag1] = xcorr(currentMarker, waveform);      % regular
+    [r2, lag2] = xcorr(currentMarker, waveform * -1); % inverted
+
+    [rval1, ind1] = max(r1);
+    [rval2, ind2] = max(r2);
+    lagval1 = lag1(ind1);
+    lagval2 = lag2(ind2);
+
+    if rval1 > rval2
+        r(i) = rval1;
+        lag(i) = lagval1;
+        labels{i} = 'regular';
+
+    elseif rval2 > rval1
+        r(i) = rval2;
+        lag(i) = lagval2;
+        labels{i} = 'inverted';
+
+    elseif (rval1 == rval2) && (lagval1 ~= lagval2)
+        r(i) = rval1;
+        lag(i) = NaN;
+        % if same rval and same lagval, we're ok
+        % if same rval and diff lagval, it's a problem
+        warning(['Cross-correlation is the same for both regular and ', ...
+                'inverted waveform, but the lag times are different. ', ...
+                'This marker was not adjusted. ', ...
+                'You should inspect this marker time: times(', ...
+                num2str(i), ').'])
     end
-    
-    if lag(ind) ~= 0
-        times(i) = times(i) + lag(ind);
+
+    if ~isnan(lag(i)) && lag(i) ~= 0
+        times(i) = times(i) + lag(i);
     end
 end
+
+xcorrInfo        = struct();
+xcorrInfo.r      = r;
+xcorrInfo.lag    = lag;
+xcorrInfo.labels = categorical(labels);
+
 end
 
 function times = adjustMarkerMaxRegion(data,times,maxRegion)
