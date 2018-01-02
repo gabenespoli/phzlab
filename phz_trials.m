@@ -19,9 +19,9 @@
 %               'condition', 'session', or 'trial'. If the numbers of trials
 %               with each label is unequal, then trials are removed at random
 %               (from the label(s) with more trials) until all groups have an
-%               equal number of trials. Note that trials which were marked for
-%               rejection will be discarded before performing equalization.
-%               Then trials will be equalized using phz_subset.
+%               equal number of trials. This function takes into account 
+%               trials that are already marked for rejection by other methods,
+%               and calls phz_subset to mark the new rejections.
 % 
 %   Note that labels are always added before equalizing.
 %
@@ -109,29 +109,41 @@ if ~isempty(equalVar)
         return
     end
 
-    PHZ = phz_discard(PHZ,verbose);
+    [~, keep] = phz_discard(PHZ, false); % keep is a logical
+    keepInd = find(keep); % 'line numbers' of kept trials
 
-    % get number of trials of each type
-    numTrials = nan(1,length(PHZ.(equalVar)));
-    for i = 1:length(PHZ.(equalVar))
-        numTrials(i) = length(PHZ.meta.tags.(equalVar)(PHZ.meta.tags.(equalVar)==PHZ.(equalVar)(i)));
+    keepTags = PHZ.meta.tags.(equalVar)(keep);
+    tags = PHZ.(equalVar);
+
+    % get number of trials of each type, accounting for already-marked rejections
+    numTrials = nan(1,length(tags));
+    for i = 1:length(tags)
+        numTrials(i) = length(keepTags(keepTags==tags(i)));
     end
+    disp(numTrials)
 
     if sum(diff(numTrials))
         maxTrials = min(numTrials);
-        ind = true(length(PHZ.meta.tags.(equalVar)), 1); % mark all trials for inclusion
-        for i = 1:length(PHZ.(equalVar))
+        subKeep = true(length(keepTags), 1); % mark all trials for inclusion
+        for i = 1:length(tags)
             if numTrials(i) > maxTrials
                 % get indices for this label
-                labelInd = find(PHZ.meta.tags.(equalVar)==PHZ.(equalVar)(i));
+                labelInd = find(keepTags==tags(i)); % indices of this label in keepTags / subKeep
                 % randomly select indices to drop
                 sel = randperm(length(labelInd), numTrials(i) - maxTrials);
                 % get the label indices of the selected indices (it's pretty meta, i know)
                 rminds = labelInd(sel);
                 % mark those indices for removal
-                ind(rminds) = false;
+                subKeep(rminds) = false;
             end
         end
+
+        % 'subKeep' is only the length of the subset of trials not marked for rejection
+        % now we have to convert these indices into 'general' indices
+        ind = true(length(keep), 1); % mark all trials for inclusion
+        rminds = keepInd(~subKeep);
+        ind(rminds) = false;
+
         str = ['Equalized the number of labels in ', equalVar, ' to be the same (', num2str(maxTrials), ').'];
         PHZ = phz_subset(PHZ, ind, str, verbose);
         
