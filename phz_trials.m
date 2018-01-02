@@ -111,18 +111,19 @@ if ~isempty(equalVar)
 
     PHZ = phz_discard(PHZ,verbose);
 
-    numTrials = nan(1,length(PHZ.trials));
-    for i = 1:length(PHZ.trials)
-        numTrials(i) = length(PHZ.meta.tags.(equalVar)(PHZ.meta.tags.(equalVar)==PHZ.trials(i)));
+    % get number of trials of each type
+    numTrials = nan(1,length(PHZ.(equalVar)));
+    for i = 1:length(PHZ.(equalVar))
+        numTrials(i) = length(PHZ.meta.tags.(equalVar)(PHZ.meta.tags.(equalVar)==PHZ.(equalVar)(i)));
     end
 
     if sum(diff(numTrials))
         maxTrials = min(numTrials);
         ind = true(length(PHZ.meta.tags.(equalVar)), 1); % mark all trials for inclusion
-        for i = 1:length(PHZ.trials)
+        for i = 1:length(PHZ.(equalVar))
             if numTrials(i) > maxTrials
                 % get indices for this label
-                labelInd = find(PHZ.meta.tags.(equalVar)==PHZ.trials(i));
+                labelInd = find(PHZ.meta.tags.(equalVar)==PHZ.(equalVar)(i));
                 % randomly select indices to drop
                 sel = randperm(length(labelInd), numTrials(i) - maxTrials);
                 % get the label indices of the selected indices (it's pretty meta, i know)
@@ -135,7 +136,7 @@ if ~isempty(equalVar)
         PHZ = phz_subset(PHZ, ind, str, verbose);
         
     else
-        disp('All labels already have the same number of epochs.')
+        disp('  All labels already have the same number of epochs.')
     end
 end
 
