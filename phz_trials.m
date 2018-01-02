@@ -123,7 +123,6 @@ if ~isempty(equalVar)
     for i = 1:length(tags)
         numTrials(i) = length(keepTags(keepTags==tags(i)));
     end
-    disp(numTrials)
 
     if sum(diff(numTrials))
         maxTrials = min(numTrials);
