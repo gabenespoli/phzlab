@@ -40,10 +40,11 @@
 
 function w = phzUtil_progressbar(w,val,str)
 
-if nargin < 3, 
+if nargin < 3
     str = '';
     extraChars = 1;
-else str = [str '\n'];
+else
+    str = [str '\n'];
     extraChars = 2;
 end
 
