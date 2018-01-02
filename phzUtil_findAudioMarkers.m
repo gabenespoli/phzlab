@@ -189,14 +189,12 @@ while askAgain
             
         case 'r'
             rmMarkers = input('  Enter marker number(s) to delete >> ');
-%             close(h)
             times(rmMarkers) = [];
             disp([num2str(length(times)),' markers remain.'])
             askAgain = true;
             
         otherwise
             if ~isnan(str2double(resp))
-%                 close(h)
                 threshold = str2double(resp);
                 times = [];
                 askAgain = false;
