@@ -1,4 +1,4 @@
-%PHZ_FILTER  Apply a zero-phase shift filter to the data.
+%PHZ_FILTER  Apply a frequency filter to the data.
 %
 % USAGE  
 %   PHZ = phz_filter(PHZ,cutoff)
@@ -14,7 +14,7 @@
 %   'order'       = [numeric] Specifies the filter order. Default 3.
 % 
 %   'zerophase'   = [0|1] Specifies whether to use zero-phase filtering
-%                   (1; filtfilt.m) or not (0; filter.m). Default 0.
+%                   (1; filtfilt.m) or not (0; filter.m). Default 1.
 %               
 % OUTPUT
 %   PHZ.data  = The filtered data.
@@ -29,6 +29,14 @@
 %   Signal Processing Toolbox
 %     - butter.m
 %     - filtfilt.m
+%     - designfilt.m
+%
+% NOTES
+%   The notch filter code was taken from the following link:
+%   https://www.mathworks.com/help/signal/ug/remove-the-60-hz-hum-from-a-signal.html
+%
+%   As per the settings there, notch filters are always zero phase (filtfilt.m)
+%   and always use an order of 2.
 
 % potential future funtionality
 % -----------------------------
@@ -78,7 +86,7 @@ for i = 1:2:length(varargin)
 end
 
 % create filter coeffs
-hpB = []; hpA = []; lpB = []; lpA = []; nB = []; nA = [];
+hpB = []; hpA = []; lpB = []; lpA = [];
 
 if hipass ~= 0
     [hpB,hpA] = butter(filterOrder,hipass / (PHZ.srate / 2), 'high');
@@ -93,9 +101,13 @@ if lopass ~= 0
 end
 
 if notch ~= 0
-    [nB,nA] = butter(filterOrder,[ ...
-        (notch - 1) / (PHZ.srate / 2) ...
-        (notch + 1) / (PHZ.srate / 2)]);
+    d = designfilt('bandstopiir', ...
+        'FilterOrder', 2, ...
+        'HalfPowerFrequency1', notch - 1, ...
+        'HalfPowerFrequency2', notch + 1, ...
+        'DesignMethod', 'butter', ...
+        'SampleRate', PHZ.srate);
+
     PHZ = phz_history(PHZ,['Butterworth bandstop filter at ', ...
         num2str(notch), ' ± 1 Hz.'], verbose);
 end
@@ -108,14 +120,14 @@ for i = 1:size(PHZ.data,1)
     if do_zeroPhase
         if hipass ~= 0, PHZ.data(i,:) = filtfilt(hpB,hpA,PHZ.data(i,:)); end
         if lopass ~= 0, PHZ.data(i,:) = filtfilt(lpB,lpA,PHZ.data(i,:)); end
-        if notch ~= 0,  PHZ.data(i,:) = filtfilt(nB,nA,PHZ.data(i,:)); end
         
     else
         if hipass ~= 0, PHZ.data(i,:) = filter(hpB,hpA,PHZ.data(i,:)); end
         if lopass ~= 0, PHZ.data(i,:) = filter(lpB,lpA,PHZ.data(i,:)); end
-        if notch ~= 0,  PHZ.data(i,:) = filter(nB,nA,PHZ.data(i,:)); end
         
     end
+
+    if notch ~= 0,  PHZ.data(i,:) = filtfilt(d,PHZ.data(i,:)); end
 end
 
 if verbose, fprintf('Done.\n'), end
