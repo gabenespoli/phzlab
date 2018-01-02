@@ -21,7 +21,10 @@
 %               (from the label(s) with more trials) until all groups have an
 %               equal number of trials. This function takes into account 
 %               trials that are already marked for rejection by other methods,
-%               and calls phz_subset to mark the new rejections.
+%               and calls phz_subset to mark the new rejections. Beware that
+%               using phz_reject, phz_subset, or phz_review after using this
+%               option may result in the number of trials becoming unequal 
+%               again.
 % 
 %   Note that labels are always added before equalizing.
 %
