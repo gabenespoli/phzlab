@@ -128,14 +128,19 @@ end
 % the 'rej' field is not present in phzlab version >= 1
 % this section is kept for backwards compatibility
 if ismember('rej',fieldnames(PHZ.proc))
-    PHZ.proc.rej.locs = '<collapsed>';
-    PHZ.proc.rej.data = '<collapsed>';
-    PHZ.proc.rej.data_locs = '<collapsed>';
+    PHZ.proc.rej.locs        = '<collapsed>';
+    PHZ.proc.rej.data        = '<collapsed>';
+    PHZ.proc.rej.data_locs   = '<collapsed>';
     PHZ.proc.rej.participant = '<collapsed>';
-    PHZ.proc.rej.condition = '<collapsed>';
-    PHZ.proc.rej.group = '<collapsed>';
-    PHZ.proc.rej.session = '<collapsed>';
-    PHZ.proc.rej.trials = '<collapsed>';
+    PHZ.proc.rej.condition   = '<collapsed>';
+    PHZ.proc.rej.group       = '<collapsed>';
+    PHZ.proc.rej.session     = '<collapsed>';
+    PHZ.proc.rej.trials      = '<collapsed>';
+end
+
+% reset number of views (from phz_review)
+if ismember('views', fieldnames(PHZ.meta.tags))
+    PHZ.meta.tags.views = zeros(size(PHZ.data,1), 1);
 end
 
 if isempty(keepVars), keepVars = {''}; end
