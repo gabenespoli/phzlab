@@ -117,6 +117,7 @@ end
 PHZ.proc.reject.threshold = threshold;
 PHZ.proc.reject.units = units;
 PHZ.proc.reject.keep = ~ind;
+PHZ.proc.reject.discarded = false;
 
 % add to PHZ.history
 PHZ = phz_history(PHZ,['Threshold of ', historyThreshold, ' marked ', ...

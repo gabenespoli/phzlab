@@ -112,6 +112,7 @@ end
 % create manual rejection marks if none exists
 if ~ismember('review', fieldnames(PHZ.proc))
     PHZ.proc.review.keep = true(size(PHZ.data,1),1);
+    PHZ.proc.review.discarded = false;
 end
 if ~ismember('views', fieldnames(PHZ.meta.tags))
     PHZ.meta.tags.views = zeros(size(PHZ.data,1),1);

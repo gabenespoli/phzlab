@@ -118,6 +118,7 @@ procName = phzUtil_getUniqueProcName(PHZ,'subset');
 PHZ.proc.(procName).message = msg;
 PHZ.proc.(procName).input = subsetInput;
 PHZ.proc.(procName).keep = ind;
+PHZ.proc.(procName).discarded = false;
 
 end
 

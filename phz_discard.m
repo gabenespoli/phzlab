@@ -45,13 +45,7 @@ function [PHZ, keep] = phz_discard(PHZ, verbose)
 if nargin == 0 && nargout == 0, help phz_discard, return, end
 if nargin < 2, verbose = true; end
 
-% all of the 'keep' fields have 1 = keep and 0 = discard
-% so, to combine them all we should use &
-keep = true(size(PHZ.data,1), 1);
-
-% combine all 'keep' vectors with logical AND
-% i.e., if at least one of the vectors has a 0 for a trial,
-%   then it will be discarded
+% find all proc fields that have discard marks
 names = fieldnames(PHZ.proc);
 ind = find(contains(names,{'reject', 'review', 'subset'}));
 
@@ -60,9 +54,24 @@ if isempty(ind)
     return
 end
 
+% combine all 'keep' vectors with logical AND
+% all of the 'keep' fields have 1 = keep and 0 = discard
+% i.e., if at least one of the vectors has a 0 for a trial,
+%   then it will be discarded
+keep = true(size(PHZ.data,1), 1);
 for i = 1:length(ind)
-    keep = keep & PHZ.proc.(names{ind(i)}).keep;
+    name = names{ind(i)};
+    if ~PHZ.proc.(name).discarded
+        keep = keep & PHZ.proc.(name).keep;
+        PHZ.proc.(name).discarded = true;
+    end
 end
+
+if all(keep)
+    disp('  Nothing to discard.')
+    return
+end
+
 procs = strjoin(names(ind),' ');
 
 % actually reject the trials
