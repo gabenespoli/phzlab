@@ -8,7 +8,8 @@
 % INPUT   
 %   (none) = Opens a file browser to select files to gather.
 % 
-%   folder = Gather all .phz files in this folder.
+%   folder = Gather all .phz files in this folder. Can also be a 
+%            cell array of full or relative file paths.
 % 
 %   'save' = Filename and path to save PHZ structure as a '.phz' file.
 %           
@@ -63,10 +64,18 @@ filename = {};
 verbose = false;
 
 % user-defined
-if nargin > 0 && isdir(varargin{1})
-    folder = varargin{1};
-    files = what(folder);
-    files = files.mat;
+if nargin > 0 
+    if ischar(varargin{1}) && isdir(varargin{1})
+        folder = varargin{1};
+        files = dir(folder);
+        files = {files.name};
+        files = files(contains(files, {'.phz', '.mat'}));
+
+    elseif iscell(varargin{1})
+        folder = '';
+        files = varargin{1};
+
+    end
     varargin(1) = [];
     
 else
