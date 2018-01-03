@@ -142,6 +142,7 @@ if ~isempty(equalVar)
 
         % 'subKeep' is only the length of the subset of trials not marked for rejection
         % now we have to convert these indices into 'general' indices
+        % even more meta, i know, i know
         ind = true(length(keep), 1); % mark all trials for inclusion
         rminds = keepInd(~subKeep);
         ind(rminds) = false;
