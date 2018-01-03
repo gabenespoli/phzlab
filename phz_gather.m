@@ -106,13 +106,11 @@ resetFields = {};
 
 % loop through files
 % ------------------
-w = waitbar(0,'Gathering PHZ data...');
 for j = 1:length(files)
     fileProgress = [num2str(j), '/', num2str(length(files)), ...
         ': ''',files{j},''''];
     
     disp(['Gathering PHZ data from file ', fileProgress])
-    waitbar(j/length(files),w,['Gathering PHZ data from file ', fileProgress])
 
     % load data
     if verbose, disp(['Loading data from file ', fileProgress]), end
@@ -202,7 +200,6 @@ for j = 1:length(files)
     % data
     PHZS.data = [PHZS.data; PHZ.data];
     if numel(PHZS.data) > 50000000 % check if filesize is getting too big
-        close(w)
         error(['Too much data to gather into one variable. Consider ',...
             'doing some preprocessing and averaging with phz_gather.'])
     end
@@ -219,7 +216,6 @@ for j = 1:length(files)
     
     if verbose, disp(' '), end
 end % end looping participants
-close(w)
 
 % cleanup PHZS
 % ------------
