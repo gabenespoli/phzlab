@@ -21,7 +21,9 @@
 function PHZ = phz_check(PHZ,verbose)
 
 if nargout == 0 && nargin == 0, help phz_check, end
-if nargin < 2, verbose = true; end
+if nargin < 2
+    verbose = 1; % use verbose = 2 for even more verbose
+end
 
 % get name of input variable for accurate feedback
 name = inputname(1);
@@ -370,7 +372,7 @@ try
     if iscategorical(C),    C = cellstr(C);     end
     if iscell(C),           C = C{:};           end
     if ischar(C),           C = str2double(C);  end
-    % if verbose, disp(['- Changed ',name,' to a double.']), end
+    if verbose == 2, disp(['- Changed ',name,' to a double.']), end
 catch, error([name,' should be a numeric array.'])
 end
 end
@@ -382,7 +384,7 @@ try
     if iscell(C),           C = C{:};           end
     if ischar(C),           C = str2double(C);  end
     if isnumeric(C),        C = logical(C);     end
-    % if verbose, disp(['- Changed ',name,' to a logical']), end
+    if verbose == 2, disp(['- Changed ',name,' to a logical']), end
 catch, error([name,' should be a logical array.'])
 end
 end
@@ -392,7 +394,7 @@ if ischar(C), return, end
 try
     if isnumeric(C), C = num2str(C); end
     if iscell(C), C = C{:}; end
-    % if verbose, disp(['- Changed ',name,' to a string.']), end
+    if verbose == 2, disp(['- Changed ',name,' to a string.']), end
 catch, error([name,' should be a string.'])
 end
 end
@@ -403,7 +405,7 @@ try
     if isnumeric(C),        C = {C};        end
     if ischar(C),           C = cellstr(C); end
     if iscategorical(C),    C = cellstr(C); end
-    % if verbose, disp(['- Changed ',name,' to a cell array.']), end
+    if verbose == 2, disp(['- Changed ',name,' to a cell array.']), end
 catch, error([name,' should be a cell array.'])
 end
 end
@@ -420,7 +422,7 @@ try
     
     if ischar(C),    C = cellstr(C);     end
     if iscell(C),    C = categorical(C); end
-    % if verbose, disp(['- Changed ',name,' to a categorical array.']), end
+    if verbose == 2, disp(['- Changed ',name,' to a categorical array.']), end
 catch, error([name,' should be a categorical array.'])
 end
 end
@@ -431,7 +433,7 @@ if ~isrow(x)
     if iscolumn(x)
         x = x';
         if noutargs == 0, warning([name,' should be changed from a column vector to a row vector.'])
-        % elseif verbose, disp(['- Changed ',name,' from a column vector to a row vector.'])
+        elseif verbose == 2, disp(['- Changed ',name,' from a column vector to a row vector.'])
         end
     else
         error(['Something is wrong with ',name,'.'])
@@ -445,7 +447,7 @@ if ~iscolumn(x)
     if isrow(x)
         x = x';
         if noutargs == 0, warning([name,' should be changed from a row vector to a column vector.'])
-        % elseif verbose, disp(['- Changed ',name,' from a row vector to a column vector.'])
+        elseif verbose == 2, disp(['- Changed ',name,' from a row vector to a column vector.'])
         end
     else
         error(['Something is wrong with ',name,'.'])
