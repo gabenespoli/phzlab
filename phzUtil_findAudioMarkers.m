@@ -120,22 +120,22 @@ xcorrInfo = struct();
 while ~foundMarkers
     
     if isempty(times)
-        disp('Finding marker times...')
+        disp('  Finding marker times...')
         aboveThresh = find(abs(data) > threshold); % find all suprathreshold points
         if ~isempty(aboveThresh) % adjust so only one suprathreshold point per marker
             aboveThreshDiff = diff(aboveThresh); % get time between each suprathreshold point
             diffs = find(aboveThreshDiff > timeBetween)+1; % ignore points too close to their neighbour
             times = [aboveThresh(1) aboveThresh(diffs)]; % add to container
         end
-        disp(['',num2str(length(times)),' markers found at threshold ',num2str(threshold),'.'])
+        disp(['  ',num2str(length(times)),' markers found at threshold ',num2str(threshold),'.'])
         foundMarkers = true;
     else
-        disp([num2str(length(times)),' markers specified.'])
+        disp(['  ',num2str(length(times)),' markers specified.'])
     end
     
     % check for correct number of markers found
     if ~isempty(numMarkers)
-        disp([num2str(numMarkers),' markers were expected.'])
+        disp(['  ',num2str(numMarkers),' markers were expected.'])
         
         if length(times) == numMarkers
             foundMarkers = true;
@@ -160,7 +160,7 @@ while ~foundMarkers
         [threshold,times,foundMarkers,returnFlag] = prompt(data,srate,threshold,times,h);
     end
     
-    if returnFlag, disp('No epochs were extracted.'), return, end
+    if returnFlag, disp('  No epochs were extracted.'), return, end
 end
 
 end
@@ -276,12 +276,12 @@ end
 xcorrInfo        = struct();
 xcorrInfo.r      = r;
 xcorrInfo.lag    = lag;
-xcorrInfo.labels = categorical(labels);
+xcorrInfo.labels = categorical(labels, {'regular', 'inverted'});
 
 end
 
 function times = adjustMarkerMaxRegion(data,times,maxRegion)
-disp('Adjusting markers to max instead of onset...')
+disp('  Adjusting markers to max instead of onset...')
 
 if times(1) + maxRegion(1) < 1, times(1) = [];
     warning('maxRegion too long for first marker. First marker removed.'), end
@@ -289,7 +289,7 @@ if times(1) + maxRegion(1) < 1, times(1) = [];
 if times(end) + maxRegion(2) > size(data,2), times(end) = [];
     warning('maxRegion too long for last marker. Last marker removed.'), end
 
-disp('Adjusting markers to max instead of onset...')
+disp('  Adjusting markers to max instead of onset...')
 str = '';
 for i = 1:length(times)
     str = phzUtil_progressbar(str,i/length(times));
@@ -299,7 +299,7 @@ end
 end
 
 function h = plotMarkerChannel(data,srate,threshold,times,plotMarkerTimes)
-disp('Plotting audio marker channel...')
+disp('  Plotting audio marker channel...')
 
 if isempty(srate)
     srate = 1;
