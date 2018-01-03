@@ -152,7 +152,7 @@ for j = 1:length(files)
             PHZ.meta = rmfield(PHZ.meta, 'filename'); end
         
         PHZS.proc = [];
-        PHZS.proc.pre(j) = PHZ.proc;
+        PHZS.proc.pre{j} = PHZ.proc;
 
         continue
     end    
@@ -173,7 +173,7 @@ for j = 1:length(files)
     end
     
     % proc field
-    PHZS.proc.pre(j) = PHZ.proc;
+    PHZS.proc.pre{j} = PHZ.proc;
     
     % basic fields (strings)
     PHZS.meta.files{j} = currentFile;
