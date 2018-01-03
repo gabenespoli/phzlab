@@ -205,7 +205,7 @@ for j = 1:length(files)
     if numel(PHZS.data) > 50000000 % check if filesize is getting too big
         close(w)
         error(['Too much data to gather into one variable. Consider ',...
-            'doing some preprocessing and averging with phz_gather.'])
+            'doing some preprocessing and averaging with phz_gather.'])
     end
     
     % behavioural response data
