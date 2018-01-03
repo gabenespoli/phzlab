@@ -154,11 +154,12 @@ y = std(x,0,dim) / sqrt(size(x,dim));
 end
 
 function keepVars = verifyKeepVars(keepVars)
+possibleKeepVars = {'trials','session','condition','group','participant','all','',' ','none'};
 if ~iscell(keepVars)
     keepVars = cellstr(keepVars);
 end
 if ~isempty(keepVars)
-    if ~all(ismember(keepVars,{'trials','session','condition','group','participant','all','',' ','none'}))
+    if ~all(ismember(keepVars, possibleKeepVars))
         error('Invalid summaryType.'), end
     if any(ismember({'all','',' ','none'},keepVars)) && length(keepVars) > 1
         error('A value in summaryType must be used on its own, but is being used with other summaryTypes.'), end
