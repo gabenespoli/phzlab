@@ -146,7 +146,6 @@ for j = 1:length(files)
         PHZS.history = {};
         PHZS = phz_history(PHZS,'Gathered PHZ structure created.', verbose);
         PHZS = phz_history(PHZS,['Preprocessing: ', strnumjoin(processing)], verbose);
-        fprintf('\n')
         PHZS.meta.files{j} = currentFile;
         if ismember('filename', fieldnames(PHZ.meta))
             PHZ.meta = rmfield(PHZ.meta, 'filename'); end
