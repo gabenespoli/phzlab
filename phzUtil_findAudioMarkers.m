@@ -219,7 +219,7 @@ end
 end
 
 function [times, xcorrInfo] = xcorrPrecision(data, times, waveform, win)
-disp('Using marker waveform and cross-correlation to optimize marker times...')
+disp('  Using marker waveform and cross-correlation to optimize marker times...')
 str = '';
 r = nan(size(times));
 lag = nan(size(times));
