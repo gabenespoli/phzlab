@@ -92,7 +92,8 @@ for i = {'participant','group','condition','session','trials'}, field = i{1};
         elseif length(PHZ.(field)) > 1
             warning(['It is unknown which values of ''',field,''' apply to which trials.'])
             
-        else error(['Problem with ',name,'.',field,'.'])
+        else 
+            error(['Problem with ',name,'.',field,'.'])
         end
         
     else % if ~isempty(PHZ.meta.tags.(field))
@@ -113,7 +114,8 @@ for i = {'participant','group','condition','session','trials'}, field = i{1};
             %             PHZ.(field) = unique(PHZ.meta.tags.(field))';
             PHZ.(field) = [];
             resetStr = ' because it did not represent all trial tags';
-        else resetStr = '';
+        else
+            resetStr = '';
         end
         
         
@@ -161,7 +163,8 @@ for i = {'participant','group','condition','session','trials'}, field = i{1};
                 % elseif verbose, disp(['- ',name,'.meta.spec.',field,' had an incorrect number of items and was reset to the default order.'])
                 end
             end
-        else PHZ.meta.spec.(field) = {};
+        else
+            PHZ.meta.spec.(field) = {};
         end
         
         % else _order is empty, make sure spec is empty
@@ -430,7 +433,8 @@ if ~isrow(x)
         if noutargs == 0, warning([name,' should be changed from a column vector to a row vector.'])
         % elseif verbose, disp(['- Changed ',name,' from a column vector to a row vector.'])
         end
-    else error(['Something is wrong with ',name,'.'])
+    else
+        error(['Something is wrong with ',name,'.'])
     end
 end
 end
@@ -443,7 +447,8 @@ if ~iscolumn(x)
         if noutargs == 0, warning([name,' should be changed from a row vector to a column vector.'])
         % elseif verbose, disp(['- Changed ',name,' from a row vector to a column vector.'])
         end
-    else error(['Something is wrong with ',name,'.'])
+    else
+        error(['Something is wrong with ',name,'.'])
     end
 end
 end
@@ -490,8 +495,9 @@ if ~all(ismember({'proc','meta'},fieldnames(PHZ))) && any(ismember({'rej','blsub
         'PHZLAB.'])
     s = input('Should PHZLAB undo this preprocessing? [y/n]','s');
     switch lower(s)
-        case 'n', disp('Aborting...'), error(' ')
-        case 'y',
+        case 'n'
+            disp('Aborting...'), error(' ')
+        case 'y'
             PHZ = phz_norm(PHZ,0);
             PHZ = phz_blc(PHZ,0);
             PHZ = phz_rej(PHZ,0);
