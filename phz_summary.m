@@ -57,7 +57,7 @@ if nargout == 0 && nargin == 0, help phz_summary, return, end
 if isempty(keepVars), return, end
 if nargin < 3, verbose = true; end
 
-PHZ = phz_check(PHZ); % (make ordinal if there are new manually-made orders i.e., not using phz_field.m)
+PHZ = phz_check(PHZ); % (make sure grouping vars are ordinal)
 
 keepVars = verifyKeepVars(keepVars);
 if ismember(keepVars,{'all'}), return, end
