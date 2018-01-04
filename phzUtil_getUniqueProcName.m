@@ -1,7 +1,7 @@
-%PHZUTIL_GETUNIQUEPROCNAME  Fins a unique string for current processing when
-%   adding to PHZ.proc. For example, when adding a 'transform' field to
-%   PHZ.proc when there already is one, this function will return
-%   'transform2'.
+%PHZUTIL_GETUNIQUEPROCNAME  Finds a unique string for current processing 
+%   when adding to PHZ.proc. For example, when adding a 'transform' 
+%   field to PHZ.proc when there already is one, this function will 
+%   return 'transform2'.
 % 
 % USAGE
 %   name = phzUtil_getUniqueProcName(PHZ,basename)
@@ -27,7 +27,9 @@
 % along with this program.  If not, see http://www.gnu.org/licenses/.
 
 function name = phzUtil_getUniqueProcName(PHZ, basename)
-if ~ischar(basename), error('Basename must be a string.'), end
+if ~ischar(basename)
+    error('Basename must be a string.')
+end
 names = fieldnames(PHZ.proc);
 
 if ~ismember(basename, names)
