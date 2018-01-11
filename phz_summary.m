@@ -64,10 +64,13 @@ if ismember(keepVars,{'all'}), return, end
 
 PHZ = phz_discard(PHZ, verbose);
 
-if ismember(keepVars{1},{'none'}) % average across all trials
-    PHZ.proc.summary.nParticipant = length(PHZ.participant);
-    PHZ.proc.summary.nTrials = size(PHZ.data,1);
-    PHZ.proc.summary.stdError = ste(PHZ.data);
+% get unique proc name so that multiple summaries can be used
+procName = phzUtil_getUniqueProcName(PHZ, 'summary');
+
+if ismember(keepVars{1}, {'none'}) % average across all trials
+    PHZ.proc.(procName).nParticipant = length(PHZ.participant);
+    PHZ.proc.(procName).nTrials = size(PHZ.data, 1);
+    PHZ.proc.(procName).stdError = ste(PHZ.data);
     preSummaryData{1} = PHZ.data;
     PHZ.data = mean(PHZ.data,1);
 
@@ -83,17 +86,17 @@ else % get categories to collapse across
 
     % make containers
     summaryData = nan(length(varTypes),size(PHZ.data,2));
-    PHZ.proc.summary.stdError = nan(size(summaryData));
-    PHZ.proc.summary.nParticipant = nan(length(varTypes),1);
-    PHZ.proc.summary.nTrials = nan(length(varTypes),1);
+    PHZ.proc.(procName).stdError = nan(size(summaryData));
+    PHZ.proc.(procName).nParticipant = nan(length(varTypes),1);
+    PHZ.proc.(procName).nTrials = nan(length(varTypes),1);
 
     % loop categories and average
     for i = 1:length(varTypes)
         preSummaryData{i} = PHZ.data(varInd == varTypes(i),:); %#ok<AGROW>
-        PHZ.proc.summary.nParticipant(i) = length(unique(PHZ.meta.tags.participant(varInd == varTypes(i))));
-        PHZ.proc.summary.nTrials(i) = size(preSummaryData{i},1);
-        PHZ.proc.summary.stdError(i,:) = ste(preSummaryData{i});
-        summaryData(i,:) = mean(preSummaryData{i},1);
+        PHZ.proc.(procName).nParticipant(i) = length(unique(PHZ.meta.tags.participant(varInd == varTypes(i))));
+        PHZ.proc.(procName).nTrials(i) = size(preSummaryData{i},1);
+        PHZ.proc.(procName).stdError(i,:) = ste(preSummaryData{i});
+        summaryData(i,:) = doSummary(preSummaryData{i}, summaryFunction);
     end
 
     PHZ.data = summaryData;
@@ -144,7 +147,7 @@ if ismember('views', fieldnames(PHZ.meta.tags))
 end
 
 if isempty(keepVars), keepVars = {''}; end
-PHZ.proc.summary.keepVars = keepVars;
+PHZ.proc.(procName).keepVars = keepVars;
 PHZ = phz_history(PHZ,['Summarized data by ''',strjoin(keepVars),'''.'],verbose);
 
 end
