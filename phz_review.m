@@ -19,11 +19,11 @@
 %       rejection (i.e., with phz_reject) will not be discarded.
 %
 % KEYBOARD CONTROLS
-%   escape/q = Quit phz_review The plot window is closed.
+%   escape / q = Quit phz_review The plot window is closed.
 %
-%   right/down/j/l/n = Cycle trials forward.
+%   right / down / j / l / n = Cycle trials forward.
 %
-%   left/up/h/k/p = Cycle trials backward.
+%   left  /  up  / k / h / p = Cycle trials backward.
 %
 %   g = Jump to a specific trial. Enter trial number in the
 %       command window.
@@ -31,7 +31,7 @@
 %   G (shift-g) = Jump to a random trial. This can be useful for
 %       spot-checking the dataset.
 %
-%   space/r = Toggle rejection mark for the current trial.
+%   space / r = Toggle rejection mark for the current trial.
 %
 %   t = Toggle the display of the rejection threshold. If the y-axis
 %       scale is set for all trials, the y-axis scale will be adjusted
