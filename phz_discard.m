@@ -44,6 +44,7 @@ function [PHZ, keep] = phz_discard(PHZ, verbose)
 
 if nargin == 0 && nargout == 0, help phz_discard, return, end
 if nargin < 2, verbose = true; end
+keep = true(size(PHZ.data,1), 1); % keep all trials initially
 
 % find all proc fields that have discard marks
 names = fieldnames(PHZ.proc);
@@ -58,7 +59,6 @@ end
 % all of the 'keep' fields have 1 = keep and 0 = discard
 % i.e., if at least one of the vectors has a 0 for a trial,
 %   then it will be discarded
-keep = true(size(PHZ.data,1), 1);
 for i = 1:length(ind)
     name = names{ind(i)};
     if ~PHZ.proc.(name).discarded
