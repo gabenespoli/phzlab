@@ -70,7 +70,7 @@ if isempty(keepVars), return, end
 
 % defaults
 verbose = true;
-summaryFunction = '*';
+summaryFunction = 'mean';
 
 % user-defined (based on class of arg, not param/value pairs)
 if ~isempty(varargin)
@@ -87,7 +87,7 @@ end
 
 PHZ = phz_check(PHZ); % (make sure grouping vars are ordinal)
 
-[keepVars, summaryFunction] = verifyKeepVars(keepVars, summaryFunction, PHZ);
+[keepVars, loseVars, summaryFunction] = verifyKeepVars(keepVars, summaryFunction, PHZ);
 if ismember(keepVars,{'all'}), return, end
     
 % get unique proc name so that multiple summaries can be used
@@ -96,6 +96,7 @@ procName = phzUtil_getUniqueProcName(PHZ, 'summary');
 % add keepVars and summaryFunction to the proc field
 PHZ.proc.(procName).summaryFunction = summaryFunction;
 PHZ.proc.(procName).keepVars = keepVars;
+PHZ.proc.(procName).loseVars = loseVars;
 
 % discard marked trials
 PHZ = phz_discard(PHZ, verbose);
@@ -192,7 +193,7 @@ end
 y = std(x,0,dim) / sqrt(size(x,dim));
 end
 
-function [keepVars, summaryFunction] = verifyKeepVars(keepVars, summaryFunction, PHZ)
+function [keepVars, loseVars, summaryFunction] = verifyKeepVars(keepVars, summaryFunction, PHZ)
 
 % convert summary function to common format
 switch lower(summaryFunction)
@@ -246,10 +247,14 @@ end
 
 % if the summary function is + or -, make the keepVar a loseVar instead
 if ismember(summaryFunction, {'add', 'subtract'})
+    % keepVar is actually a loseVar
     if length(keepVars) ~= 1
         error('Must use exactly one keepVar with an ''add'' or ''subtract'' summary function.')
     end
+    loseVars = keepVars;
     keepVars = possibleKeepVars(~ismember(keepVars, possibleKeepVars));
+else
+    loseVars = possibleKeepVars(~ismember(keepVars, possibleKeepVars));
 end
 
 % if a keepVar doesn't have multiple categories within, it doesn't need to be summary'd
