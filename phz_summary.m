@@ -5,35 +5,47 @@
 %   [PHZ, preSummaryData] = phz_summary(PHZ, keepVars)
 % 
 % INPUT
-%   PHZ       = PHZLAB data structure.
+%   PHZ      = [struct] PHZLAB data structure.
 % 
-%   keepVars  = A string or a cell array of strings of grouping
-%               variables that you would like to keep. All other 
-%               grouping variables (i.e., those not listed in 
-%               KEEPVARS) will be averaged across (collapsed). KEEPVARS
-%               can be combination of 'participant', 'group', 'session',
-%               and 'trials'. Use 'all' or [] (empty) to retain all trials
-%               (i.e., do nothing) or 'none' to average all trials together
-%               (i.e., discard all grouping variables). 'all' and 'none' 
-%               cannot be used in combination with other KEEPVARS.
-% 
+%   keepVars = [string|cell of strings] Grouping variables that you would
+%       like to keep. All other grouping variables (i.e., those not listed
+%       in KEEPVARS) will be averaged across (collapsed).  KEEPVARS can be
+%       combination of 'participant', 'group', 'condition', 'session', and
+%       'trials'. There some special values for keepVars that are listed
+%       below. 
+%
+%       []    = Retain all trials (i.e., do nothing). Cannot be used in
+%               combination with other KEEPVARS.
+%
+%       'none'= Average all trials together (i.e., discard all grouping 
+%               variables). Can also use ' ' (space). Cannot be used in
+%               combination with other KEEPVARS.
+%
+%       'all' = Average all repeated trials; this is shorthand for 
+%               {'participant', 'group', 'condition', 'session', 
+%               'trials'}. Cannot be used in combination with other 
+%               KEEPVARS.
+%
 % OUTPUT
 %   PHZ.data                      = The data summarized by KEEPVARS.
 %   PHZ.proc.summary.keepVars     = The values specified in KEEPVARS.
 %   PHZ.proc.summary.stdError     = Standard error of each average.
 %   PHZ.proc.summary.nParticipant = No. of participants in each average.
 %   PHZ.proc.summary.nTrials      = No. of trials in each average.
-%   preSummaryData                = A cell array the same height as PHZ.data
-%                                   containing vectors with the raw data 
-%                                   points included in each average.
+%   preSummaryData                = A cell array the same height as
+%                                   PHZ.data containing vectors with the
+%                                   raw data points included in each 
+%                                   average.
 % 
 % EXAMPLES
-%   PHZ = phz_summary(PHZ,'trials') >> For each value in PHZ.trials,
-%         average all of those trials together. The number of trials in
-%         PHZ.data will correspond to the number of different kinds of
-%         trials.
-%   PHZ = phz_summary(PHZ,{'trials','group'}) >> For each unique combination
-%         of PHZ.trials and PHZ.group, average those trials together.
+%    >> PHZ = phz_summary(PHZ,'trials')
+%       For each value in PHZ.trials, average all of those trials
+%       together. The number of trials in PHZ.data will correspond to the
+%       number of different kinds of trials.
+%
+%    >> PHZ = phz_summary(PHZ,{'trials','group'})
+%       For each unique combination of PHZ.trials and PHZ.group, average
+%       those trials together.
 
 % Copyright (C) 2016 Gabriel A. Nespoli, gabenespoli@gmail.com
 % 
@@ -50,29 +62,50 @@
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see http://www.gnu.org/licenses/.
 
-function [PHZ, preSummaryData] = phz_summary(PHZ,keepVars,verbose)
+function [PHZ, preSummaryData] = phz_summary(PHZ, keepVars, varargin)
 preSummaryData = {};
 
 if nargout == 0 && nargin == 0, help phz_summary, return, end
 if isempty(keepVars), return, end
-if nargin < 3, verbose = true; end
+
+% defaults
+verbose = true;
+summaryFunction = '*';
+
+% user-defined (based on class of arg, not param/value pairs)
+if ~isempty(varargin)
+    for i = 1:length(varargin)
+        if islogical(varargin{i})
+            verbose = varargin{i};
+
+        elseif ischar(varargin{i})
+            summaryFunction = varargin{i};
+
+        end
+    end
+end
 
 PHZ = phz_check(PHZ); % (make sure grouping vars are ordinal)
 
-keepVars = verifyKeepVars(keepVars);
+[keepVars, summaryFunction] = verifyKeepVars(keepVars, summaryFunction, PHZ);
 if ismember(keepVars,{'all'}), return, end
-
-PHZ = phz_discard(PHZ, verbose);
-
+    
 % get unique proc name so that multiple summaries can be used
 procName = phzUtil_getUniqueProcName(PHZ, 'summary');
 
-if ismember(keepVars{1}, {'none'}) % average across all trials
+% add keepVars and summaryFunction to the proc field
+PHZ.proc.(procName).summaryFunction = summaryFunction;
+PHZ.proc.(procName).keepVars = keepVars;
+
+% discard marked trials
+PHZ = phz_discard(PHZ, verbose);
+
+if ismember(keepVars{1}, {'none'}) % summary across all trials
+    PHZ.proc.(procName).stdError = ste(PHZ.data);
     PHZ.proc.(procName).nParticipant = length(PHZ.participant);
     PHZ.proc.(procName).nTrials = size(PHZ.data, 1);
-    PHZ.proc.(procName).stdError = ste(PHZ.data);
     preSummaryData{1} = PHZ.data;
-    PHZ.data = mean(PHZ.data,1);
+    PHZ.data = doSummary(PHZ.data, summaryFunction);
 
 else % get categories to collapse across
     for i = 1:length(keepVars)
@@ -117,7 +150,7 @@ preSummaryData = preSummaryData(:); % make col so dims match PHZ.data
 loseVars = {'participant','group','condition','session','trials'};
 loseVars(ismember(loseVars,keepVars)) = [];
 for i = loseVars, field = i{1};
-    if length(unique(PHZ.meta.tags.(field))) == 1
+    if ~ischar(PHZ.meta.tags.(field)) && length(unique(PHZ.meta.tags.(field))) == 1
         PHZ.meta.tags.(field) = PHZ.meta.tags.(field)(1:size(PHZ.data,1));
     else
         PHZ.meta.tags.(field) = '<collapsed>';
@@ -146,8 +179,6 @@ if ismember('views', fieldnames(PHZ.meta.tags))
     PHZ.meta.tags.views = zeros(size(PHZ.data,1), 1);
 end
 
-if isempty(keepVars), keepVars = {''}; end
-PHZ.proc.(procName).keepVars = keepVars;
 PHZ = phz_history(PHZ,['Summarized data by ''',strjoin(keepVars),'''.'],verbose);
 
 end
@@ -161,17 +192,98 @@ end
 y = std(x,0,dim) / sqrt(size(x,dim));
 end
 
-function keepVars = verifyKeepVars(keepVars)
-possibleKeepVars = {'trials','session','condition','group','participant','all','',' ','none'};
+function [keepVars, summaryFunction] = verifyKeepVars(keepVars, summaryFunction, PHZ)
+
+% convert summary function to common format
+switch lower(summaryFunction)
+    case {'*', 'mean', 'avg', 'average'},   summaryFunction = 'mean';
+    case {'+', 'add'},                      summaryFunction = 'add';
+    case {'-', 'sub', 'subtract'},          summaryFunction = 'subtract';
+    otherwise, error('Invalid summaryFunction.')
+end
+
+% define possible values for input
+possibleKeepVars = {'participant', 'group', 'condition', 'session', 'trials'};
+possibleAloneKeepVars = {'', 'none', ' ', 'all'};
+possibleSummaryFunctions = {'mean', 'add', 'subtract'};
+
+% make sure keepVars is a cell
 if ~iscell(keepVars)
     keepVars = cellstr(keepVars);
 end
-if ~isempty(keepVars)
-    if ~all(ismember(keepVars, possibleKeepVars))
-        error('Invalid summaryType.'), end
-    if any(ismember({'all','',' ','none'},keepVars)) && length(keepVars) > 1
-        error('A value in summaryType must be used on its own, but is being used with other summaryTypes.'), end
-    if ismember(keepVars{1},{' '}) || isempty(keepVars{1})
-        keepVars = {'none'}; end
+
+% make sure all keep vars are valid values
+if ~all(ismember(keepVars, [possibleKeepVars, possibleAloneKeepVars]))
+    error('Invalid keepVars')
+end
+
+% make sure keepVars that should be used alone are being used alone
+if any(ismember(possibleAloneKeepVars, keepVars)) && length(keepVars) > 1
+    error('A value in keepVars must be used on its own, but is being used with other keepVars')
+end
+
+% parse shorthands for 'none', ' ', and 'all'
+if ismember(keepVars{1},{' '}) || isempty(keepVars{1})
+    keepVars = {'none'};
+elseif strcmpi(keepVars{1}, 'all')
+    keepVars = possibleKeepVars;
+end
+
+% parse summary functions
+% make sure there is only 1 or 0 summary functions
+% and that it's not being used alone
+indSumFunc = ismember(keepVars, possibleSummaryFunctions);
+if sum(indSumFunc) == 1 
+    if length(keepVars) > 1
+        summaryFunction = keepVars{indSumFunc};
+        keepVars(indSumFunc) = [];
+    else
+        error('A keepVar must be specified with a summary function.')
+    end
+elseif sum(indSumFunc) ~= 0
+    error('Too many summary functions were specified.')
+end
+
+% if the summary function is + or -, make the keepVar a loseVar instead
+if ismember(summaryFunction, {'add', 'subtract'})
+    if length(keepVars) ~= 1
+        error('Must use exactly one keepVar with an ''add'' or ''subtract'' summary function.')
+    end
+    keepVars = possibleKeepVars(~ismember(keepVars, possibleKeepVars));
+end
+
+% if a keepVar doesn't have multiple categories within, it doesn't need to be summary'd
+rminds = [];
+for i = 1:length(keepVars)
+    if ~ismember(keepVars{i}, possibleKeepVars)
+        continue
+    end
+    if ischar(PHZ.meta.tags.(keepVars{i})) || length(unique(PHZ.meta.tags.(keepVars{i}))) < 2
+        rminds = [rminds i]; %#ok<AGROW>
+    end
+end
+keepVars(rminds) = [];
+if isempty(keepVars)
+    keepVars = {'none'};
+end
+
+end
+
+function summaryData = doSummary(preData, summaryFunction)
+switch summaryFunction
+    case 'mean'
+        summaryData = mean(preData, 1);
+
+    case 'add'
+        if size(preData, 1) ~= 2
+            error('Cannot add unless there are exactly 2 trials.')
+        end
+        summaryData = preData(1,:) + preData(2,:);
+
+    case 'subtract'
+        if size(preData, 1) ~= 2
+            error('Cannot subtract unless there are exactly 2 trials.')
+        end
+        summaryData = preData(1,:) - preData(2,:);
 end
 end
