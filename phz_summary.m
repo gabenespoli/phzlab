@@ -89,7 +89,10 @@ PHZ = phz_check(PHZ); % (make sure grouping vars are ordinal)
 
 [keepVars, loseVars, summaryFunction] = verifyKeepVars(keepVars, summaryFunction, PHZ);
 if ismember(keepVars,{'all'}), return, end
-    
+
+% discard marked trials
+PHZ = phz_discard(PHZ, verbose);
+
 % get unique proc name so that multiple summaries can be used
 procName = phzUtil_getUniqueProcName(PHZ, 'summary');
 
@@ -97,9 +100,6 @@ procName = phzUtil_getUniqueProcName(PHZ, 'summary');
 PHZ.proc.(procName).summaryFunction = summaryFunction;
 PHZ.proc.(procName).keepVars = keepVars;
 PHZ.proc.(procName).loseVars = loseVars;
-
-% discard marked trials
-PHZ = phz_discard(PHZ, verbose);
 
 if ismember(keepVars{1}, {'none'}) % summary across all trials
     PHZ.proc.(procName).stdError = ste(PHZ.data);
