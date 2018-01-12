@@ -238,8 +238,8 @@ for i = 1:length(times)
     currentMarker = data(times(i) + win(1):times(i) + win(2));
 
     % find highest cross-correlation (both polarities)
-    [r1, lag1] = xcorr(currentMarker, waveform);      % regular
-    [r2, lag2] = xcorr(currentMarker, waveform * -1); % inverted
+    [r1, lag1] = xcorr(currentMarker, waveform,      'coeff'); % regular
+    [r2, lag2] = xcorr(currentMarker, waveform * -1, 'coeff'); % inverted
 
     [rval1, ind1] = max(r1);
     [rval2, ind2] = max(r2);
