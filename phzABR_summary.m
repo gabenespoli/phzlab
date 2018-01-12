@@ -5,7 +5,7 @@
 %   phzABR_equalizeTrials, and then phz_summary is used to a) average
 %   together each polarity (while maintaining the other grouping
 %   variables), and then b) combine the resulting two waveforms using
-%   the specified summary function (i.e., add, subtract, or average).
+%   the specified summary function (i.e., add, subtract, or mean).
 %
 % USAGE
 %   PHZ = phzABR_summary(PHZ, summaryFunction)
@@ -14,16 +14,16 @@
 %   PHZ               = [struct] PHZLAB data structure.
 %
 %   summaryFunction   = [string] Function to use to combine trials. Can
-%                       be either '+', '-', 'add', 'subtract', or 'mean'.
+%                       be either 'add', 'subtract', or 'mean'.
 % NOTE
 % How summaryFunction works with phz_summary:
-%   The default method for summarizing trials is to average 
-%   them together ('*'). Include a '+' in KEEPVARS to sum the 
-%   trials instead. Include a '-' to subtract them; note that 
-%   for subtraction there must be exactly two trials for every 
-%   unique combination of the values of KEEPVARS. These must 
-%   be used with at least one other KEEPVARS. '*' can be used
-%   to use the default (mean).
+%   The default method for summarizing trials is to average them together
+%   ('mean'). Include an 'add' in KEEPVARS to sum the trials instead, or
+%   a 'subtract' to subtract them. Note that for addition and subtraction
+%   there must be exactly two trials for every unique combination of the
+%   values of KEEPVARS. These must be used with at least one other
+%   KEEPVARS. The default for phz_summary is 'mean', but there is no
+%   default for phzABR_summary; this parameter must be specified.
 
 % Copyright (C) 2016 Gabriel A. Nespoli, gabenespoli@gmail.com
 % 
@@ -47,18 +47,6 @@ if nargin < 3, verbose = true; end
 grpVar = 'trials'; % For now this function can only act on the 'trials'
 %   grouping variable. This was done to simplify the input args, since
 %   this is such a special case anyway.
-
-% parse input
-switch lower(summaryFunction)
-    case {'+', 'add'}
-        summaryFunction = '+';
-    case {'-', 'sub', 'subtract'}
-        summaryFunction = '-';
-    case {'*', 'mean', 'avg', 'average'}
-        summaryFunction = '*';
-    otherwise
-        error('Invalid summaryFunction.')
-end
 
 % make sure there are exactly two labels in the grpVar tags
 if length(unique(PHZ.meta.tags.(grpVar))) ~= 2
