@@ -48,14 +48,37 @@ else
     extraChars = 2;
 end
 
-del = repmat('\b',1,length(w)-1-extraChars); % extra -2 for the newline chars
-dot = floor(val * 20);
-pct = num2str(floor(val * 100));
-pct = [repmat(' ',1,3-length(pct)),pct,'%% '];
+if usejava('desktop') % using matlab gui
 
-w = ['[',repmat('.',1,dot),repmat(' ',1,20 - dot) '] ',pct];
-w = [str w '\n'];
+    del = repmat('\b',1,length(w)-1-extraChars); % extra -2 for the newline chars
+    dot = floor(val * 20);
+    pct = num2str(floor(val * 100));
+    pct = [repmat(' ',1,3-length(pct)),pct,'%% '];
 
-fprintf([del w])
+    w = ['[',repmat('.',1,dot),repmat(' ',1,20 - dot) '] ',pct];
+    w = [str w '\n'];
 
+    fprintf([del w])
+
+else % using -nodisplay option to run matlab in a terminal
+
+    if isempty(w)
+        % fprintf('%s\n', str)
+        % fprintf('[%s]\n', repmat(' ', 1, 20))
+        fprintf('  [')
+        w = 0;
+        return
+    end
+
+    dot = floor(val * 20);
+    if dot > w
+        fprintf('%s', repmat('.', 1, dot - w))
+        w = dot;
+    end
+
+    if val == 1
+        fprintf('] 100%%\n')
+    end
+
+end
 end
