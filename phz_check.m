@@ -124,6 +124,7 @@ for i = {'participant','group','condition','session','trials'}, field = i{1};
         % if empty grouping var, reset (auto-create) from tags
         if isempty(PHZ.(field))
             PHZ.(field) = unique(PHZ.meta.tags.(field))';
+            if verbose == 2, verbose = true; else, verbose = false; end
             PHZ = phz_history(PHZ,[name,'.',field,' was reset',resetStr,'.'],verbose,0);
         end
         
