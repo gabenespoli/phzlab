@@ -15,6 +15,15 @@
 %
 %   summaryFunction   = [string] Function to use to combine trials. Can
 %                       be either '+', '-', 'add', 'subtract', or 'mean'.
+% NOTE
+% How summaryFunction works with phz_summary:
+%   The default method for summarizing trials is to average 
+%   them together ('*'). Include a '+' in KEEPVARS to sum the 
+%   trials instead. Include a '-' to subtract them; note that 
+%   for subtraction there must be exactly two trials for every 
+%   unique combination of the values of KEEPVARS. These must 
+%   be used with at least one other KEEPVARS. '*' can be used
+%   to use the default (mean).
 
 % Copyright (C) 2016 Gabriel A. Nespoli, gabenespoli@gmail.com
 % 
