@@ -51,7 +51,6 @@ names = fieldnames(PHZ.proc);
 ind = find(contains(names,{'reject', 'review', 'subset'}));
 
 if isempty(ind)
-    disp('  Nothing to discard.')
     return
 end
 
@@ -68,7 +67,6 @@ for i = 1:length(ind)
 end
 
 if all(keep)
-    disp('  Nothing to discard.')
     return
 end
 
