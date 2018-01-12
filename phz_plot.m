@@ -77,6 +77,9 @@
 %                 variables can be specified; the first is plotted as 
 %                 separate lines/bars, and the second is plotted across
 %                 separate plots.
+%
+%   'abrsummary' = Calls phzABR_summary. If specified, this is called
+%                 before phz_summary.
 % 
 % OUTPUT 
 %   A new figure is created and the specified plot is displayed.
@@ -110,6 +113,7 @@ PHZ = phz_check(PHZ);
 region = [];
 feature = [];
 keepVars = {'none'};
+summaryFunction = '';
 
 do_plotsmooth = false;
 dispn = 'none';
@@ -153,6 +157,7 @@ for i = 1:2:length(varargin)
         case 'region',                  region = varargin{i+1};
         case 'feature',                 feature = varargin{i+1};
         case {'summary','keepvars'},    keepVars = varargin{i+1};
+        case {'abrsummary','summaryfunction'}, summaryFunction = varargin{i+1};
             
         case {'plotsmooth'},            do_plotsmooth = varargin{i+1};
         case {'dispn','n'},             dispn = varargin{i+1};    
@@ -176,6 +181,7 @@ end
 % process & prepare data to plot
 if length(cellstr(keepVars)) > 2, error('Cannot plot more than 2 summary types.'), end
 if ~isempty(feature) && ~strcmp(feature,'time'), PHZ = phz_region(PHZ,region,verbose); end
+if ~isempty(summaryFunction), PHZ = phzABR_summary(PHZ,summaryFunction,verbose); end
 [PHZ,featureTitle,preSummaryData] = phz_feature(PHZ,feature,'summary',keepVars,'verbose',verbose);
 % (run phz_summary through phz_feature because fft feature needs to average
 %  over the summaryType by participant before doing the fft)
@@ -186,7 +192,7 @@ elseif ismember('freqs',fieldnames(PHZ)), x = PHZ.freqs;
 end
 
 % prepare plot stuff
-[lineOrder,~,lineSpec,plotOrder,plotTags] = getLabelsAndSpec(PHZ,dispn);
+[lineOrder,~,lineSpec,plotOrder,plotTags,~] = getLabelsAndSpec(PHZ,dispn);
 [rows,cols,pos,ytitleLoc,xtitleLoc] = getPlotDims(plotOrder);
 if isempty(yl), yl = nan(length(plotOrder),2); do_yl = true; else, do_yl = false; end
 if isempty(xl), xl = nan(size(yl));            do_xl = true; else, do_xl = false; end
@@ -401,30 +407,41 @@ end
 
 function [lineOrder,lineTags,lineSpec,plotOrder,plotTags,plotSpec] = getLabelsAndSpec(PHZ,dispn)
 
+% get most recent summary proc field name
+names = fieldnames(PHZ.proc);
+ind = max(find(startsWith(names, 'summary')));
+if ~isempty(ind)
+    isSummary = true;
+    procName = names{ind};
+else
+    isSummary = false;
+    procName = '';
+end
+
 % lines/bars
-if ~ismember('summary',fieldnames(PHZ.proc))
+if ~isSummary
     lineOrder = cellstr(num2str((1:size(PHZ.data,1))));
     lineSpec = cell(size(lineOrder));
     for j = 1:length(lineOrder)
         lineSpec{j} = '';
     end
     lineTags = [];
-elseif ismember(PHZ.proc.summary.keepVars{1},{' ','none'}) || isempty(PHZ.proc.summary.keepVars{1})
+elseif ismember(PHZ.proc.(procName).keepVars{1},{' ','none'}) || isempty(PHZ.proc.(procName).keepVars{1})
     lineOrder = {'All trials'};
     lineSpec = {''};
     lineTags = [];
 else
-    lineOrder = PHZ.(PHZ.proc.summary.keepVars{1});
-    lineSpec = PHZ.meta.spec.(PHZ.proc.summary.keepVars{1});
-    lineTags = PHZ.meta.tags.(PHZ.proc.summary.keepVars{1});
+    lineOrder = PHZ.(PHZ.proc.(procName).keepVars{1});
+    lineSpec = PHZ.meta.spec.(PHZ.proc.(procName).keepVars{1});
+    lineTags = PHZ.meta.tags.(PHZ.proc.(procName).keepVars{1});
 end
 
 % plots
-if ~ismember('summary',fieldnames(PHZ.proc))
+if ~isSummary
     plotOrder = {''};
     plotSpec = {''};
     plotTags = [];
-elseif length(PHZ.proc.summary.keepVars) == 1
+elseif length(PHZ.proc.(procName).keepVars) == 1
     if length(PHZ.participant) > 1 || isundefined(PHZ.participant)
         plotOrder = {'All participants'};
     else
@@ -433,9 +450,9 @@ elseif length(PHZ.proc.summary.keepVars) == 1
     plotSpec = {''};
     plotTags = [];
 else 
-    plotOrder = PHZ.(PHZ.proc.summary.keepVars{2});
-    plotSpec = PHZ.meta.spec.(PHZ.proc.summary.keepVars{2});
-    plotTags = PHZ.meta.tags.(PHZ.proc.summary.keepVars{2});
+    plotOrder = PHZ.(PHZ.proc.(procName).keepVars{2});
+    plotSpec = PHZ.meta.spec.(PHZ.proc.(procName).keepVars{2});
+    plotTags = PHZ.meta.tags.(PHZ.proc.(procName).keepVars{2});
 end
 
 % add n's
@@ -447,49 +464,49 @@ if ~ismember(dispn,{'none',''})
     end
     
     % add n's to labels for lines/bars
-    switch PHZ.proc.summary.keepVars{1}
+    switch PHZ.proc.(procName).keepVars{1}
         case 'all'
             if nt
-                lineLabels{1} = [lineLabels{1},' (',num2str(PHZ.proc.summary.nTrials),')'];
+                lineLabels{1} = [lineLabels{1},' (',num2str(PHZ.proc.(procName).nTrials),')'];
             end
             
         case 'trials'
             if nt
-                for i = 1:numel(PHZ.proc.summary.nTrials)
-                    lineLabels{i} = [lineLabels{i},' (',num2str(PHZ.proc.summary.nTrials(i)),')'];
+                for i = 1:numel(PHZ.proc.(procName).nTrials)
+                    lineLabels{i} = [lineLabels{i},' (',num2str(PHZ.proc.(procName).nTrials(i)),')'];
                 end
             end
             
         case 'group'
             if np
-                for i = 1:numel(PHZ.proc.summary.nParticipant)
-                    lineLabels{i} = [lineLabels{i},' (',num2str(PHZ.proc.summary.nParticipant(i)),')'];
+                for i = 1:numel(PHZ.proc.(procName).nParticipant)
+                    lineLabels{i} = [lineLabels{i},' (',num2str(PHZ.proc.(procName).nParticipant(i)),')'];
                 end
             end
     end
     
     % add n's to labels for plots
-    if length(PHZ.proc.summary.keepVars) > 1
-        switch PHZ.proc.summary.keepVars{2}
+    if length(PHZ.proc.(procName).keepVars) > 1
+        switch PHZ.proc.(procName).keepVars{2}
             case 'trials'
                 if nt
                     for i = 1:length(plotLabels)
-%                         theseLabels = PHZ.proc.summary.nTrials(PH
-                        plotLabels{i} = [plotLabels{i},' (',num2str(sum(PHZ.proc.summary.nTrials(PHZ.trials == plotLabels{i}))),')'];
+%                         theseLabels = PHZ.proc.(procName).nTrials(PH
+                        plotLabels{i} = [plotLabels{i},' (',num2str(sum(PHZ.proc.(procName).nTrials(PHZ.trials == plotLabels{i}))),')'];
                     end
                 end
                 
             case 'group'
                 if np
                     for i = 1:length(plotLabels)
-                        plotLabels{i} = [plotLabels{i},' (',num2str(PHZ.proc.summary.nParticipant(i)),')'];
+                        plotLabels{i} = [plotLabels{i},' (',num2str(PHZ.proc.(procName).nParticipant(i)),')'];
                     end
                 end
         end
         
     else
-        if np && ~strcmp(PHZ.proc.summary.keepVars{1},'group')
-            plotLabels{1} = [plotLabels{1},' (~',num2str(max(PHZ.proc.summary.nParticipant)),')'];
+        if np && ~strcmp(PHZ.proc.(procName).keepVars{1},'group')
+            plotLabels{1} = [plotLabels{1},' (~',num2str(max(PHZ.proc.(procName).nParticipant)),')'];
         end
     end
 end
@@ -554,8 +571,27 @@ if ~isempty(PHZ.region) && ~isstruct(PHZ.region) && ~strcmp(PHZ.region,'whole ep
     line2 = [line2, PHZ.region];
 end
 
+% search for non-mean summary functions
+names = fieldnames(PHZ.proc);
+inds = find(startsWith(names, 'summary'));
+for i = 1:length(inds)
+    ind = inds(i);
+    switch PHZ.proc.(names{ind}).summaryFunction
+        case {'add', '+'}
+            summaryFunction = '+';
+            appendSumFunc = true;
+        case {'subtract', 'sub', '-'}
+            summaryFunction = '-';
+            appendSumFunc = true;
+        otherwise
+            appendSumFunc = false;
+    end
+    if appendSumFunc
+        line2 = [line2, ' ', summaryFunction, PHZ.proc.(names{ind}).loseVars{1}]; %#ok<AGROW>
+    end
+end
+
 if ~isempty(line2), ytitle{2} = line2; end % add 2nd line titles if any
 ytitle{end+1} = ' '; % spacer to prevent overlapping with y ticks
 
 end
-
