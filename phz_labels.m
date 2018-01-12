@@ -63,7 +63,7 @@ if ischar(labels)
 
     end
     
-elseif isnumeric(labels) || iscell(labels)
+elseif isnumeric(labels) || iscell(labels) || iscategorical(labels)
 
     if ~isequal(length(labels),totTrials)
         error(['The number of labels (',num2str(length(labels)),...
