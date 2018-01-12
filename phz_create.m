@@ -220,7 +220,7 @@ for i = 1:length(files)
     if length(files) > 1, w = phzUtil_progressbar(w,i/length(files),fileProgress); end
     
     % load data
-    if verbose, disp(['Loading data from file ',fileProgress]), end
+    if verbose, disp(['  Loading data from file ',fileProgress]), end
     PHZ = getBlankPHZ(verbose); % get new blank PHZ structure
     PHZ.proc.create.datafile = fullfile(folder,files{i});
     raw = load(PHZ.proc.create.datafile,'-mat');
