@@ -15,7 +15,7 @@
 %               1's and 0's ('alt') trials.
 %
 % OUTPUT
-%   PHZ.meta.tags.trials = The specified trial labels.
+%   PHZ.lib.tags.trials = The specified trial labels.
 %
 
 % Copyright (C) 2016 Gabriel A. Nespoli, gabenespoli@gmail.com
@@ -46,14 +46,14 @@ if ischar(labels)
     switch lower(labels)
 
         case {'seq','sequential'}
-            PHZ.meta.tags.trials = 1:totTrials;
+            PHZ.lib.tags.trials = 1:totTrials;
             PHZ = phz_history(PHZ,'Added sequential trial labels (i.e., 1, 2, 3, etc.).',verbose);
         
         case {'alt','alternating'}
             if ~mod(totTrials,2) % (if PHZ.trials is even)
-                PHZ.meta.tags.trials = repmat([1;0],[totTrials/2,1]);
+                PHZ.lib.tags.trials = repmat([1;0],[totTrials/2,1]);
             else % (PHZ.trials is odd)
-                PHZ.meta.tags.trials = [repmat([1;0],[(totTrials/2)-0.5,1]); 1];
+                PHZ.lib.tags.trials = [repmat([1;0],[(totTrials/2)-0.5,1]); 1];
             end
             
             PHZ = phz_history(PHZ,'Added alternating trial labels (i.e., 0, 1, 0, 1, etc.).',verbose);        
@@ -70,7 +70,7 @@ elseif isnumeric(labels) || iscell(labels) || iscategorical(labels)
             ') does not match the number of trials (',num2str(totTrials),').'])
     end
     
-    PHZ.meta.tags.trials = labels;
+    PHZ.lib.tags.trials = labels;
     PHZ = phz_history(PHZ,'Adjusted trial labels.',verbose);
     
 else

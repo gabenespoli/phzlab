@@ -111,9 +111,9 @@ if ismember(keepVars{1}, {'none'}) % summary across all trials
 else % get categories to collapse across
     for i = 1:length(keepVars)
         if i == 1
-            varInd = PHZ.meta.tags.(keepVars{i});
+            varInd = PHZ.lib.tags.(keepVars{i});
         else
-            varInd = varInd .* PHZ.meta.tags.(keepVars{i});
+            varInd = varInd .* PHZ.lib.tags.(keepVars{i});
         end
     end
     varTypes = unique(varInd); % this will be in the proper spec order because they are ordinal categorical arrays
@@ -127,7 +127,7 @@ else % get categories to collapse across
     % loop categories and average
     for i = 1:length(varTypes)
         preSummaryData{i} = PHZ.data(varInd == varTypes(i),:); %#ok<AGROW>
-        PHZ.proc.(procName).nParticipant(i) = length(unique(PHZ.meta.tags.participant(varInd == varTypes(i))));
+        PHZ.proc.(procName).nParticipant(i) = length(unique(PHZ.lib.tags.participant(varInd == varTypes(i))));
         PHZ.proc.(procName).nTrials(i) = size(preSummaryData{i},1);
         PHZ.proc.(procName).stdError(i,:) = ste(preSummaryData{i});
         summaryData(i,:) = doSummary(preSummaryData{i}, summaryFunction);
@@ -142,7 +142,7 @@ else % get categories to collapse across
         for j = 1:length(varTypes)
             newVar{j} = varTypes{j}{i};
         end
-        PHZ.meta.tags.(field) = categorical(newVar,cellstr(PHZ.(field)),'Ordinal',true);
+        PHZ.lib.tags.(field) = categorical(newVar,cellstr(PHZ.(field)),'Ordinal',true);
     end 
 end
 
@@ -151,10 +151,10 @@ preSummaryData = preSummaryData(:); % make col so dims match PHZ.data
 loseVars = {'participant','group','condition','session','trials'};
 loseVars(ismember(loseVars,keepVars)) = [];
 for i = loseVars, field = i{1};
-    if ~ischar(PHZ.meta.tags.(field)) && length(unique(PHZ.meta.tags.(field))) == 1
-        PHZ.meta.tags.(field) = PHZ.meta.tags.(field)(1:size(PHZ.data,1));
+    if ~ischar(PHZ.lib.tags.(field)) && length(unique(PHZ.lib.tags.(field))) == 1
+        PHZ.lib.tags.(field) = PHZ.lib.tags.(field)(1:size(PHZ.data,1));
     else
-        PHZ.meta.tags.(field) = '<collapsed>';
+        PHZ.lib.tags.(field) = '<collapsed>';
     end
 end
 
@@ -176,8 +176,8 @@ if ismember('rej',fieldnames(PHZ.proc))
 end
 
 % reset number of views (from phz_review)
-if ismember('views', fieldnames(PHZ.meta.tags))
-    PHZ.meta.tags.views = zeros(size(PHZ.data,1), 1);
+if ismember('views', fieldnames(PHZ.lib.tags))
+    PHZ.lib.tags.views = zeros(size(PHZ.data,1), 1);
 end
 
 PHZ = phz_history(PHZ,['Summarized data by ''',strjoin(keepVars),'''.'],verbose);
@@ -263,7 +263,7 @@ for i = 1:length(keepVars)
     if ~ismember(keepVars{i}, possibleKeepVars)
         continue
     end
-    if ischar(PHZ.meta.tags.(keepVars{i})) || length(unique(PHZ.meta.tags.(keepVars{i}))) < 2
+    if ischar(PHZ.lib.tags.(keepVars{i})) || length(unique(PHZ.lib.tags.(keepVars{i}))) < 2
         rminds = [rminds i]; %#ok<AGROW>
     end
 end

@@ -49,7 +49,7 @@ grpVar = 'trials'; % For now this function can only act on the 'trials'
 %   this is such a special case anyway.
 
 % make sure there are exactly two labels in the grpVar tags
-if length(unique(PHZ.meta.tags.(grpVar))) ~= 2
+if length(unique(PHZ.lib.tags.(grpVar))) ~= 2
     error('There must be exactly two labels in the specified grouping variable.')
 end
 

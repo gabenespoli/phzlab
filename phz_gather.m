@@ -144,9 +144,9 @@ for j = 1:length(files)
         PHZS.history = {};
         PHZS = phz_history(PHZS,'Gathered PHZ structure created.', verbose);
         PHZS = phz_history(PHZS,['Preprocessing: ', strnumjoin(processing)], verbose);
-        PHZS.meta.files{j} = currentFile;
-        if ismember('filename', fieldnames(PHZ.meta))
-            PHZ.meta = rmfield(PHZ.meta, 'filename'); end
+        PHZS.lib.files{j} = currentFile;
+        if ismember('filename', fieldnames(PHZ.lib))
+            PHZ.lib = rmfield(PHZ.lib, 'filename'); end
         
         PHZS.proc = [];
         PHZS.proc.pre{j} = PHZ.proc;
@@ -173,7 +173,7 @@ for j = 1:length(files)
     PHZS.proc.pre{j} = PHZ.proc;
     
     % basic fields (strings)
-    PHZS.meta.files{j} = currentFile;
+    PHZS.lib.files{j} = currentFile;
     for i = {'study','datatype','units'}, field = i{1};
         if ~strcmp(PHZ.(field),PHZS.(field))
             PHZS = phz_history(PHZS, ['NOTE: The ''',field,''' field of ''', ...
@@ -184,15 +184,15 @@ for j = 1:length(files)
     % grouping variables & tags
     % if different, reset to include unique values of tags after looping
     for i = {'participant','group','condition','session','trials'}, field = i{1};
-        if ~strcmp(PHZ.meta.tags.(field),'<collapsed>')
+        if ~strcmp(PHZ.lib.tags.(field),'<collapsed>')
             
             if ~all(ismember(cellstr(PHZ.(field)),cellstr(PHZS.(field))))
                 if ~ismember(field,resetFields), resetFields{end+1} = field; end %#ok<AGROW>
             end
             
-            PHZ.meta.tags.(field) = categorical(cellstr(PHZ.meta.tags.(field)),'Ordinal',false);
-            PHZS.meta.tags.(field) = categorical(cellstr(PHZS.meta.tags.(field)),'Ordinal',false);
-            PHZS.meta.tags.(field) = [PHZS.meta.tags.(field); PHZ.meta.tags.(field)];
+            PHZ.lib.tags.(field) = categorical(cellstr(PHZ.lib.tags.(field)),'Ordinal',false);
+            PHZS.lib.tags.(field) = categorical(cellstr(PHZS.lib.tags.(field)),'Ordinal',false);
+            PHZS.lib.tags.(field) = [PHZS.lib.tags.(field); PHZ.lib.tags.(field)];
             
         end
     end
@@ -220,7 +220,7 @@ end % end looping participants
 % cleanup PHZS
 % ------------
 for j = 1:length(resetFields), field = resetFields{j};
-    PHZS.(field) = unique(PHZS.meta.tags.(field));
+    PHZS.(field) = unique(PHZS.lib.tags.(field));
     PHZS = phz_history(PHZS,['The ',field, ...
         ' field was reset to include the unique values of tags.', ...
         field,'.'],verbose,0);

@@ -151,7 +151,7 @@ for i = 1:length(feature)
         else addVars = cellstr(keepVars);
         end
         
-        d = table(s.meta.tags.(addVars{1}),'VariableNames',addVars(1));
+        d = table(s.lib.tags.(addVars{1}),'VariableNames',addVars(1));
         d.Properties.VariableUnits = {''};
         d.Properties.VariableDescriptions = {''};
         d.Properties.Description = [PHZ.study,' ',upper(PHZ.datatype),' data'];
@@ -162,8 +162,8 @@ for i = 1:length(feature)
         else d.Properties.UserData.region = 'epoch';
         end
         
-        if ismember('files',fieldnames(PHZ.meta))
-            d.Properties.UserData.files = PHZ.meta.files;
+        if ismember('files',fieldnames(PHZ.lib))
+            d.Properties.UserData.files = PHZ.lib.files;
         elseif ismember('create',fieldnames(PHZ.proc)) && ismember('datafile',fieldnames(PHZ.proc.create))
             d.Properties.UserData.files = PHZ.proc.create.datafile;
         end
@@ -172,8 +172,8 @@ for i = 1:length(feature)
         d.Properties.UserData.history = PHZ.history;
         
         for j = 1:length(addVars) - 1
-            if ~strcmp(s.meta.tags.(addVars{j+1}),'<collapsed>')
-                d.(addVars{j+1}) = s.meta.tags.(addVars{j+1});
+            if ~strcmp(s.lib.tags.(addVars{j+1}),'<collapsed>')
+                d.(addVars{j+1}) = s.lib.tags.(addVars{j+1});
                 d.Properties.VariableUnits{end} = '';
                 d.Properties.VariableDescriptions{end} = '';
             end

@@ -18,7 +18,7 @@
 % OUTPUT
 %   PHZ.data  = Data with marked trials removed.
 %
-%   PHZ.meta.tags.* = The trial tags (i.e., participant, group,
+%   PHZ.lib.tags.* = The trial tags (i.e., participant, group,
 %               condition, session, trials) also have the 
 %               corresponding rows removed.
 %
@@ -77,7 +77,7 @@ PHZ.data = PHZ.data(keep, :);
 
 for fields = {'participant','group','condition','session','trials'}
     field = fields{1};
-    PHZ.meta.tags.(field) = PHZ.meta.tags.(field)(keep);
+    PHZ.lib.tags.(field) = PHZ.lib.tags.(field)(keep);
 end
 
 qnum = {'q1','q2','q3','q4','q5'};

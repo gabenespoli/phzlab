@@ -59,7 +59,7 @@ switch lower(field)
         old = cell(size(prompt));
         for i = 1:length(prompt)
             if strfind(prompt{i},'spec')
-                old{i} = cellstr(PHZ.meta.spec.(prompt{i}(1:end-5)));
+                old{i} = cellstr(PHZ.lib.spec.(prompt{i}(1:end-5)));
             else
                 old{i} = cellstr(PHZ.(prompt{i}));
             end
@@ -75,7 +75,7 @@ switch lower(field)
                 if ismember(prompt{i},{'study','datatype','units'})
                     PHZ.(prompt{i}) = new{i};
                 elseif strfind(prompt{i},'spec')
-                    PHZ.meta.spec.(prompt{i}(1:end-5)) = regexp(new{i},' ','split');
+                    PHZ.lib.spec.(prompt{i}(1:end-5)) = regexp(new{i},' ','split');
                 else
                     PHZ.(prompt{i}) = regexp(new{i},' ','split');
                 end
@@ -87,7 +87,7 @@ switch lower(field)
         
     case {'region','regions'}
                 
-        prompt = PHZ.meta.tags.region;
+        prompt = PHZ.lib.tags.region;
         
         old = cell(size(prompt));
         
@@ -110,13 +110,13 @@ switch lower(field)
         
         prompt = {'' '' '' '' ''};
         
-        old = PHZ.meta.tags.region;
+        old = PHZ.lib.tags.region;
         
         new = inputdlg(prompt,dlg_title,numlines,old,'on');
         
         for i = 1:length(new)
             if ~strcmp(new{i},old{i})
-                PHZ.meta.tags.region{i} = new{i};
+                PHZ.lib.tags.region{i} = new{i};
                 
                 PHZ = phz_history(PHZ,['Changed region name ',old{i},...
                     ' to ',new{i},'.'],verbose);

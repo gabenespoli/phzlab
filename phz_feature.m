@@ -258,13 +258,13 @@ switch lower(featureStr)
             % if PHZS has already been summary'd, phzFeature_itpc will have to
             %   load each file again to calculate it
             newData = [];
-            trialsPerFile = size(PHZ.data,1) / length(PHZ.meta.files);
+            trialsPerFile = size(PHZ.data,1) / length(PHZ.lib.files);
             
-            for i = 1:length(PHZ.meta.files)
+            for i = 1:length(PHZ.lib.files)
                 disp(['Calculating ITPC for file ',...
-                    num2str(i),'/',num2str(length(PHZ.meta.files)),...
-                    ': ''',PHZ.meta.files{i},''''])
-                TMP = phz_load(PHZ.meta.files{i});
+                    num2str(i),'/',num2str(length(PHZ.lib.files)),...
+                    ': ''',PHZ.lib.files{i},''''])
+                TMP = phz_load(PHZ.lib.files{i});
                 TMP = phz_proc(TMP,PHZ.proc.pre(i));
                 TMP = phzFeature_itpc(TMP,PHZ.proc.pre(i).summary.keepVars);
                 

@@ -101,15 +101,15 @@
 %                   the relevent values for recreating the analysis with
 %                   another file. See phz_proc for more uses.
 % 
-%   meta.tags.*   = [categorical|cell] Specifies grouping variable labels
-%                   for each row in PHZ.data. PHZ.meta.tags.(grpvar) are
+%   lib.tags.*   = [categorical|cell] Specifies grouping variable labels
+%                   for each row in PHZ.data. PHZ.lib.tags.(grpvar) are
 %                   stored as categoricals and must be the same length as 
 %                   the number of rows in data (i.e., number of epochs).
-%                   PHZ.meta.tags.region is stored as a cell and must be
+%                   PHZ.lib.tags.region is stored as a cell and must be
 %                   the same length as the number of regions in PHZ.region.
 %                   Regions can be added using phz_field.
 % 
-%   meta.spec.*   = [cell] Specifies the lineSpec property (incl. colour) 
+%   lib.spec.*   = [cell] Specifies the lineSpec property (incl. colour) 
 %                   for plotting. Must be the same length as the 
 %                   corresponding grouping variable (i.e., participant, 
 %                   group, condition, session, or trials. See the help for
@@ -267,7 +267,7 @@ for i = 1:length(files)
     
     % save PHZ file
     if ischar(savefolder)
-        [pathstr,name] = fileparts(PHZ.meta.datafile);
+        [pathstr,name] = fileparts(PHZ.lib.datafile);
         if isempty(savefolder), savefolder = pathstr; end
         PHZ = phz_save(PHZ,fullfile(savefolder,[name,'.phz']));
     else
@@ -318,19 +318,19 @@ PHZ.proc = struct;
 PHZ.srate = [];
 PHZ.times = [];
 
-PHZ.meta.tags.participant = categorical;
-PHZ.meta.tags.group = categorical;
-PHZ.meta.tags.condition = categorical;
-PHZ.meta.tags.session = categorical;
-PHZ.meta.tags.trials = categorical;
-PHZ.meta.tags.region = {'baseline','target','target2','target3','target4'};
+PHZ.lib.tags.participant = categorical;
+PHZ.lib.tags.group = categorical;
+PHZ.lib.tags.condition = categorical;
+PHZ.lib.tags.session = categorical;
+PHZ.lib.tags.trials = categorical;
+PHZ.lib.tags.region = {'baseline','target','target2','target3','target4'};
 
-PHZ.meta.spec.participant = {};
-PHZ.meta.spec.group = {};
-PHZ.meta.spec.condition = {};
-PHZ.meta.spec.session = {};
-PHZ.meta.spec.trials = {};
-PHZ.meta.spec.region = {'k','b','g','y','r'};
+PHZ.lib.spec.participant = {};
+PHZ.lib.spec.group = {};
+PHZ.lib.spec.condition = {};
+PHZ.lib.spec.session = {};
+PHZ.lib.spec.trials = {};
+PHZ.lib.spec.region = {'k','b','g','y','r'};
 
 PHZ.etc = struct;
 PHZ.history = {};

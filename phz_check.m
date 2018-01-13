@@ -58,9 +58,9 @@ elseif ismember('freqs',fieldnames(PHZ))
     PHZ.freqs = checkAndFixRow(PHZ.freqs,[name,'.freqs'],nargout,verbose);
 end
 
-%% grouping vars, meta.tags, meta.spec
-if ~isstruct(PHZ.meta.tags), error([name,'.meta.tags should be a structure.']), end
-if ~isstruct(PHZ.meta.spec), error([name,'.meta.spec should be a structure.']), end
+%% grouping vars, lib.tags, lib.spec
+if ~isstruct(PHZ.lib.tags), error([name,'.lib.tags should be a structure.']), end
+if ~isstruct(PHZ.lib.spec), error([name,'.lib.spec should be a structure.']), end
 
 for i = {'participant','group','condition','session','trials'}, field = i{1};
     
@@ -70,16 +70,16 @@ for i = {'participant','group','condition','session','trials'}, field = i{1};
     if length(PHZ.(field)) ~= length(unique(PHZ.(field))), error([name,'.',field,' cannot contain repeated values.']), end
     
     % tags
-    if ischar(PHZ.meta.tags.(field)) && strcmp(PHZ.meta.tags.(field),'<collapsed>')
+    if ischar(PHZ.lib.tags.(field)) && strcmp(PHZ.lib.tags.(field),'<collapsed>')
         PHZ = resetSpec(PHZ,field);
         continue
     end
     
-    PHZ.meta.tags.(field) = verifyCategorical(PHZ.meta.tags.(field),[name,'.meta.tags.',field],verbose);
-    PHZ.meta.tags.(field) = checkAndFixColumn(PHZ.meta.tags.(field),[name,'.meta.tags.',field],nargout,verbose);
+    PHZ.lib.tags.(field) = verifyCategorical(PHZ.lib.tags.(field),[name,'.lib.tags.',field],verbose);
+    PHZ.lib.tags.(field) = checkAndFixColumn(PHZ.lib.tags.(field),[name,'.lib.tags.',field],nargout,verbose);
     
     % grouping vars && tags
-    if isempty(PHZ.meta.tags.(field)) || any(isundefined(PHZ.(field)))
+    if isempty(PHZ.lib.tags.(field)) || any(isundefined(PHZ.(field)))
         
         % both are empty, do nothing
         if isempty(PHZ.(field)) || any(isundefined(PHZ.(field)))
@@ -88,7 +88,7 @@ for i = {'participant','group','condition','session','trials'}, field = i{1};
             
         % only 1 grouping var value, auto-create tags
         if length(PHZ.(field)) == 1
-            PHZ.meta.tags.(field) = repmat(PHZ.(field),size(PHZ.data,1),1);
+            PHZ.lib.tags.(field) = repmat(PHZ.(field),size(PHZ.data,1),1);
             
             % multiple grouping var values; tags remains empty
         elseif length(PHZ.(field)) > 1
@@ -98,22 +98,22 @@ for i = {'participant','group','condition','session','trials'}, field = i{1};
             error(['Problem with ',name,'.',field,'.'])
         end
         
-    else % if ~isempty(PHZ.meta.tags.(field))
+    else % if ~isempty(PHZ.lib.tags.(field))
         
         % make sure tags is same length as number of trials
-        if (length(PHZ.meta.tags.(field)) ~= size(PHZ.data,1))
+        if (length(PHZ.lib.tags.(field)) ~= size(PHZ.data,1))
             
             % if only one value, repeat it to the number of trials
-            if length(unique(PHZ.meta.tags.(field))) == 1
-                PHZ.meta.tags.(field) = repmat(PHZ.meta.tags.(field),size(PHZ.data,1),1);
+            if length(unique(PHZ.lib.tags.(field))) == 1
+                PHZ.lib.tags.(field) = repmat(PHZ.lib.tags.(field),size(PHZ.data,1),1);
             else
-                error([name,'.meta.tags.',field,' must be the same length as the number of trials.'])
+                error([name,'.lib.tags.',field,' must be the same length as the number of trials.'])
             end
         end
         
         % if there are tags not represented, empty grouping var
-        if ~isempty(PHZ.(field)) && ~all(ismember(cellstr(PHZ.meta.tags.(field)),cellstr(PHZ.(field))))
-            %             PHZ.(field) = unique(PHZ.meta.tags.(field))';
+        if ~isempty(PHZ.(field)) && ~all(ismember(cellstr(PHZ.lib.tags.(field)),cellstr(PHZ.(field))))
+            %             PHZ.(field) = unique(PHZ.lib.tags.(field))';
             PHZ.(field) = [];
             resetStr = ' because it did not represent all trial tags';
         else
@@ -123,7 +123,7 @@ for i = {'participant','group','condition','session','trials'}, field = i{1};
         
         % if empty grouping var, reset (auto-create) from tags
         if isempty(PHZ.(field))
-            PHZ.(field) = unique(PHZ.meta.tags.(field))';
+            PHZ.(field) = unique(PHZ.lib.tags.(field))';
             if verbose == 2, verbose = true; else, verbose = false; end
             PHZ = phz_history(PHZ,[name,'.',field,' was reset',resetStr,'.'],verbose,0);
         end
@@ -149,31 +149,31 @@ for i = {'participant','group','condition','session','trials'}, field = i{1};
     % make ordinal
     if ~isempty(PHZ.(field)) && all(~isundefined(PHZ.(field)))
         PHZ.(field)           = categorical(PHZ.(field),          cellstr(PHZ.(field)),'Ordinal',true);
-        PHZ.meta.tags.(field) = categorical(PHZ.meta.tags.(field),cellstr(PHZ.(field)),'Ordinal',true);
+        PHZ.lib.tags.(field) = categorical(PHZ.lib.tags.(field),cellstr(PHZ.(field)),'Ordinal',true);
     end
     
     % verify spec
     do_resetSpec = [];
     if ~isempty(PHZ.(field))
         
-        if ~ismember(PHZ.meta.tags.(field),{'<collapsed>'})
+        if ~ismember(PHZ.lib.tags.(field),{'<collapsed>'})
             %             || isundefined(PHZ.(i{1}))
             
             % if there is an order, make sure spec is same length
-            if length(PHZ.(field)) ~= length(PHZ.meta.spec.(field))
+            if length(PHZ.(field)) ~= length(PHZ.lib.spec.(field))
                 do_resetSpec = true;
-                if nargout == 0, warning([name,'.meta.spec.',field,' has an incorrect number of items.'])
-                % elseif verbose, disp(['- ',name,'.meta.spec.',field,' had an incorrect number of items and was reset to the default order.'])
+                if nargout == 0, warning([name,'.lib.spec.',field,' has an incorrect number of items.'])
+                % elseif verbose, disp(['- ',name,'.lib.spec.',field,' had an incorrect number of items and was reset to the default order.'])
                 end
             end
         else
-            PHZ.meta.spec.(field) = {};
+            PHZ.lib.spec.(field) = {};
         end
         
         % else _order is empty, make sure spec is empty
-    elseif ~isempty(PHZ.meta.spec.(field))
-        PHZ.meta.spec.(field) = {};
-        % disp(['- ',name,'.meta.spec.',field,' was emptied (set to {})'])
+    elseif ~isempty(PHZ.lib.spec.(field))
+        PHZ.lib.spec.(field) = {};
+        % disp(['- ',name,'.lib.spec.',field,' was emptied (set to {})'])
         
     end
     
@@ -184,7 +184,7 @@ end
 
 %% region
 if isstruct(PHZ.region)
-    if length(unique(PHZ.meta.tags.region)) < length(PHZ.meta.tags.region), error('All region fields must have unique names.'), end
+    if length(unique(PHZ.lib.tags.region)) < length(PHZ.lib.tags.region), error('All region fields must have unique names.'), end
     
     rname = fieldnames(PHZ.region);
     
@@ -192,23 +192,23 @@ if isstruct(PHZ.region)
         PHZ.region.(rname{i}) = verifyNumeric(PHZ.region.(rname{i}),[name,'.region.',(rname{i})],verbose);
         PHZ.region.(rname{i}) = checkAndFix1x2(PHZ.region.(rname{i}),[name,'.region.',(rname{i})],nargout,verbose);
         
-        % rename the region if there is a new name in PHZ.meta.tags.region
-        if ~strcmp(rname{i},PHZ.meta.tags.region{i})
-            PHZ.region.(PHZ.meta.tags.region{i}) = PHZ.region.(rname{i});
+        % rename the region if there is a new name in PHZ.lib.tags.region
+        if ~strcmp(rname{i},PHZ.lib.tags.region{i})
+            PHZ.region.(PHZ.lib.tags.region{i}) = PHZ.region.(rname{i});
             PHZ.region = rmfield(PHZ.region,rname{i});
         end
     end
     
-    PHZ.region = orderfields(PHZ.region,PHZ.meta.tags.region);
+    PHZ.region = orderfields(PHZ.region,PHZ.lib.tags.region);
     
 elseif isnumeric(PHZ.region)
     PHZ.region = checkAndFix1x2(PHZ.region,[name,'.region'],nargout,verbose);
 end
 
-PHZ.meta.tags.region = verifyCell(PHZ.meta.tags.region,[name,'.meta.tags.region'],verbose);
-PHZ.meta.tags.region = checkAndFixRow(PHZ.meta.tags.region,[name,'.meta.tags.region'],nargout,verbose);
-% if length(PHZ.meta.tags.region) ~= 5
-%     error('There should be 5 region names in PHZ.meta.tags.region.'), end
+PHZ.lib.tags.region = verifyCell(PHZ.lib.tags.region,[name,'.lib.tags.region'],verbose);
+PHZ.lib.tags.region = checkAndFixRow(PHZ.lib.tags.region,[name,'.lib.tags.region'],nargout,verbose);
+% if length(PHZ.lib.tags.region) ~= 5
+%     error('There should be 5 region names in PHZ.lib.tags.region.'), end
 
 %% resp
 if ~isstruct(PHZ.resp)
@@ -287,7 +287,7 @@ end
 if ismember('review',fieldnames(PHZ.proc))
     PHZ.proc.review.keep  = verifyLogical(PHZ.proc.review.keep,[name,'.proc.review.keep'],verbose);
 end
-if ismember('views',fieldnames(PHZ.meta.tags))
+if ismember('views',fieldnames(PHZ.lib.tags))
     PHZ.proc.review.views = verifyNumeric(PHZ.proc.review.views,[name,'.proc.review.views'],verbose);
 end
 
@@ -331,27 +331,27 @@ if ismember('norm',fieldnames(PHZ.proc))
     %     end
 end
 
-%% meta (except tags & spec)
+%% lib (except tags & spec)
 
 % filename
-if ismember('filename',fieldnames(PHZ.meta))
-    verifyChar(PHZ.meta.filename,[name,'.meta.filename'],verbose);
-%     if ~exist(PHZ.meta.filename,'file')
+if ismember('filename',fieldnames(PHZ.lib))
+    verifyChar(PHZ.lib.filename,[name,'.lib.filename'],verbose);
+%     if ~exist(PHZ.lib.filename,'file')
 %         disp('The filename for this PHZ file doesn''t seem to exist...')
 %     end
 end
 
 % datafile
-if ismember('datafile',fieldnames(PHZ.meta))
-    verifyChar(PHZ.meta.datafile,[name,'.meta.datafile'],verbose);
+if ismember('datafile',fieldnames(PHZ.lib))
+    verifyChar(PHZ.lib.datafile,[name,'.lib.datafile'],verbose);
 end
 
 % files
-if ismember('files',fieldnames(PHZ.meta))
-    PHZ.meta.files = verifyCell(PHZ.meta.files,[name,'.meta.files'],verbose);
-    PHZ.meta.files = checkAndFixColumn(PHZ.meta.files,[name,'.meta.files'],nargout,verbose);
-%     if mod(size(PHZ.data,1) / length(PHZ.meta.files),1)
-%         error('The number of filenames in PHZ.meta.files does not divide evenly into the number of trials in PHZ.data.')
+if ismember('files',fieldnames(PHZ.lib))
+    PHZ.lib.files = verifyCell(PHZ.lib.files,[name,'.lib.files'],verbose);
+    PHZ.lib.files = checkAndFixColumn(PHZ.lib.files,[name,'.lib.files'],nargout,verbose);
+%     if mod(size(PHZ.data,1) / length(PHZ.lib.files),1)
+%         error('The number of filenames in PHZ.lib.files does not divide evenly into the number of trials in PHZ.data.')
 %     end
 end
 
@@ -363,7 +363,7 @@ end
 
 function PHZ = resetSpec(PHZ,field)
 for j = 1:length(PHZ.(field))
-    PHZ.meta.spec.(field){j} = '';
+    PHZ.lib.spec.(field){j} = '';
 end
 end
 
@@ -476,7 +476,7 @@ end
 function PHZ = backwardsCompatibility(PHZ,verbose)
 
 % swap grouping and order vars, add tags (older than v0.7.7)
-if ~ismember('tags',fieldnames(PHZ)) && ~ismember('meta',fieldnames(PHZ))
+if ~ismember('tags',fieldnames(PHZ)) && ~ismember('lib',fieldnames(PHZ))
     
     for i = {'participant','group','session','trials'}, field = i{1};
         PHZ.tags.(field) = PHZ.(field);
@@ -491,8 +491,8 @@ if ~ismember('tags',fieldnames(PHZ)) && ~ismember('meta',fieldnames(PHZ))
     
 end
 
-% move stuff to meta and create proc (older than v0.8)
-if ~all(ismember({'proc','meta'},fieldnames(PHZ))) && any(ismember({'rej','blsub','norm'},fieldnames(PHZ)))
+% move stuff to lib and create proc (older than v0.8)
+if ~all(ismember({'proc','lib'},fieldnames(PHZ))) && any(ismember({'rej','blsub','norm'},fieldnames(PHZ)))
     warning(['Preprocessing (rej, blsub, norm) must be undone ',...
         'before this file can be compatible with this version of ',...
         'PHZLAB.'])
@@ -511,18 +511,18 @@ updateTo8 = false;
 
 for i = {'tags','spec'}, field = i{1};
     if ismember(field,fieldnames(PHZ)), updateTo8 = true;
-        PHZ.meta.(field) = PHZ.(field);
+        PHZ.lib.(field) = PHZ.(field);
         PHZ = rmfield(PHZ,field);
     end
 end
 
 if ismember('files',fieldnames(PHZ)), updateTo8 = true;
-    PHZ.meta.files = PHZ.files;
+    PHZ.lib.files = PHZ.files;
     PHZ = rmfield(PHZ,'files');
 end
 
 if ismember('filename',fieldnames(PHZ.etc)), updateTo8 = true;
-    PHZ.meta.filename = PHZ.etc.filename;
+    PHZ.lib.filename = PHZ.etc.filename;
     PHZ.etc = rmfield(PHZ.etc,'filename');
 end
 
@@ -536,8 +536,8 @@ end
 % add 'condition' as a grouping variable (v0.8.4)
 if ~ismember('condition',fieldnames(PHZ))
     PHZ.condition = categorical;
-    PHZ.meta.tags.condition = categorical;
-    PHZ.meta.spec.condition = {};
+    PHZ.lib.tags.condition = categorical;
+    PHZ.lib.spec.condition = {};
 end
 
 end
@@ -548,16 +548,16 @@ function PHZ = orderPHZfields(PHZ)
 if isstruct(PHZ.region)
     
     % if spec order doesn't match the struct, recreate the struct
-%     if ~strcmp(strjoin(fieldnames(PHZ.region)),strjoin(PHZ.meta.tags.region))
-    [~,regionMatch] = ismember(PHZ.meta.tags.region,fieldnames(PHZ.region));
+%     if ~strcmp(strjoin(fieldnames(PHZ.region)),strjoin(PHZ.lib.tags.region))
+    [~,regionMatch] = ismember(PHZ.lib.tags.region,fieldnames(PHZ.region));
     if length(regionMatch) > length(fieldnames(PHZ.region)) || ...
         ~all(regionMatch == 1:length(fieldnames(PHZ.region)))
         rname = fieldnames(PHZ.region);
-        for i = 1:length(PHZ.meta.tags.region)
+        for i = 1:length(PHZ.lib.tags.region)
             if i > length(rname)
-                temp.(PHZ.meta.tags.region{i}) = [];
+                temp.(PHZ.lib.tags.region{i}) = [];
             else
-                temp.(PHZ.meta.tags.region{i}) = PHZ.region.(rname{i});
+                temp.(PHZ.lib.tags.region{i}) = PHZ.region.(rname{i});
             end
         end
         PHZ.region = temp;
@@ -586,7 +586,7 @@ mainOrder = {
     
     'resp'
     'proc'
-    'meta'
+    'lib'
     'etc'
     'history'};
 if ~all(ismember(fieldnames(PHZ),mainOrder))
@@ -596,9 +596,9 @@ end
 mainOrder = mainOrder(ismember(mainOrder,fieldnames(PHZ)));
 PHZ = orderfields(PHZ,mainOrder);
 
-% meta structure
+% lib structure
 % --------------
-metaOrder = {
+libOrder = {
     'tags'
     'spec'
     
@@ -606,16 +606,16 @@ metaOrder = {
     'datafile'
     'files'
     };
-if ~all(ismember(fieldnames(PHZ.meta),metaOrder))
-    error(['Invalid fields present in PHZ.meta structure. ',...
+if ~all(ismember(fieldnames(PHZ.lib),libOrder))
+    error(['Invalid fields present in PHZ.lib structure. ',...
         'Use PHZ.etc to store miscellaneous data.'])
 end
-metaOrder = metaOrder(ismember(metaOrder,fieldnames(PHZ.meta)));
-PHZ.meta = orderfields(PHZ.meta,metaOrder);
+libOrder = libOrder(ismember(libOrder,fieldnames(PHZ.lib)));
+PHZ.lib = orderfields(PHZ.lib,libOrder);
 
-% meta.tags structure
+% lib.tags structure
 % -------------------
-metaTagsOrder = {
+libTagsOrder = {
     'participant'
     'group'
     'condition'
@@ -623,16 +623,16 @@ metaTagsOrder = {
     'trials'
     'region'
     };
-if ~all(ismember(fieldnames(PHZ.meta.tags),metaTagsOrder))
-    error(['Invalid fields present in PHZ.meta.tags structure. ',...
+if ~all(ismember(fieldnames(PHZ.lib.tags),libTagsOrder))
+    error(['Invalid fields present in PHZ.lib.tags structure. ',...
         'Use PHZ.etc to store miscellaneous data.'])
 end
-metaTagsOrder = metaTagsOrder(ismember(metaTagsOrder,fieldnames(PHZ.meta.tags)));
-PHZ.meta.tags = orderfields(PHZ.meta.tags,metaTagsOrder);
+libTagsOrder = libTagsOrder(ismember(libTagsOrder,fieldnames(PHZ.lib.tags)));
+PHZ.lib.tags = orderfields(PHZ.lib.tags,libTagsOrder);
 
-% meta.spec structure
+% lib.spec structure
 % -------------------
-metaSpecOrder = {
+libSpecOrder = {
     'participant'
     'group'
     'condition'
@@ -640,11 +640,11 @@ metaSpecOrder = {
     'trials'
     'region'
     };
-if ~all(ismember(fieldnames(PHZ.meta.spec),metaSpecOrder))
-    error(['Invalid fields present in PHZ.meta.spec structure. ',...
+if ~all(ismember(fieldnames(PHZ.lib.spec),libSpecOrder))
+    error(['Invalid fields present in PHZ.lib.spec structure. ',...
         'Use PHZ.etc to store miscellaneous data.'])
 end
-metaSpecOrder = metaSpecOrder(ismember(metaSpecOrder,fieldnames(PHZ.meta.spec)));
-PHZ.meta.spec = orderfields(PHZ.meta.spec,metaSpecOrder);
+libSpecOrder = libSpecOrder(ismember(libSpecOrder,fieldnames(PHZ.lib.spec)));
+PHZ.lib.spec = orderfields(PHZ.lib.spec,libSpecOrder);
 
 end

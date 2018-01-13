@@ -43,7 +43,7 @@ function PHZ = phz_blsub(PHZ,region,verbose)
 
 if nargout == 0 && nargin == 0, help phz_blc, return, end
 if nargin > 1 && isempty(region), return, end
-if nargin < 2, region = PHZ.meta.tags.region{1}; end
+if nargin < 2, region = PHZ.lib.tags.region{1}; end
 if nargin < 3, verbose = true; end
 
 [PHZ,do_blsub,do_restore] = verifyBLinput(PHZ,region,verbose);

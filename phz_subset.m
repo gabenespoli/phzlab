@@ -101,7 +101,7 @@ elseif iscell(subset)
     subsetInput = subset;
     [field, labels] = verifySubsetInput(PHZ, subset);
 
-    ind = ismember(PHZ.meta.tags.(field), labels);
+    ind = ismember(PHZ.lib.tags.(field), labels);
 
     if isnumeric(labels), labels = num2str(labels); end
     subsetStr = ['Restricted data to: ',field,' = ',...

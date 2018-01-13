@@ -51,7 +51,7 @@ elseif ismember('freqs',fieldnames(PHZ)), indField = 'freqs';
 end
 
 % convert input to vector of indices
-possibleRegions = PHZ.meta.tags.region;
+possibleRegions = PHZ.lib.tags.region;
 
 if isnumeric(region) && length(region) == 1;
     region = possibleRegions{region};

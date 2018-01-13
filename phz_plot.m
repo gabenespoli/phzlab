@@ -289,13 +289,13 @@ for p = 1:length(plotOrder)
     if ismember(PHZ.proc.feature,{'fft','itfft','itpc'}) % FFT / PC plots
         if isempty(xtitleLoc) || xtitleLoc == p, xlabel('Frequency (Hz)'), end
 
-        % custom FFT x-axis limits via PHZ.meta.spec.fftlim
-        if ismember('fftlim',fieldnames(PHZ.meta.spec))
-            if isnumeric(PHZ.meta.spec.fftlim) && isvector(PHZ.meta.spec.fftlim) && length(PHZ.meta.spec.fftlim) == 2
+        % custom FFT x-axis limits via PHZ.lib.spec.fftlim
+        if ismember('fftlim',fieldnames(PHZ.lib.spec))
+            if isnumeric(PHZ.lib.spec.fftlim) && isvector(PHZ.lib.spec.fftlim) && length(PHZ.lib.spec.fftlim) == 2
                 do_xl = false;
-                xl = PHZ.meta.spec.fftlim;
+                xl = PHZ.lib.spec.fftlim;
             else
-                warning('Problem with PHZ.meta.spec.fftlim. Using defaults.')
+                warning('Problem with PHZ.lib.spec.fftlim. Using defaults.')
             end
         end
 
@@ -378,8 +378,8 @@ for p = 1:length(plotOrder)
                     region{k}(2),...
                     region{k}(2)];
                 y = [yl(1) yl(2) yl(2) yl(1)];
-                obj = patch(x,y,PHZ.meta.spec.region{k},'EdgeColor','none',...
-                    'DisplayName',PHZ.meta.tags.region{k});
+                obj = patch(x,y,PHZ.lib.spec.region{k},'EdgeColor','none',...
+                    'DisplayName',PHZ.lib.tags.region{k});
                 alpha(obj,0.1) % make translucent
             end
         end
@@ -432,8 +432,8 @@ elseif ismember(PHZ.proc.(procName).keepVars{1},{' ','none'}) || isempty(PHZ.pro
     lineTags = [];
 else
     lineOrder = PHZ.(PHZ.proc.(procName).keepVars{1});
-    lineSpec = PHZ.meta.spec.(PHZ.proc.(procName).keepVars{1});
-    lineTags = PHZ.meta.tags.(PHZ.proc.(procName).keepVars{1});
+    lineSpec = PHZ.lib.spec.(PHZ.proc.(procName).keepVars{1});
+    lineTags = PHZ.lib.tags.(PHZ.proc.(procName).keepVars{1});
 end
 
 % plots
@@ -451,8 +451,8 @@ elseif length(PHZ.proc.(procName).keepVars) == 1
     plotTags = [];
 else 
     plotOrder = PHZ.(PHZ.proc.(procName).keepVars{2});
-    plotSpec = PHZ.meta.spec.(PHZ.proc.(procName).keepVars{2});
-    plotTags = PHZ.meta.tags.(PHZ.proc.(procName).keepVars{2});
+    plotSpec = PHZ.lib.spec.(PHZ.proc.(procName).keepVars{2});
+    plotTags = PHZ.lib.tags.(PHZ.proc.(procName).keepVars{2});
 end
 
 % add n's

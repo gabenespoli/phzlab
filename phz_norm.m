@@ -107,10 +107,10 @@ if do_norm || do_restore
             PHZ.data = (PHZ.data - PHZ.proc.norm.mean(ind)) ./ PHZ.proc.norm.stDev(ind);
             
         else
-            PHZ.proc.norm.mean = nan(size(PHZ.meta.tags.(normtype)));
-            PHZ.proc.norm.stDev = nan(size(PHZ.meta.tags.(normtype)));
+            PHZ.proc.norm.mean = nan(size(PHZ.lib.tags.(normtype)));
+            PHZ.proc.norm.stDev = nan(size(PHZ.lib.tags.(normtype)));
             for i = 1:length(PHZ.(normtype))
-                ind = PHZ.meta.tags.(normtype) == PHZ.(normtype)(i);
+                ind = PHZ.lib.tags.(normtype) == PHZ.(normtype)(i);
                 data = PHZ.data(ind,:);
                 PHZ.proc.norm.mean(ind) = mean(data(:));
                 PHZ.proc.norm.stDev(ind) = std(data(:));

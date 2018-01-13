@@ -12,7 +12,7 @@
 %   startTrial = [numeric|'reset'] If numeric, this is the trial
 %       number to start at. Default is to start at the first 
 %       unviewed trial (the number of times each trial has been
-%       viewed is stored in PHZ.meta.tags.views).
+%       viewed is stored in PHZ.lib.tags.views).
 %
 %       If it is the string 'reset', all manual rejection marks 
 %       are discarded. Note that trials marked with threshold 
@@ -63,7 +63,7 @@
 %   PHZ.proc.review.keep = [logical] Trials that have been
 %       manually marked for rejection. 1 = keep, 0 = reject.
 %
-%   PHZ.meta.tags.views = [numeric] Number of times each trial
+%   PHZ.lib.tags.views = [numeric] Number of times each trial
 %       has been viewed.
 %
 % EXAMPLES
@@ -114,13 +114,13 @@ if ~ismember('review', fieldnames(PHZ.proc))
     PHZ.proc.review.keep = true(size(PHZ.data,1),1);
     PHZ.proc.review.discarded = false;
 end
-if ~ismember('views', fieldnames(PHZ.meta.tags))
-    PHZ.meta.tags.views = zeros(size(PHZ.data,1),1);
+if ~ismember('views', fieldnames(PHZ.lib.tags))
+    PHZ.lib.tags.views = zeros(size(PHZ.data,1),1);
 end
 
 % defaults
 if isempty(startTrial) % find first unviewed trial
-    currentTrial = find(PHZ.meta.tags.views == 0, 1);
+    currentTrial = find(PHZ.lib.tags.views == 0, 1);
 else
     currentTrial = startTrial;
 end
@@ -154,7 +154,7 @@ while keepGoing
     % make titles and axis labels
     plotTitle = ['Trial #', num2str(currentTrial)];
     if showTags
-        plotTitle = [plotTitle; {getTrialTagTitle(PHZ.meta.tags, currentTrial)}];
+        plotTitle = [plotTitle; {getTrialTagTitle(PHZ.lib.tags, currentTrial)}];
     end
     plotTitle = [plotTitle; {getKeepStatusStr(PHZ, currentTrial)}];
 
@@ -349,7 +349,7 @@ end
 end
 
 function PHZ = addView(PHZ, currentTrial)
-PHZ.meta.tags.views(currentTrial) = PHZ.meta.tags.views(currentTrial) + 1;
+PHZ.lib.tags.views(currentTrial) = PHZ.lib.tags.views(currentTrial) + 1;
 end
 
 function yl = getYL(data, rejectionThreshold)

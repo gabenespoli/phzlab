@@ -71,7 +71,7 @@ if nargin > 2
 else verbose = true;
 end
 
-PHZ.meta.filename = filename;
+PHZ.lib.filename = filename;
 
 PHZ = phz_history(PHZ,['Saved to ''',filename,'''.'],verbose);
 
