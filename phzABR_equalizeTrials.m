@@ -74,7 +74,7 @@ if sum(diff(numTrials))
             labelInd = find(keepTags==tags(i)); % indices of this label in keepTags / subKeep
             % randomly select indices to drop
             sel = randperm(length(labelInd), numTrials(i) - maxTrials);
-            % get the label indices of the selected indices (it's pretty lib, i know)
+            % get the label indices of the selected indices (it's pretty meta, i know)
             rminds = labelInd(sel);
             % mark those indices for removal
             subKeep(rminds) = false;
@@ -83,7 +83,7 @@ if sum(diff(numTrials))
 
     % 'subKeep' is only the length of the subset of trials not marked for rejection
     % now we have to convert these indices into 'general' indices
-    % even more lib, i know, i know
+    % even more meta, i know, i know
     ind = true(length(keep), 1); % mark all trials for inclusion
     rminds = keepInd(~subKeep);
     ind(rminds) = false;
