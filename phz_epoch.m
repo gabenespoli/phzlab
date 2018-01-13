@@ -56,7 +56,6 @@ if nargin == 0 && nargout == 0, help phz_epoch, return, end
 if size(PHZ.data,1) > 1, error('PHZ.data seems to already be epoched...'), end
 
 % defaults
-labels = 'seq';
 winUnits = 'seconds';
 timeUnits = 'seconds';
 verbose = true;

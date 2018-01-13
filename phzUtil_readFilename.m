@@ -51,7 +51,8 @@ if any(cellfun(@isempty,delimstr(2:end-1)))
 if isempty(delimstr{1}), cursor = 1;
 elseif strcmp(delimstr{1},name(1:length(delimstr{1})))
     cursor = 1 + length(delimstr{1});
-else error(['Filename ''',name,''' doesn''t match the namestr.'])
+else
+    error(['Filename ''',name,''' doesn''t match the namestr.'])
 end
 delimstr(1) = []; % delimstr now holds delims that follow each grpvar
 

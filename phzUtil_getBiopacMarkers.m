@@ -97,7 +97,9 @@ data = regexp(cellstr(data),'\t','split');
 
 % strip html if journal file
 [~,~,ext] = fileparts(filename);
-if strcmp(ext,'.jcq'), data = convertJournalToText(data); end
+if strcmp(ext,'.jcq')
+    error('This function can''t read .jcq files yet.')
+end
 
 % remove header stuff if present & convert to table
 if isequal(data{1},{'Event Summary'}), data(1) = []; end
@@ -152,7 +154,7 @@ for i = 1:length(timeStr)
     switch timeStr{i}{2}
         case 'hrs', times(i) = times(i) * 60 * 60;
         case 'min', times(i) = times(i) * 60;
-        case 'sec', % nothing to adjust
+        case 'sec' % nothing to adjust
         otherwise, error(['Unknown time unit ''',timeStr{i}{2},'''.'])
     end
 end
@@ -184,8 +186,4 @@ for i = 1:length(labels)
     end
     labels{i} = strtrim(labels{i});
 end
-end
-
-function data = convertJournalToText(data)
-error('This function can''t read .jcq files yet.')
 end

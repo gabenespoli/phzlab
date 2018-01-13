@@ -68,7 +68,8 @@ end
 
 if nargin > 2
     verbose = varargin{2};
-else verbose = true;
+else
+    verbose = true;
 end
 
 PHZ.lib.filename = filename;

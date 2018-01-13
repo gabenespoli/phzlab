@@ -39,7 +39,11 @@ if nargin > 1 && isempty(recttype), return, end
 if nargin < 2, recttype = 'full'; end % 'full' or 'half'
 if nargin < 3, verbose = true; end
 
-if ismember('rej',fieldnames(PHZ.proc)), do_rej = true; else do_rej = false; end
+if ismember('rej',fieldnames(PHZ.proc))
+    do_rej = true;
+else
+    do_rej = false;
+end
 
 % rectify signal
 recttype = [upper(recttype(1)),lower(recttype(2:end))];

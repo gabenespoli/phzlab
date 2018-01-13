@@ -90,7 +90,8 @@ if do_norm || do_restore
         normtype = lower(normtype);
         if ~ismember(normtype,{'participant','group','session','trials','all','none'})
             error('Invalid NORMTYPE.')
-        else PHZ.proc.norm.type = normtype;
+        else
+            PHZ.proc.norm.type = normtype;
         end 
         
         % do normalization

@@ -65,7 +65,7 @@ if nargin < 3, verbose = true; end
 % parse input
 if ischar(win)
     winStr = win;
-    if strfind(lower(win),'rms')
+    if contains(lower(win),'rms')
         smoothtype = 'RMS';
         if length(win) > 3
             win = str2double(win(4:end));
@@ -73,7 +73,7 @@ if ischar(win)
             win = 100; % default RMS window in ms
         end
 
-    elseif strfind(lower(win),'mean')
+    elseif contains(lower(win),'mean')
         smoothtype = 'Mean';
         if length(win) > 4
             win = str2double(win(5:end));
@@ -92,7 +92,9 @@ elseif isnumeric(win)
     winStr = ['mean',num2str(win)];
     smoothtype = 'Mean';
 
-else error('Invalid input.')    
+else
+    error('Invalid input.')    
+
 end
 
 % check win length
@@ -101,7 +103,8 @@ if isempty(win) || length(win) > 1 || win < 0, error('Invalid window length.'), 
 % convert win to samples
 if win < 1
     win = round(size(PHZ.data,2) * 0.05); % proportion of total length
-else win = round(win / 1000 * PHZ.srate); % convert from seconds to samples
+else
+    win = round(win / 1000 * PHZ.srate); % convert from seconds to samples
 end
 
 % do smoothing

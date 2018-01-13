@@ -140,12 +140,12 @@ function varargout=phzUtil_sigstar(groups,stats,nosort,fontsize)
 
         elseif iscell(grp) %Handle string pairs or string/index pairs
 
-            if isstr(grp{1})
+            if ischar(grp{1})
                 a=strmatch(grp{1},xtl);
             elseif isnumeric(grp{1})
                 a=grp{1};
             end
-            if isstr(grp{2})
+            if ischar(grp{2})
                 b=strmatch(grp{2},xtl);
             elseif isnumeric(grp{2})
                 b=grp{2};

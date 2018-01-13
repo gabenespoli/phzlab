@@ -53,7 +53,7 @@ end
 % convert input to vector of indices
 possibleRegions = PHZ.lib.tags.region;
 
-if isnumeric(region) && length(region) == 1;
+if isnumeric(region) && length(region) == 1
     region = possibleRegions{region};
 end
 
@@ -65,7 +65,8 @@ if ischar(region)
             num2str(PHZ.region.(region)(end)), ']'];
         region = PHZ.region.(region);
         if isempty(region), error('This region is empty.'), end
-    else error('Invalid region.')
+    else
+        error('Invalid region.')
     end
 end
 

@@ -80,7 +80,11 @@
 function varargout = phz_writetable(PHZ,varargin)
 
 if nargout == 0 && nargin == 0, help phz_writetable, return, end
-if isempty(PHZ), PHZ = phz_gather; else PHZ = phz_check(PHZ); end
+if isempty(PHZ)
+    PHZ = phz_gather;
+else
+    PHZ = phz_check(PHZ);
+end
 
 % defaults
 feature = [];
@@ -148,7 +152,8 @@ for i = 1:length(feature)
     if i == 1
         if ismember(keepVars,{'all'})
             addVars = {'participant','group','condition','session','trials'};
-        else addVars = cellstr(keepVars);
+        else
+            addVars = cellstr(keepVars);
         end
         
         d = table(s.lib.tags.(addVars{1}),'VariableNames',addVars(1));
@@ -158,8 +163,10 @@ for i = 1:length(feature)
         
         d.Properties.UserData.study = PHZ.study;
         d.Properties.UserData.datatype = PHZ.datatype;
-        if ischar(PHZ.region), d.Properties.UserData.region = PHZ.region;
-        else d.Properties.UserData.region = 'epoch';
+        if ischar(PHZ.region)
+            d.Properties.UserData.region = PHZ.region;
+        else
+            d.Properties.UserData.region = 'epoch';
         end
         
         if ismember('files',fieldnames(PHZ.lib))

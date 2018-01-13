@@ -20,7 +20,7 @@ function phz_workflows(datatype)
 
 if nargin == 0 && nargout == 0; help phz_workflow, return, end
 
-if isstruct(datatype) && strcmp('datatype',fieldnames(datatype)),
+if isstruct(datatype) && strcmp('datatype',fieldnames(datatype))
     datatype = datatype.datatype;
 end
 disp(' ')
