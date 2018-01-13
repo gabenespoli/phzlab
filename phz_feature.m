@@ -286,6 +286,9 @@ switch lower(featureStr)
 
 
     case 'src'
+        if ~ismember('stim', fieldnames(PHZ.misc))
+            error('Cannot find stim field in PHZ.misc.')
+        end
         featureTitle = 'Stimulus-Response Correlation';
         PHZ.units = '';
         PHZ.data = phzFeature_src(PHZ.data,PHZ.misc.stim,PHZ.srate,val);
@@ -297,6 +300,9 @@ switch lower(featureStr)
         %   This comment also applies to 'srclag'.
         
     case 'srclag'
+        if ~ismember('stim', fieldnames(PHZ.misc))
+            error('Cannot find stim field in PHZ.misc.')
+        end
         featureTitle = 'Stimulus-Response Lag';
         PHZ.units = 's';
         [~,PHZ.data] = phzFeature_src(PHZ.data,PHZ.misc.stim,PHZ.srate,val);
