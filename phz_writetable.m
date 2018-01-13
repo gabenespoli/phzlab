@@ -81,7 +81,7 @@ function varargout = phz_writetable(PHZ,varargin)
 
 if nargout == 0 && nargin == 0, help phz_writetable, return, end
 if isempty(PHZ)
-    PHZ = phz_gather;
+    PHZ = phz_combine;
 else
     PHZ = phz_check(PHZ);
 end

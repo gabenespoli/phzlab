@@ -1,11 +1,11 @@
 # PHZLAB: A MATLAB toolbox for analysis of physiological data.
-PHZ structures are created for each recording of data, and can be filtered, epoched, and otherwise preprocessed. Multiple PHZ structures can be gathered into a single one, enabling powerful plotting functionality. Data can then be exported into a table for statistical analyses.
+PHZ structures are created for each recording of data, and can be filtered, epoched, and otherwise preprocessed. Multiple PHZ structures can be combined into a single one, enabling powerful plotting functionality. Data can then be exported into a table for statistical analyses.
 
 ## Functions
 
 ### File I/O
 - phz_create:       Create a PHZ structure from a data file.
-- phz_gather:       Gather many PHZ structures into a single one.
+- phz_combine:       Combine many PHZ structures into a single one.
 - phz_save:         Save a PHZ structure.
 - phz_load:         Load a PHZ structure.
 - phz_field:        Change the values of certain PHZ structure fields.

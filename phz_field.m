@@ -55,7 +55,7 @@ switch lower(field)
             'trials spec'};
         %     'srate'}; % if srate changes, times needs to change too
         
-        % gather current values of fields
+        % combine current values of fields
         old = cell(size(prompt));
         for i = 1:length(prompt)
             if strfind(prompt{i},'spec')

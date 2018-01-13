@@ -1,14 +1,14 @@
-%PHZ_GATHER  Create a PHZS structure of data from many PHZ structures.
+%PHZ_COMBINE  Create a PHZS structure of data from many PHZ structures.
 % 
 % USAGE    
-%   PHZ = phz_gather
-%   PHZ = phz_gather(folder)
-%   PHZ = phz_gather(...,'Param1',Value1,etc.)
+%   PHZ = phz_combine
+%   PHZ = phz_combine(folder)
+%   PHZ = phz_combine(...,'Param1',Value1,etc.)
 % 
 % INPUT   
-%   (none) = Opens a file browser to select files to gather.
+%   (none) = Opens a file browser to select files to combine.
 % 
-%   folder = Gather all .phz files in this folder. Can also be a 
+%   folder = Combine all .phz files in this folder. Can also be a 
 %            cell array of full or relative file paths.
 % 
 %   'save' = Filename and path to save PHZ structure as a '.phz' file.
@@ -31,12 +31,12 @@
 %                   file individually.
 % 
 % OUTPUT  
-%   PHZ = Gathered PHZLAB data structure. More-or-less a concatnated 
+%   PHZ = Combined PHZLAB data structure. More-or-less a concatnated 
 %         version of all input PHZ structures.
 % 
 % EXAMPLES
-%   PHZ = phz_gather >> Opens a file browser to select multiple files.
-%   PHZ = phz_gather('myfolder') >> Gathers all .phz files in myfolder.
+%   PHZ = phz_combine >> Opens a file browser to select multiple files.
+%   PHZ = phz_combine('myfolder') >> Combines all .phz files in myfolder.
 
 % Copyright (C) 2016 Gabriel A. Nespoli, gabenespoli@gmail.com
 % 
@@ -53,9 +53,9 @@
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see http://www.gnu.org/licenses/.
 
-function PHZS = phz_gather(varargin)
+function PHZS = phz_combine(varargin)
 
-if nargout == 0 && nargin == 0, help phz_gather, return, end
+if nargout == 0 && nargin == 0, help phz_combine, return, end
 
 % defaults
 region = [];
@@ -82,7 +82,7 @@ else
     [files,folder] = uigetfile({ ...
         '*.phz', 'PHZ-files (*.phz)'; ...
         '*.mat', 'MAT-files (*.mat)'}, ...
-        'Select PHZ files to gather...', ...
+        'Select PHZ files to combine...', ...
         'MultiSelect', 'on');
     if isnumeric(files) && files == 0, return, end
     if ischar(files), files = cellstr(files); end
@@ -110,7 +110,7 @@ for j = 1:length(files)
     fileProgress = [num2str(j), '/', num2str(length(files)), ...
         ': ''',files{j},''''];
     
-    disp(['Gathering PHZ data from file ', fileProgress])
+    disp(['Combining PHZ data from file ', fileProgress])
 
     % load data
     if verbose, disp(['Loading data from file ', fileProgress]), end
@@ -135,14 +135,14 @@ for j = 1:length(files)
     PHZ = phz_region(PHZ, region, verbose);
     PHZ = phz_summary(PHZ, keepVars, verbose);
     
-    % gather data
+    % combine data
     % -----------
     if j == 1
         PHZS = PHZ;
         
         % reset history field
         PHZS.history = {};
-        PHZS = phz_history(PHZS,'Gathered PHZ structure created.', verbose);
+        PHZS = phz_history(PHZS,'Combined PHZ structure created.', verbose);
         PHZS = phz_history(PHZS,['Preprocessing: ', strnumjoin(processing)], verbose);
         PHZS.lib.files{j} = currentFile;
         if ismember('filename', fieldnames(PHZ.lib))
@@ -200,8 +200,8 @@ for j = 1:length(files)
     % data
     PHZS.data = [PHZS.data; PHZ.data];
     if numel(PHZS.data) > 50000000 % check if filesize is getting too big
-        error(['Too much data to gather into one variable. Consider ',...
-            'doing some preprocessing and averaging with phz_gather.'])
+        error(['Too much data to combine into one variable. Consider ',...
+            'doing some preprocessing and averaging with phz_combine.'])
     end
     
     % behavioural response data
