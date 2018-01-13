@@ -47,7 +47,8 @@
 %
 %   Frequency-domain features:
 %   'fft'         = Amplitude spectrum. Trials are averaged together in
-%                   the time domain before calculating.
+%                   the time domain before calculating (kind of like an
+%                   "evoked" average).
 %
 %   'fft100'      = Entering 'fft' followed by a number will calculate
 %                   the value of the FFT at that frequency (e.g.,
@@ -61,6 +62,7 @@
 %   'itfft'       = Intertrial FFT. Whereas the 'fft' feature averages
 %                   trials before caluclating the FFT, 'itfft' calculates
 %                   the FFT on each trial before averaging trials together.
+%                   (kind of like an "induced" average).
 %
 %   'itpc'        = Intertrial phase coherence.
 % 
