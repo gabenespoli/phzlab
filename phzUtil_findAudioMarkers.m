@@ -3,8 +3,8 @@
 %
 % USAGE
 %   times = phzUtil_findAudioMarkers(data,threshold,timeBetween)
-%   times = phzUtil_findAudioMarkers(data,threshold,timeBewteen,...
-%                                                   'Param1',Value1,etc.)
+%   times = phzUtil_findAudioMarkers(...,'Param1',Value1,etc.)
+%   [times, xcorrInfo] = phzUtil_findAudioMarkers(...)
 %
 % INPUT
 %
@@ -48,12 +48,13 @@
 %                       After the marker time is found, a cross-correlation
 %                       is calculated between DATA and MARKERWAVEFORM,
 %                       within the MARKERWINDOW, for both regular and
-%                       inverted (multiplied by -1) versions of the waveform. 
-%                       The marker time is adjusted to the location of the 
-%                       maximum cross-correlation among the two versions of
-%                       the stimulus. The xcorrInfo output arg contains the
-%                       results of this process. This function is intended
-%                       for use with auditory brainstem response (ABR) data.
+%                       inverted (multiplied by -1) versions of the
+%                       waveform. The marker time is adjusted to the
+%                       location of the maximum cross-correlation among
+%                       the two versions of the stimulus. The xcorrInfo
+%                       output arg contains the results of this process.
+%                       This function is intended for use with auditory
+%                       brainstem response (ABR) data.
 %
 % OUTPUT
 %   times             = [numeric] Indices of start times of markers
