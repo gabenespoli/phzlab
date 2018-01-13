@@ -230,7 +230,7 @@ switch lower(featureStr)
         % summarize in time domain (adding 'participant' to summary if it isn't already)
         if any(ismember({'participant','all','none'},keepVars))
             PHZ = phz_summary(PHZ,keepVars);
-        else
+        elseif length(PHZ.participant) > 1
             PHZ = phz_summary(PHZ,[{'participant'} keepVars]);
         end
         
