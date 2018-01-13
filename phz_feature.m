@@ -70,7 +70,7 @@
 %                   r-value or the time in seconds of the maximum
 %                   cross-correlation between each epoch and a stimulus
 %                   waveform. The stimulus waveform must be provided in
-%                   PHZ.misc.stim and must be the same length as a single
+%                   PHZ.etc.stim and must be the same length as a single
 %                   trial. SRC is usually used for FFR data. Note that SRC 
 %                   will operate on each row of PHZ.data. If you are 
 %                   dealing with FFR responses, you probably want to
@@ -286,12 +286,12 @@ switch lower(featureStr)
 
 
     case 'src'
-        if ~ismember('stim', fieldnames(PHZ.misc))
-            error('Cannot find stim field in PHZ.misc.')
+        if ~ismember('stim', fieldnames(PHZ.etc))
+            error('Cannot find stim field in PHZ.etc.')
         end
         featureTitle = 'Stimulus-Response Correlation';
         PHZ.units = '';
-        PHZ.data = phzFeature_src(PHZ.data,PHZ.misc.stim,PHZ.srate,val);
+        PHZ.data = phzFeature_src(PHZ.data,PHZ.etc.stim,PHZ.srate,val);
         
         % note: SRC will operate on each row of PHZ.data (i.e. each trial).
         %   If you are dealing with FFR responses, you don't want each
@@ -300,12 +300,12 @@ switch lower(featureStr)
         %   This comment also applies to 'srclag'.
         
     case 'srclag'
-        if ~ismember('stim', fieldnames(PHZ.misc))
-            error('Cannot find stim field in PHZ.misc.')
+        if ~ismember('stim', fieldnames(PHZ.etc))
+            error('Cannot find stim field in PHZ.etc.')
         end
         featureTitle = 'Stimulus-Response Lag';
         PHZ.units = 's';
-        [~,PHZ.data] = phzFeature_src(PHZ.data,PHZ.misc.stim,PHZ.srate,val);
+        [~,PHZ.data] = phzFeature_src(PHZ.data,PHZ.etc.stim,PHZ.srate,val);
         
         % note: See comment above in the 'src' section.
         

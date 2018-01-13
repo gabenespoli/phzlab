@@ -116,9 +116,9 @@
 %                   the plot.m function for more details on lineSpec. These
 %                   values can be changed using the phz_field function.
 % 
-%   misc          = [struct] Empty structure for user to store data of any
+%   etc           = [struct] Empty structure for user to store data of any
 %                   type. There are some PHZLAB functions that access 
-%                   certain fields from PHZ.misc (e.g., FFR
+%                   certain fields from PHZ.etc (e.g., FFR
 %                   stimulus-response correlation), but in general you can 
 %                   do whatever you want here.
 % 
@@ -332,7 +332,7 @@ PHZ.meta.spec.session = {};
 PHZ.meta.spec.trials = {};
 PHZ.meta.spec.region = {'k','b','g','y','r'};
 
-PHZ.misc = struct;
+PHZ.etc = struct;
 PHZ.history = {};
 
 PHZ = phz_history(PHZ,'PHZ structure created.',verbose);

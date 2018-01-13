@@ -168,7 +168,7 @@ for i = 1:length(feature)
             d.Properties.UserData.files = PHZ.proc.create.datafile;
         end
 
-        d.Properties.UserData.misc = PHZ.misc;
+        d.Properties.UserData.etc = PHZ.etc;
         d.Properties.UserData.history = PHZ.history;
         
         for j = 1:length(addVars) - 1

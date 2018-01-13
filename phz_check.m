@@ -521,9 +521,9 @@ if ismember('files',fieldnames(PHZ)), updateTo8 = true;
     PHZ = rmfield(PHZ,'files');
 end
 
-if ismember('filename',fieldnames(PHZ.misc)), updateTo8 = true;
-    PHZ.meta.filename = PHZ.misc.filename;
-    PHZ.misc = rmfield(PHZ.misc,'filename');
+if ismember('filename',fieldnames(PHZ.etc)), updateTo8 = true;
+    PHZ.meta.filename = PHZ.etc.filename;
+    PHZ.etc = rmfield(PHZ.etc,'filename');
 end
 
 if updateTo8
@@ -587,11 +587,11 @@ mainOrder = {
     'resp'
     'proc'
     'meta'
-    'misc'
+    'etc'
     'history'};
 if ~all(ismember(fieldnames(PHZ),mainOrder))
     error(['Invalid fields present in PHZ structure. ',...
-        'Use PHZ.misc to store miscellaneous data.'])
+        'Use PHZ.etc to store miscellaneous data.'])
 end
 mainOrder = mainOrder(ismember(mainOrder,fieldnames(PHZ)));
 PHZ = orderfields(PHZ,mainOrder);
@@ -608,7 +608,7 @@ metaOrder = {
     };
 if ~all(ismember(fieldnames(PHZ.meta),metaOrder))
     error(['Invalid fields present in PHZ.meta structure. ',...
-        'Use PHZ.misc to store miscellaneous data.'])
+        'Use PHZ.etc to store miscellaneous data.'])
 end
 metaOrder = metaOrder(ismember(metaOrder,fieldnames(PHZ.meta)));
 PHZ.meta = orderfields(PHZ.meta,metaOrder);
@@ -625,7 +625,7 @@ metaTagsOrder = {
     };
 if ~all(ismember(fieldnames(PHZ.meta.tags),metaTagsOrder))
     error(['Invalid fields present in PHZ.meta.tags structure. ',...
-        'Use PHZ.misc to store miscellaneous data.'])
+        'Use PHZ.etc to store miscellaneous data.'])
 end
 metaTagsOrder = metaTagsOrder(ismember(metaTagsOrder,fieldnames(PHZ.meta.tags)));
 PHZ.meta.tags = orderfields(PHZ.meta.tags,metaTagsOrder);
@@ -642,7 +642,7 @@ metaSpecOrder = {
     };
 if ~all(ismember(fieldnames(PHZ.meta.spec),metaSpecOrder))
     error(['Invalid fields present in PHZ.meta.spec structure. ',...
-        'Use PHZ.misc to store miscellaneous data.'])
+        'Use PHZ.etc to store miscellaneous data.'])
 end
 metaSpecOrder = metaSpecOrder(ismember(metaSpecOrder,fieldnames(PHZ.meta.spec)));
 PHZ.meta.spec = orderfields(PHZ.meta.spec,metaSpecOrder);
