@@ -58,6 +58,7 @@ examples.
 - `phzABR_summary`: Add or subtract polarities.
 - `phzABR_plot`: Summary plot for ABR data (coming soon).
 - `phz_BTexport`: Export data to [Brainstem Toolbox](http://www.brainvolts.northwestern.edu/) (coming soon).
+- `phzBiopac_transform`: Convert data by gain and desired units.
 - `phzBiopac_readJournalMarkers`: Read marker times from Biopac AcqKnowledge journal text.
 - `phzUtil_findAudioMarkers`: Search for audio onsets in a signal.
 
