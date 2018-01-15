@@ -1,15 +1,16 @@
 %PHZ_TRANSFORM  Apply a transformation to the data.
 %
 % USAGE
-%   PHZ = phz_transform(PHZ,transform)
+%   PHZ = phz_transform(PHZ, transform)
 %
 % INPUT
 %   PHZ       = PHZLAB data structure.
 %
-%   transform = [string|numeric|cell] Type of transformation to apply to the
-%               data. See below for a list of possible transformations. If
-%               a cell, the first element is the transformation to apply,
-%               and the second element is a string with the new units.
+%   transform = [string|numeric|cell] Type of transformation to apply to
+%               the data. See below for a list of possible transformations.
+%               If a cell, the first element is the transformation to
+%               apply, and the second element is a string with the new
+%               units.
 %
 %       'sqrt'    = Take square root of every data point.
 %                   Data cannot be negative.
@@ -23,6 +24,14 @@
 %   PHZ.data  = The transformed data.
 %   PHZ.proc.transform.transform = The transformation(s) performed.
 %   PHZ.proc.transform.
+%
+% EXAMPLES
+%    >> PHZ = phz_transform(PHZ, 1000)
+%       Multiply all data points by 1000.
+%
+%    >> PHZ = phz_transform(PHZ, {1000, 'uV'})
+%       Also change PHZ.units to 'uV' (microvolts). Note that this simply
+%       changes the unit label and does not scale the data.
 
 % Copyright (C) 2018 Gabriel A. Nespoli, gabenespoli@gmail.com
 %
