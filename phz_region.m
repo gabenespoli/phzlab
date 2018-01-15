@@ -23,7 +23,7 @@
 %           from the first sample to the 3001st sample. For a sampling rate
 %           of 1000 Hz, this would correspond to 0-3 seconds.
 
-% Copyright (C) 2016 Gabriel A. Nespoli, gabenespoli@gmail.com
+% Copyright (C) 2018 Gabriel A. Nespoli, gabenespoli@gmail.com
 % 
 % This program is free software: you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by

@@ -24,7 +24,7 @@
 %   PHZ = phz_blsub(PHZ,[-1 0]) >> Subtract the mean of -1s to 0s.
 %   PHZ = phz_blsub(PHZ,0) >> Undo baseline subtraction.
 
-% Copyright (C) 2016 Gabriel A. Nespoli, gabenespoli@gmail.com
+% Copyright (C) 2018 Gabriel A. Nespoli, gabenespoli@gmail.com
 % 
 % This program is free software: you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
