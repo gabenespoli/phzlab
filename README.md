@@ -6,6 +6,8 @@ PHZLAB is a MATLAB Toolbox for analyzing physiological data, both peripheral (e.
 
 PHZLAB is inspired by [EEGLAB](https://sccn.ucsd.edu/eeglab/index.php), and borrows the idea of a having a single struct to hold data and metadata for a given data file or group of data files. All functions operate on this PHZ structure, keeping a log of processing (PHZ.history), as well as the PHZLAB settings required to reproduce all processing (PHZ.proc).
 
+Tutorial and example scripts coming soon.
+
 ## Functions
 
 ### File I/O
@@ -22,22 +24,24 @@ PHZLAB is inspired by [EEGLAB](https://sccn.ucsd.edu/eeglab/index.php), and borr
 - phz_rectify:      Full- or half-wave rectification.
 - phz_smooth:       Sliding window averaging (incl. RMS)
 - phz_transform:    Transform data (e.g., square root, etc.)
-- phz_reject:       Remove trials with values exceeding a threshold or SD.
+- phz_reject:       Mark trials with values exceeding a threshold or SD.
 - phz_blsub:        Subtract mean of baseline region from each trial.
 - phz_norm:         Normalize across specified grouping variables.
+- phz_dicard:       Remove trials marked by reject, subset, and review.
 - phz_proc:         Apply many processing functions in one step.
 
 ### Analysis
-- phz_subset:       Keep data only from specified grouping variables.
+- phz_subset:       Mark data only from specified grouping variables.
 - phz_region:       Keep only data from a certain time region.
 - phz_feature:      Convert data to the specified feature.
 - phz_summary:      Average across grouping variables.
 - phzABR_summary:   Special case accounting for different polarities.
 
 ### Visualization and Export
+- phz_review:       Inspect individual trials.
 - phz_plot:         Visualize data as line or bar graphs.
-- phzABR_plot:      Summary plot for ABR data.
-- phz_BTexport:     Export data to [Brainstem Toolbox](http://www.brainvolts.northwestern.edu/).
+- phzABR_plot:      Summary plot for ABR data (coming soon).
+- phz_BTexport:     Export data to [Brainstem Toolbox](http://www.brainvolts.northwestern.edu/) (coming soon).
 - phz_writetable:   Export features to a MATLAB table or csv file (e.g., for R).
 
 ## Version
