@@ -547,12 +547,12 @@ end
 if ismember('meta', fieldnames(PHZ))
     PHZ.lib = PHZ.meta;
     PHZ = rmfield(PHZ, 'meta');
-    PHZ = phz_history(PHZ, 'Renamed ''meta'' field to ''lib''.');
+    PHZ = phz_history(PHZ, 'Renamed ''meta'' field to ''lib''.',verbose,0);
 end
 if ismember('misc', fieldnames(PHZ))
     PHZ.etc = PHZ.misc;
     PHZ = rmfield(PHZ, 'misc');
-    PHZ = phz_history(PHZ, 'Renamed ''misc'' field to ''etc''.');
+    PHZ = phz_history(PHZ, 'Renamed ''misc'' field to ''etc''.',verbose,0);
 end
 
 end
