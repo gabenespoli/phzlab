@@ -545,16 +545,54 @@ end
 
 % change meta/misc fields to lib/etc (v1.0)
 if ismember('meta', fieldnames(PHZ))
-    PHZ.lib = PHZ.meta;
+    if ismember('lib', fieldnames(PHZ))
+        try
+            temp = mergestructs(PHZ.lib, PHZ.meta);
+        catch err
+            disp('! Problem merging PHZ.meta into PHZ.lib.')
+            rethrow(err)
+        end
+        PHZ.lib = temp;
+        PHZ = phz_history(PHZ, 'Merged ''meta'' field into ''lib'' field.',verbose,0);
+    else
+        PHZ.lib = PHZ.meta;
+        PHZ = phz_history(PHZ, 'Renamed ''meta'' field to ''lib''.',verbose,0);
+    end
     PHZ = rmfield(PHZ, 'meta');
-    PHZ = phz_history(PHZ, 'Renamed ''meta'' field to ''lib''.',verbose,0);
 end
 if ismember('misc', fieldnames(PHZ))
-    PHZ.etc = PHZ.misc;
+    if ismember('etc', fieldnames(PHZ))
+        try
+            temp = mergestructs(PHZ.etc, PHZ.misc);
+        catch err
+            disp('! Problem merging PHZ.misc into PHZ.etc')
+            rethrow(err)
+        end
+        PHZ.etc = temp;
+        PHZ = phz_history(PHZ, 'Merged ''misc'' field into ''etc'' field.',verbose,0);
+    else
+        PHZ.etc = PHZ.misc;
+        PHZ = phz_history(PHZ, 'Renamed ''misc'' field to ''etc''.',verbose,0);
+    end
     PHZ = rmfield(PHZ, 'misc');
-    PHZ = phz_history(PHZ, 'Renamed ''misc'' field to ''etc''.',verbose,0);
 end
 
+end
+
+function M = mergestructs(a, b)
+disp(inputname(1))
+M = struct;
+aNames = fieldnames(a);
+bNames = fieldnames(b);
+if any(ismember(aNames, bNames))
+    error('Tried to merge structs but there were merge conflicts.')
+end
+for i = 1:length(aNames)
+    M.(aNames{i}) = a.(aNames{i});
+end
+for i = 1:length(bNames)
+    M.(bNames{i}) = b.(bNames{i});
+end
 end
 
 function PHZ = orderPHZfields(PHZ)
