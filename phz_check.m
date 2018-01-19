@@ -522,9 +522,9 @@ if ismember('files',names), updateTo8 = true;
     PHZ = rmfield(PHZ,'files');
 end
 
-if ismember('filename',fieldnames(PHZ.etc)), updateTo8 = true;
-    PHZ.lib.filename = PHZ.etc.filename;
-    PHZ.etc = rmfield(PHZ.etc,'filename');
+if ismember('filename',fieldnames(PHZ.misc)), updateTo8 = true;
+    PHZ.meta = PHZ.misc.filename;
+    PHZ.misc = rmfield(PHZ.misc,'filename');
 end
 
 if updateTo8
@@ -537,8 +537,8 @@ end
 % add 'condition' as a grouping variable (v0.8.4)
 if ~ismember('condition',names)
     PHZ.condition = categorical;
-    PHZ.lib.tags.condition = categorical;
-    PHZ.lib.spec.condition = {};
+    PHZ.meta.tags.condition = categorical;
+    PHZ.meta.spec.condition = {};
 end
 
 % change meta/misc fields to lib/etc (v1.0)
