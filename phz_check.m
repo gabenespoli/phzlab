@@ -540,6 +540,18 @@ if ~ismember('condition',fieldnames(PHZ))
     PHZ.lib.spec.condition = {};
 end
 
+% change meta/misc fields to lib/etc (v1.0)
+if ismember('meta', fieldnames(PHZ))
+    PHZ.lib = PHZ.meta;
+    PHZ = rmfield(PHZ, 'meta');
+    PHZ = phz_history(PHZ, 'Renamed ''meta'' field to ''lib''.');
+end
+if ismember('misc', fieldnames(PHZ))
+    PHZ.etc = PHZ.misc;
+    PHZ = rmfield(PHZ, 'misc');
+    PHZ = phz_history(PHZ, 'Renamed ''misc'' field to ''etc''.');
+end
+
 end
 
 function PHZ = orderPHZfields(PHZ)
