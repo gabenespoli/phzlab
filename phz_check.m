@@ -474,9 +474,10 @@ end
 end
 
 function PHZ = backwardsCompatibility(PHZ,verbose)
+names = fieldnames(PHZ);
 
 % swap grouping and order vars, add tags (older than v0.7.7)
-if ~ismember('tags',fieldnames(PHZ)) && ~ismember('lib',fieldnames(PHZ))
+if ~ismember('tags',names) && ~ismember('lib',names)
     
     for i = {'participant','group','session','trials'}, field = i{1};
         PHZ.tags.(field) = PHZ.(field);
@@ -492,7 +493,7 @@ if ~ismember('tags',fieldnames(PHZ)) && ~ismember('lib',fieldnames(PHZ))
 end
 
 % move stuff to lib and create proc (older than v0.8)
-if ~all(ismember({'proc','lib'},fieldnames(PHZ))) && any(ismember({'rej','blsub','norm'},fieldnames(PHZ)))
+if ~all(ismember({'proc','lib'},names)) && any(ismember({'rej','blsub','norm'},names))
     warning(['Preprocessing (rej, blsub, norm) must be undone ',...
         'before this file can be compatible with this version of ',...
         'PHZLAB.'])
@@ -510,13 +511,13 @@ end
 updateTo8 = false;
 
 for i = {'tags','spec'}, field = i{1};
-    if ismember(field,fieldnames(PHZ)), updateTo8 = true;
+    if ismember(field,names), updateTo8 = true;
         PHZ.lib.(field) = PHZ.(field);
         PHZ = rmfield(PHZ,field);
     end
 end
 
-if ismember('files',fieldnames(PHZ)), updateTo8 = true;
+if ismember('files',names), updateTo8 = true;
     PHZ.lib.files = PHZ.files;
     PHZ = rmfield(PHZ,'files');
 end
@@ -527,26 +528,26 @@ if ismember('filename',fieldnames(PHZ.etc)), updateTo8 = true;
 end
 
 if updateTo8
-    if ~ismember('proc',fieldnames(PHZ)) || ~isstruct(PHZ.proc)
+    if ~ismember('proc',names) || ~isstruct(PHZ.proc)
         PHZ.proc = struct;
         PHZ = phz_history(PHZ,'Updated PHZ structure to v0.8.',verbose,0);
     end
 end
 
 % add 'condition' as a grouping variable (v0.8.4)
-if ~ismember('condition',fieldnames(PHZ))
+if ~ismember('condition',names)
     PHZ.condition = categorical;
     PHZ.lib.tags.condition = categorical;
     PHZ.lib.spec.condition = {};
 end
 
 % change meta/misc fields to lib/etc (v1.0)
-if ismember('meta', fieldnames(PHZ))
+if ismember('meta', names)
     PHZ.lib = PHZ.meta;
     PHZ = rmfield(PHZ, 'meta');
     PHZ = phz_history(PHZ, 'Renamed ''meta'' field to ''lib''.');
 end
-if ismember('misc', fieldnames(PHZ))
+if ismember('misc', names)
     PHZ.etc = PHZ.misc;
     PHZ = rmfield(PHZ, 'misc');
     PHZ = phz_history(PHZ, 'Renamed ''misc'' field to ''etc''.');
