@@ -476,7 +476,9 @@ end
 function PHZ = backwardsCompatibility(PHZ,verbose)
 
 % swap grouping and order vars, add tags (older than v0.7.7)
-if ~ismember('tags',fieldnames(PHZ)) && ~ismember('lib',fieldnames(PHZ))
+if ismember('spec',fieldnames(PHZ)) && ...
+    ~ismember('tags',fieldnames(PHZ)) && ...
+    ~ismember('lib',fieldnames(PHZ))
     
     for i = {'participant','group','session','trials'}, field = i{1};
         PHZ.tags.(field) = PHZ.(field);
