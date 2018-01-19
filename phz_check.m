@@ -474,10 +474,9 @@ end
 end
 
 function PHZ = backwardsCompatibility(PHZ,verbose)
-names = fieldnames(PHZ);
 
 % swap grouping and order vars, add tags (older than v0.7.7)
-if ~ismember('tags',names) && ~ismember('lib',names) && ismember('spec',names)
+if ~ismember('tags',fieldnames(PHZ)) && ~ismember('lib',fieldnames(PHZ))
     
     for i = {'participant','group','session','trials'}, field = i{1};
         PHZ.tags.(field) = PHZ.(field);
@@ -493,7 +492,7 @@ if ~ismember('tags',names) && ~ismember('lib',names) && ismember('spec',names)
 end
 
 % move stuff to lib and create proc (older than v0.8)
-if ~all(ismember({'proc','lib'},names)) && any(ismember({'rej','blsub','norm'},names))
+if ~all(ismember({'proc','lib'},fieldnames(PHZ))) && any(ismember({'rej','blsub','norm'},fieldnames(PHZ)))
     warning(['Preprocessing (rej, blsub, norm) must be undone ',...
         'before this file can be compatible with this version of ',...
         'PHZLAB.'])
@@ -511,43 +510,44 @@ end
 updateTo8 = false;
 
 for i = {'tags','spec'}, field = i{1};
-    if ismember(field,names), updateTo8 = true;
+    if ismember(field,fieldnames(PHZ)), updateTo8 = true;
         PHZ.lib.(field) = PHZ.(field);
         PHZ = rmfield(PHZ,field);
     end
 end
 
-if ismember('files',names), updateTo8 = true;
+if ismember('files',fieldnames(PHZ)), updateTo8 = true;
     PHZ.lib.files = PHZ.files;
     PHZ = rmfield(PHZ,'files');
 end
 
-if ismember('misc',names) && ismember('filename',fieldnames(PHZ.misc)), updateTo8 = true;
+if ismember('misc',fieldnames(PHZ)) && ismember('filename',fieldnames(PHZ.misc))
+    updateTo8 = true;
     PHZ.meta = PHZ.misc.filename;
     PHZ.misc = rmfield(PHZ.misc,'filename');
 end
 
 if updateTo8
-    if ~ismember('proc',names) || ~isstruct(PHZ.proc)
+    if ~ismember('proc',fieldnames(PHZ)) || ~isstruct(PHZ.proc)
         PHZ.proc = struct;
         PHZ = phz_history(PHZ,'Updated PHZ structure to v0.8.',verbose,0);
     end
 end
 
 % add 'condition' as a grouping variable (v0.8.4)
-if ~ismember('condition',names)
+if ~ismember('condition',fieldnames(PHZ))
     PHZ.condition = categorical;
     PHZ.meta.tags.condition = categorical;
     PHZ.meta.spec.condition = {};
 end
 
 % change meta/misc fields to lib/etc (v1.0)
-if ismember('meta', names)
+if ismember('meta', fieldnames(PHZ))
     PHZ.lib = PHZ.meta;
     PHZ = rmfield(PHZ, 'meta');
     PHZ = phz_history(PHZ, 'Renamed ''meta'' field to ''lib''.');
 end
-if ismember('misc', names)
+if ismember('misc', fieldnames(PHZ))
     PHZ.etc = PHZ.misc;
     PHZ = rmfield(PHZ, 'misc');
     PHZ = phz_history(PHZ, 'Renamed ''misc'' field to ''etc''.');
