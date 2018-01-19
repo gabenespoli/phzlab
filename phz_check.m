@@ -522,7 +522,7 @@ if ismember('files',names), updateTo8 = true;
     PHZ = rmfield(PHZ,'files');
 end
 
-if ismember('filename',fieldnames(PHZ.misc)), updateTo8 = true;
+if ismember('misc',names) && ismember('filename',fieldnames(PHZ.misc)), updateTo8 = true;
     PHZ.meta = PHZ.misc.filename;
     PHZ.misc = rmfield(PHZ.misc,'filename');
 end
