@@ -89,7 +89,7 @@ end
 % defaults
 feature = [];
 region = [];
-keepVars = {'all'};
+keepVars = [];
 
 unstackVars = [];
 
@@ -150,7 +150,7 @@ for i = 1:length(feature)
     
     % create table on first loop
     if i == 1
-        if ismember(keepVars,{'all'})
+        if isempty(keepVars) || ismember(keepVars,{'all'})
             addVars = {'participant','group','condition','session','trials'};
         else
             addVars = cellstr(keepVars);

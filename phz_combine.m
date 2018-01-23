@@ -59,7 +59,7 @@ if nargout == 0 && nargin == 0, help phz_combine, return, end
 
 % defaults
 region = [];
-keepVars = {'all'};
+keepVars = [];
 filename = {};
 verbose = false;
 
