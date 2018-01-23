@@ -70,6 +70,7 @@ if nargin > 0
         files = dir(folder);
         files = {files.name};
         files = files(contains(files, {'.phz', '.mat'}));
+        files = files(~startsWith(files, '.')); % ignore dotfiles
 
     elseif iscell(varargin{1})
         folder = '';
