@@ -2,13 +2,22 @@
 % 
 % USAGE
 %   PHZ = phz_load(PHZ)
-%   PHZ = phz_load(PHZ,filename)
+%   PHZ = phz_load(PHZ,filename,verbose,force)
 % 
 % INTPUT
 %   PHZ           = [struct] PHZLAB data structure to save.
 % 
-%   filename      = [string] Filename (and path) of save location.
+%   filename      = [string] Filename (and path) of save location. Leave
+%                   empty ('' or []) to be prompted to select a location
+%                   with a dialog box.
 % 
+%   verbose       = [true|false] Specifies whether to print save progress
+%                   in the command window. Default true.
+%
+%   force         = [true|false] If true, overwrite existing file if it
+%                   exists, otherwise user will be prompted to overwrite,
+%                   cancel, or change the filename. Default false.
+%
 % OUTPUT
 %   PHZ.history   = Updated to reflect the save action.
 % 
@@ -36,49 +45,41 @@
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see http://www.gnu.org/licenses/.
 
-function PHZ = phz_save(PHZ,varargin)
+function PHZ = phz_save(PHZ,filename,verbose,force)
 
 if nargout == 0 && nargin == 0, help phz_save, return, end
+if nargin < 2, filename = ''; end
+if nargin < 3, verbose = true; end
+if nargin < 4, force = false; end
 
-% get filename with dialog box
-if nargin == 1
+if isempty(filename)
+    % get filename with dialog box
     [filename,pathname] = uiputfile({'*.phz';'*.*'},'Select file to write',[inputname(1),'.phz']);
     filename = fullfile(pathname,filename);
-end
-
-% use filename from input argument
-if nargin > 1
-    [pathname,filename,ext] = fileparts(varargin{1});
+else
+    % use filename from input argument
+    [pathname,filename,ext] = fileparts(filename);
     if isempty(ext) || ~ismember(ext,{'.phz','.mat'}), ext = '.phz'; end
     filename = fullfile(pathname,[filename,ext]);
 end
 
 % ask about overwriting an existing filename
-if exist(filename,'file') && nargin > 2
-	goodInput = false;
-	while goodInput == false
-		s = input('File already exists. Overwrite? [y/n]: ','s');
-		switch lower(s)
-			case 'y', goodInput = true;
-			case 'n', disp('Aborting...'), return
-			otherwise, disp('Invalid input.')
-		end
-	end
-end
-
-if nargin > 2
-    verbose = varargin{2};
-else
-    verbose = true;
+if exist(filename,'file') && ~force
+    goodInput = false;
+    while goodInput == false
+        s = input('File already exists. Overwrite? [y/n]: ','s');
+        switch lower(s)
+            case 'y', goodInput = true;
+            case 'n', disp('Aborting...'), return
+            otherwise, disp('Invalid input.')
+        end
+    end
 end
 
 PHZ.lib.filename = filename;
-
 PHZ = phz_history(PHZ,['Saved to ''',filename,'''.'],verbose);
-
-fprintf('  Saving...')
-
+if verbose, fprintf('  Saving...'), end
 save(filename,'PHZ')
+if verbose, fprintf(' Done.\n'), end
 
-fprintf(' Done.\n')
 end
