@@ -67,10 +67,20 @@ end
 if exist(filename,'file') && ~force
     goodInput = false;
     while goodInput == false
-        s = input('File already exists. Overwrite? [y/n]: ','s');
+        s = input(['File already exists. ',...
+                   '[o]verwrite, [c]ancel, or [e]dit filename?: '],'s');
         switch lower(s)
-            case 'y', goodInput = true;
-            case 'n', disp('Aborting...'), return
+            case 'o'
+                goodInput = true;
+            case 'c'
+                disp('Aborting...')
+                return
+            case 'e'
+                fprintf('Old filename: %s\n', filename)
+                filename = input('New filename: ', 's');
+                if ~exist(filename,'file')
+                    goodInput = true;
+                end
             otherwise, disp('Invalid input.')
         end
     end
