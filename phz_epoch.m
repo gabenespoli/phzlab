@@ -77,7 +77,7 @@ PHZ.proc.epoch.timesUnits = timeUnits;
 times = convertToSamples(times,timeUnits,PHZ.srate);
 extractWindow = convertToSamples(extractWindow,winUnits,PHZ.srate);
 
-[PHZ.data,rminds] = extractEpochs(PHZ.data,times,extractWindow);
+[PHZ.data,rminds] = extractEpochs(PHZ.data,times,extractWindow,verbose);
 PHZ.times = (extractWindow(1):1:extractWindow(2)) / PHZ.srate; % convert times to seconds
 
 if isempty(rminds)
@@ -91,16 +91,16 @@ end
 
 end
 
-function [epochs,rminds] = extractEpochs(data,times,extractWindow)
+function [epochs,rminds] = extractEpochs(data,times,extractWindow,verbose)
 
-disp('  Extracting epochs...')
+if verbose, disp('  Extracting epochs...'), end
 
 epochs = zeros(length(times),extractWindow(2) - extractWindow(1) + 1);
 rminds = [];
 w = '';
 
 for i = 1:length(times) % loop through epochs
-    w = phzUtil_progressbar(w,i/length(times));
+    if verbose, w = phzUtil_progressbar(w,i/length(times)); end
     
     % skip epochs for which the epoch window is too large for the datafile
     if (times(i) + extractWindow(1) < 1) || (times(i) + extractWindow(2) > size(data,2))
