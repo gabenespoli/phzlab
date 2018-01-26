@@ -135,7 +135,7 @@ for i = {'participant','group','condition','session','trials'}, field = i{1};
                 temp = sort(temp);
 %                 PHZ.(field) = cellstr(num2str(PHZ.(field)));
 %                 PHZ.(field) = strrep(PHZ.(field),' ','');
-                temp = verifyCategorical(temp);
+                temp = verifyCategorical(temp,'temp',false);
                 temp = categorical(temp,temp,'Ordinal',true);
                 if ~isequal(PHZ.(field),temp)
                     PHZ.(field) = temp;
