@@ -20,6 +20,8 @@
 %   'save'    = Filename and path to save resultant table as either a
 %               MATLAB file (.mat) or text file of comma-separated values
 %               (.csv). The file extension determines the type of file.
+%
+%   'force'   = See help phzUtil_getUniqueSaveName.
 %   
 %   The following functions can be called as parameter/value pairs,
 %   and are executed in the same order as they appear in the
@@ -95,6 +97,7 @@ unstackVars = [];
 
 filename = {};
 infoname = {};
+force = 0;
 
 verbose = true;
 
@@ -126,6 +129,7 @@ for i = 1:2:length(varargin)
             
         case {'save','filename'},       filename = addToCell(filename,varargin{i+1});
         case {'info','infoname'},       infoname = addToCell(infoname,varargin{i+1});
+        case {'force'},                 force = varargin{i+1};
             
     end
 end
@@ -202,20 +206,23 @@ end
 % finish up
 checkForEmptyCells(d);
 d = insertOtherInfo(d,infoname);
-printOrSaveToFile(filename,d)
+printOrSaveToFile(filename,d,force)
 varargout{1} = d;
 disp('   Done exporting PHZ features.')
 end
 
-function printOrSaveToFile(filename,d)
+function printOrSaveToFile(filename,d,force)
 if ~isempty(filename)
     for i = 1:length(filename)
-        [~,~,ext] = fileparts(filename{i});
+        fname = filename{i};
+        fname = phzUtil_getUniqueSaveName(fname,force);
+        if isempty(fname), continue, end
+        [~,~,ext] = fileparts(fname);
         switch ext
-            case {'.mat'},          save(filename{i},'d')
-            case {'.csv','.txt'},   writetable(d,filename{i})
+            case {'.mat'},          save(fname,'d')
+            case {'.csv','.txt'},   writetable(d,fname)
         end
-        disp(['  Saved file ''',filename{i},'''.'])
+        disp(['  Saved file ''',fname,'''.'])
     end
 end
 end

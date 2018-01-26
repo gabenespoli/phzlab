@@ -14,9 +14,7 @@
 %   verbose       = [true|false] Specifies whether to print save progress
 %                   in the command window. Default true.
 %
-%   force         = [true|false] If true, overwrite existing file if it
-%                   exists, otherwise user will be prompted to overwrite,
-%                   cancel, or change the filename. Default false.
+%   force         = See help phzUtil_getUniqueSaveName.
 %
 % OUTPUT
 %   PHZ.history   = Updated to reflect the save action.
@@ -50,7 +48,7 @@ function PHZ = phz_save(PHZ,filename,verbose,force)
 if nargout == 0 && nargin == 0, help phz_save, return, end
 if nargin < 2, filename = ''; end
 if nargin < 3, verbose = true; end
-if nargin < 4, force = false; end
+if nargin < 4, force = 0; end
 
 if isempty(filename)
     % get filename with dialog box
@@ -64,27 +62,8 @@ else
 end
 
 % ask about overwriting an existing filename
-if exist(filename,'file') && ~force
-    goodInput = false;
-    while goodInput == false
-        s = input(['File already exists. ',...
-                   '[o]verwrite, [c]ancel, or [e]dit filename?: '],'s');
-        switch lower(s)
-            case 'o'
-                goodInput = true;
-            case 'c'
-                disp('Aborting...')
-                return
-            case 'e'
-                fprintf('Old filename: %s\n', filename)
-                filename = input('New filename: ', 's');
-                if ~exist(filename,'file')
-                    goodInput = true;
-                end
-            otherwise, disp('Invalid input.')
-        end
-    end
-end
+filename = phzUtil_getUniqueSaveName(filename,force);
+if isempty(filename), return, end
 
 PHZ.lib.filename = filename;
 PHZ = phz_history(PHZ,['Saved to ''',filename,'''.'],verbose);
