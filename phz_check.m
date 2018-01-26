@@ -63,46 +63,46 @@ if ~isstruct(PHZ.lib.tags), error([name,'.lib.tags should be a structure.']), en
 if ~isstruct(PHZ.lib.spec), error([name,'.lib.spec should be a structure.']), end
 
 for i = {'participant','group','condition','session','trials'}, field = i{1};
-    
+
     % grouping vars
     PHZ.(field) = verifyCategorical(PHZ.(field),[name,'.',field],verbose);
     PHZ.(field) = checkAndFixRow(PHZ.(field),[name,'.',field],nargout,verbose);
     if length(PHZ.(field)) ~= length(unique(PHZ.(field))), error([name,'.',field,' cannot contain repeated values.']), end
-    
+
     % tags
     if ischar(PHZ.lib.tags.(field)) && strcmp(PHZ.lib.tags.(field),'<collapsed>')
         PHZ = resetSpec(PHZ,field);
         continue
     end
-    
+
     PHZ.lib.tags.(field) = verifyCategorical(PHZ.lib.tags.(field),[name,'.lib.tags.',field],verbose);
     PHZ.lib.tags.(field) = checkAndFixColumn(PHZ.lib.tags.(field),[name,'.lib.tags.',field],nargout,verbose);
-    
+
     % grouping vars && tags
     if isempty(PHZ.lib.tags.(field)) || any(isundefined(PHZ.(field)))
-        
+
         % both are empty, do nothing
         if isempty(PHZ.(field)) || any(isundefined(PHZ.(field)))
             PHZ.(field) = categorical(cellstr('-'));
         end
-            
+
         % only 1 grouping var value, auto-create tags
         if length(PHZ.(field)) == 1
             PHZ.lib.tags.(field) = repmat(PHZ.(field),size(PHZ.data,1),1);
-            
+
             % multiple grouping var values; tags remains empty
         elseif length(PHZ.(field)) > 1
             warning(['It is unknown which values of ''',field,''' apply to which trials.'])
-            
+
         else 
             error(['Problem with ',name,'.',field,'.'])
         end
-        
+
     else % if ~isempty(PHZ.lib.tags.(field))
-        
+
         % make sure tags is same length as number of trials
         if (length(PHZ.lib.tags.(field)) ~= size(PHZ.data,1))
-            
+
             % if only one value, repeat it to the number of trials
             if length(unique(PHZ.lib.tags.(field))) == 1
                 PHZ.lib.tags.(field) = repmat(PHZ.lib.tags.(field),size(PHZ.data,1),1);
@@ -110,7 +110,7 @@ for i = {'participant','group','condition','session','trials'}, field = i{1};
                 error([name,'.lib.tags.',field,' must be the same length as the number of trials.'])
             end
         end
-        
+
         % if there are tags not represented, empty grouping var
         if ~isempty(PHZ.(field)) && ~all(ismember(cellstr(PHZ.lib.tags.(field)),cellstr(PHZ.(field))))
             %             PHZ.(field) = unique(PHZ.lib.tags.(field))';
@@ -119,15 +119,14 @@ for i = {'participant','group','condition','session','trials'}, field = i{1};
         else
             resetStr = '';
         end
-        
-        
+
         % if empty grouping var, reset (auto-create) from tags
         if isempty(PHZ.(field))
             PHZ.(field) = unique(PHZ.lib.tags.(field))';
             if verbose == 2, verbose = true; else, verbose = false; end
             PHZ = phz_history(PHZ,[name,'.',field,' was reset',resetStr,'.'],verbose,0);
         end
-        
+
         % if numeric, order numerically
         try
             if ~any(isnan(str2double(cellstr(PHZ.(field)))))
@@ -145,20 +144,20 @@ for i = {'participant','group','condition','session','trials'}, field = i{1};
         catch
         end
     end
-    
+
     % make ordinal
     if ~isempty(PHZ.(field)) && all(~isundefined(PHZ.(field)))
         PHZ.(field)           = categorical(PHZ.(field),          cellstr(PHZ.(field)),'Ordinal',true);
         PHZ.lib.tags.(field) = categorical(PHZ.lib.tags.(field),cellstr(PHZ.(field)),'Ordinal',true);
     end
-    
+
     % verify spec
     do_resetSpec = [];
     if ~isempty(PHZ.(field))
-        
+
         if ~ismember(PHZ.lib.tags.(field),{'<collapsed>'})
             %             || isundefined(PHZ.(i{1}))
-            
+
             % if there is an order, make sure spec is same length
             if length(PHZ.(field)) ~= length(PHZ.lib.spec.(field))
                 do_resetSpec = true;
@@ -169,17 +168,17 @@ for i = {'participant','group','condition','session','trials'}, field = i{1};
         else
             PHZ.lib.spec.(field) = {};
         end
-        
+
         % else _order is empty, make sure spec is empty
     elseif ~isempty(PHZ.lib.spec.(field))
         PHZ.lib.spec.(field) = {};
         % disp(['- ',name,'.lib.spec.',field,' was emptied (set to {})'])
-        
+
     end
-    
+
     if do_resetSpec
         PHZ = resetSpec(PHZ,field); end
-    
+
 end
 
 %% region
