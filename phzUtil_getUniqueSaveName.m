@@ -37,11 +37,11 @@
 function filename = phzUtil_getUniqueSaveName(filename, force)
 if nargin < 2, force = 0; end
 
-if ~exists(filename, 'file')
+if ~exist(filename, 'file')
     return
 end
 
-if exists(filename, 'file') && force == 1
+if exist(filename, 'file') && force == 1
     filename = appendUniqueNumber(filename);
     return
 end
