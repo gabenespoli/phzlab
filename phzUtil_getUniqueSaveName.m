@@ -44,6 +44,8 @@ end
 if exist(filename, 'file') && force == 1
     filename = appendUniqueNumber(filename);
     return
+else
+    fprintf('  Filename already exists: ''%s''', filename)
 end
 
 goodInput = false;
@@ -70,7 +72,7 @@ while goodInput == false
         case 'e'
             fprintf('Old filename: %s\n', filename)
             filename = input('New filename: ', 's');
-            if ~exist(filename,'file')
+            if isempty(filename) || ~exist(filename,'file')
                 goodInput = true;
             end
         otherwise, disp('Invalid input.')
