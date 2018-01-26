@@ -197,18 +197,6 @@ end
 % unstack
 if ~isempty(unstackVars)
     d = phzUtil_unstack2(d,feature,unstackVars);
-%     if ~iscell(unstackVars), unstackVars = cellstr(unstackVars); end
-%     d = unstack(d,feature,unstackVars{1});
-%     
-%     if length(unstackVars) == 2
-%         dataVars = d.Properties.VariableNames;
-%         rm = ismember(dataVars,{'participant','group','condition','session','trials'});
-%         dataVars(rm) = [];
-%         
-%         d = unstack(d,dataVars,unstackVars{2});
-%         
-%     elseif length(unstackVars) > 2, error('Cannot unstack more than 2 variables.')
-%     end
 end
 
 % finish up
