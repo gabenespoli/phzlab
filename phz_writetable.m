@@ -208,7 +208,7 @@ checkForEmptyCells(d);
 d = insertOtherInfo(d,infoname);
 printOrSaveToFile(filename,d,force)
 varargout{1} = d;
-disp('   Done exporting PHZ features.')
+disp('  Done exporting PHZ features.')
 end
 
 function printOrSaveToFile(filename,d,force)
