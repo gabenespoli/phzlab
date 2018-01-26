@@ -137,7 +137,7 @@ if ~iscell(feature), feature = {feature}; end
 % data preprocessing
 PHZ = phz_region(PHZ,region,verbose);
 
-disp('Calculating features...')
+disp('  Calculating features...')
 for i = 1:length(feature)
     
     [s,featureTitle] = phz_feature(PHZ,feature{i},'summary',keepVars,'verbose',verbose);
@@ -216,7 +216,7 @@ checkForEmptyCells(d);
 d = insertOtherInfo(d,infoname);
 printOrSaveToFile(filename,d)
 varargout{1} = d;
-disp('Done exporting PHZ features.')
+disp('   Done exporting PHZ features.')
 end
 
 function printOrSaveToFile(filename,d)
@@ -227,7 +227,7 @@ if ~isempty(filename)
             case {'.mat'},          save(filename{i},'d')
             case {'.csv','.txt'},   writetable(d,filename{i})
         end
-        disp(['Saved file ''',filename{i},'''.'])
+        disp(['  Saved file ''',filename{i},'''.'])
     end
 end
 end
@@ -241,7 +241,7 @@ for i = 1:length(infoname)
     if any(strcmp('group',infodata.Properties.VariableNames))
         disp(['There is also a GROUP variable in ',infoname{i}])
         disp('What would you like to do?')
-        disp('1 - use the GROUP variable from the FFR data')
+        disp('1 - use the GROUP variable from the PHZ data')
         disp(['2 - use the GROUP variable from ',infoname{i}])
         disp('3 - retain both GROUP variables')
         val = input('  >> ');
