@@ -69,7 +69,7 @@ if nargin > 0
         folder = varargin{1};
         files = dir(folder);
         files = {files.name};
-        files = files(contains(files, {'.phz', '.mat'}));
+        files = files(contains(files, {'.phz'}));
         files = files(~startsWith(files, '.')); % ignore dotfiles
 
     elseif iscell(varargin{1})
@@ -81,8 +81,7 @@ if nargin > 0
     
 else
     [files,folder] = uigetfile({ ...
-        '*.phz', 'PHZ-files (*.phz)'; ...
-        '*.mat', 'MAT-files (*.mat)'}, ...
+        '*.phz', 'PHZ-files (*.phz)'}, ...
         'Select PHZ files to combine...', ...
         'MultiSelect', 'on');
     if isnumeric(files) && files == 0, return, end
