@@ -409,7 +409,8 @@ function [lineOrder,lineTags,lineSpec,plotOrder,plotTags,plotSpec] = getLabelsAn
 
 % get most recent summary proc field name
 names = fieldnames(PHZ.proc);
-ind = max(find(startsWith(names, 'summary')), 'first');
+ind = startsWith(names, 'summary');
+ind = max(find(ind, length(ind), 'first'));
 if ~isempty(ind)
     isSummary = true;
     procName = names{ind};
