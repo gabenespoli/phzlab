@@ -1,17 +1,11 @@
 %PHZ_EPOCH  Split a PHZ structure into epochs.
 %
 % USAGE
-%   PHZ = phz_epoch(PHZ,win,times)
-%   PHZ = phz_epoch(PHZ,win,times,'Param1',Value1,etc.)
+%   PHZ = phz_epoch(PHZ,times,extractWindow)
+%   PHZ = phz_epoch(PHZ,times,extractWindow,'Param1',Value1,etc.)
 %
 % INPUTS
 %   PHZ           = [struct] PHZLAB data structure.
-%
-%   extractWindow = [numeric] A vector of length 2 specifying the window 
-%                   around each epoch time to extract. Enter in the form 
-%                   [start end] relative to the marker. Default units is 
-%                   seconds. e.g. [-1 2] (one second before and two seconds
-%                   after the marker).
 % 
 %   times         = [numeric|string] If a vector, TIMES is the indices 
 %                   (sample numbers from where the epochs should be 
@@ -19,6 +13,12 @@
 %                   file containing the epoch times. If empty, phz_epoch 
 %                   attempts to open the raw data file to get the epoch 
 %                   times from there. Default units is samples.
+%
+%   extractWindow = [numeric] A vector of length 2 specifying the window 
+%                   around each epoch time to extract. Enter in the form 
+%                   [start end] relative to the marker. Default units is 
+%                   seconds. e.g. [-1 2] (one second before and two seconds
+%                   after the marker).
 % 
 %   'winUnits'    = [string] Specifies the units of the values in 
 %                   EXTRACTWINDOW. Options are 'samples', 's'/'seconds', 
@@ -50,7 +50,7 @@
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see http://www.gnu.org/licenses/.
 
-function PHZ = phz_epoch(PHZ,extractWindow,times,varargin)
+function PHZ = phz_epoch(PHZ,times,extractWindow,varargin)
 
 if nargin == 0 && nargout == 0, help phz_epoch, return, end
 if size(PHZ.data,1) > 1, error('PHZ.data seems to already be epoched...'), end
