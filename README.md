@@ -44,9 +44,7 @@ functions that can be called from the command window or incorporated into
 your own scripts. Once processed, data can be exported for statistical
 analysis, and publication-ready plots can be easily produced.
 
-## Quick Tutorial
-
-*See the examples folder for template scripts that you can use.*
+See the examples folder for template scripts that you can use.
 
 ### Loading data
 
@@ -55,17 +53,40 @@ it.
 ```matlab
 PHZ = phz_create('blank');
 PHZ.data = data;
+PHZ.srate = 1000;
 PHZ.participant = 1;
 PHZ.group = 'control';
 PHZ.units = 'V';
 ```
 
-Change the units to millivolts, and add a high-pass filter and a notch filter
-to remove line noise.
+If you recorded these data using Biopac AcqKnowledge and saved the .acq file
+as a .mat file (using the 'Save as...' menu in AcqKnowledge), then you can
+specify a specific channel from that file to load. PHZLAB will automatically
+read the sampling rate, datatype, and units. These can be overridden though:
 ```matlab
+PHZ = phz_create( ...
+    'filename',     'my_biopac_data.mat', ...
+    'filetype',     'acq', ...
+    'channel',      4, ...
+    'datatype',     'EMG', ...
+    'units',        'V');
+```
+
+Change the units to millivolts, and add a high-pass filter and a notch filter
+to remove line noise. If these are Biopac data, you can use the special
+Biopac transform function to account for this when converting the units:
+```matlab
+% manual calculation and changing units
 PHZ = phz_transform(PHZ, 1000);
 PHZ.units = 'mV';
-PHZ = phz_filter(PHZ, [1 0 60]); % 1 Hz HP and 60 Hz notch
+
+% using Biopac gain (hardware gain value on amplifier was 50)
+PHZ = phzBiopac_transform(PHZ, 50, 'm');
+```
+
+Filter the data with a 10-500 Hz bandpass and a 60 Hz notch filter:
+```matlab
+PHZ = phz_filter(PHZ, [10 500 60]);
 ```
 
 Split a continuous data file into epochs and label them. This requires that you
@@ -93,12 +114,11 @@ the given folder.
 PHZ = phz_combine('phzfiles');
 ```
 
-If there is too much data in all files to put into a single file, PHZLAB will
-throw an error and suggest that you do some preprocessing (including
-averaging, e.g., by using `phz_summary`) before combining the files. This can
-be done right from the call to `phz_combine`. Note that you won't be able to
-change this processing later without re-combining the files with different
-settings:
+If there is too much data to put into a single file, PHZLAB will throw an error
+and suggest that you do some preprocessing (including averaging, e.g., by using
+`phz_summary`) before combining the files. This can be done right from the call
+to `phz_combine`. Note that you won't be able to change this processing later
+without re-combining the files with different settings:
 ```matlab
 PHZ = phz_combine('phzfiles', ...
                   'blsub',    [-1 0], ...
