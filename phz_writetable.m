@@ -17,7 +17,7 @@
 %               unstacked. This is useful if you will be using SPSS
 %               with a repeated measures design. See examples.
 % 
-%   'save'    = Filename and path to save resultant table as either a
+%   'filename'= Filename and path to save resultant table as either a
 %               MATLAB file (.mat) or text file of comma-separated values
 %               (.csv). The file extension determines the type of file.
 %
