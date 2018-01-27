@@ -37,6 +37,9 @@
 %                   x-axis and right y-axis, making plots look more
 %                   "presentation-ready". Default 0.
 % 
+%   'dark'        = [0|1] Makes the plot background black instead of white.
+%                   Useful at night. Default 0.
+%
 %   'simpleYTitle'= [0|1] Enter 1 to suppress inclusion of processing info
 %                   in the y-axis title. Default 0 (include this info).
 % 
@@ -125,6 +128,7 @@ yl = [];
 xl = [];
 sameyl = [];
 pretty = false;
+dark = false;
 simpleytitle = false;
 do_title = true;
 do_close = false;
@@ -168,6 +172,7 @@ for i = 1:2:length(varargin)
         case {'xl','xlim'},             xl = varargin{i+1};
         case 'sameyl',                  sameyl = varargin{i+1};
         case 'pretty',                  pretty = varargin{i+1};
+        case 'dark',                    dark = varargin{i+1};
         case 'simpleytitle',            simpleytitle = varargin{i+1};
         case {'do_title','title'},      do_title = varargin{i+1};
         case {'plotall','all'},         plotall = varargin{i+1};
@@ -393,6 +398,7 @@ for p = 1:length(plotOrder)
     % adjust font size
     set(gca,'FontSize',fontsize)
     if pretty, set(gca,'box','off'), end
+    if dark, set(gca,'color','k'), end
 
 end
 
