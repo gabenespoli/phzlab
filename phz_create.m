@@ -47,6 +47,7 @@
 %   'group'       = Fills the 'group' field of the PHZ structure.
 %   'condition'   = Fills the 'condition' field of the PHZ structure.
 %   'session'     = Fills the 'session' field of the PHZ structure.
+%   'units'       = Fills the 'units' field of the PHZ structure.
 % 
 %   'savefolder'  = [string] The folder where the new PHZ file should be 
 %                   saved. SAVEFOLDER must be specified if multiple PHZ 
@@ -264,6 +265,7 @@ for i = 1:length(files)
     end
     
     if ~isempty(datatype), PHZ.datatype = datatype; end
+    if ~isempty(units), PHZ.units = units; end
     
     % save PHZ file
     if ischar(savefolder)
