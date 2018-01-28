@@ -10,8 +10,8 @@ peripheral (e.g., SCL, EMG) and neural (e.g., ABR, FFR).
 1. [How it works](#how-it-works)
 2. [Tutorial](#tutorial)
     1. [Loading data](#tutorial-loading)
-    2. [Combine many phz files into one](#tutorial-combining)
-    3. [Preprocessing](#tutorial-preprocessing)
+    2. [Preprocessing](#tutorial-preprocessing)
+    3. [Combine many PHZ files into one](#tutorial-combining)
     4. [Plotting](#tutorial-plotting)
     5. [Exporting](#tutorial-exporting)
 3. [Installation](#installation)
@@ -29,7 +29,7 @@ peripheral (e.g., SCL, EMG) and neural (e.g., ABR, FFR).
 
 <a name="how-it-works"></a>
 
-## 1. How it works
+## How it works
 PHZLAB is inspired by [EEGLAB](https://sccn.ucsd.edu/eeglab/index.php), 
 and borrows the idea of a having a single variable (a struct called PHZ)
 to hold data and metadata for a given file or files. All functions operate
@@ -40,15 +40,15 @@ functions that can be called from the command window or incorporated into
 your own scripts. Once processed, data can be exported for statistical
 analysis, and publication-ready plots can be easily produced.
 
-See the examples folder for template scripts that you can use.
+See the [examples](examples) folder for template scripts that you can use.
 
 <a name="tutorial"></a>
 
-## 2. Tutorial
+## Tutorial
 
 <a name="tutorial-loading"></a>
 
-### 2.i Loading data
+### Loading data
 
 Usually you will create an empty PHZ variable and manually add your data into
 it.
@@ -69,7 +69,7 @@ read the sampling rate, datatype, and units. These can be overridden though:
 PHZ = phz_create( ...
     'filename',     'my_biopac_data.mat', ...
     'filetype',     'acq', ...
-    'channel',      4, ...
+    'channel',      1, ...
     'datatype',     'EMG', ...
     'units',        'V');
 ```
@@ -107,29 +107,6 @@ Save this file to disk:
 phz_save(PHZ, 'phzfiles/datafile1.phz');
 ```
 
-<a name="tutorial-combining"></a>
-
-### Combine many files into one
-
-This lets us process the whole dataset at once, as well as dynamically draw
-plots with different settings. `phz_combine` will combine all .phz files in
-the given folder.
-```matlab
-PHZ = phz_combine('phzfiles');
-```
-
-If there is too much data to put into a single file, PHZLAB will throw an error
-and suggest that you do some preprocessing (including averaging, e.g., by using
-`phz_summary`) before combining the files. This can be done right from the call
-to `phz_combine`. Note that you won't be able to change this processing later
-without re-combining the files with different settings:
-```matlab
-PHZ = phz_combine('phzfiles', ...
-                  'blsub',    [-1 0], ...
-                  'reject',   0.05, ...
-                  'summary',  {'participant', 'group', 'trials'});
-```
-
 <a name="tutorial-preprocessing"></a>
 
 ### Preprocessing
@@ -144,7 +121,30 @@ Mark trials for rejection that contain values above a threshold.
 PHZ = phz_reject(PHZ, 0.05);
 ```
 
-<a name="tutorial-plotting"></a>
+<a name="tutorial-combining"></a>
+
+### Combine many PHZ files into one
+
+PHZLAB can combine all .phz files in a given folder into a single PHZ variable.
+This lets you apply processing functions to the whole dataset at once, and
+allows you easily make plots plots that include all data.
+```matlab
+PHZ = phz_combine('phzfiles');
+```
+
+If there is too much data to put into a single file, PHZLAB will throw an error
+and suggest that you do some preprocessing (including averaging, e.g., by using
+`phz_summary`) before combining the files. This can be done from the call to
+`phz_combine`. You won't be able to change this processing later without
+re-combining the files with different settings:
+```matlab
+PHZ = phz_combine('phzfiles', ...
+                  'blsub',    [-1 0], ...
+                  'reject',   0.05, ...
+                  'summary',  {'participant', 'group', 'trials'});
+```
+
+<a name="tutorial-preprocessing"></a>
 
 ### Plotting
 
