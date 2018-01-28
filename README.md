@@ -10,8 +10,8 @@ peripheral (e.g., SCL, EMG) and neural (e.g., ABR, FFR).
 1. [How it works](#how-it-works)
 2. [Tutorial](#tutorial)
     1. [Loading data](#tutorial-loading)
-    2. [Combine many phz files into one](#tutorial-combining)
-    3. [Preprocessing](#tutorial-preprocessing)
+    2. [Preprocessing](#tutorial-preprocessing)
+    3. [Combine many PHZ files into one](#tutorial-combining)
     4. [Plotting](#tutorial-plotting)
     5. [Exporting](#tutorial-exporting)
 3. [Installation](#installation)
@@ -29,7 +29,7 @@ peripheral (e.g., SCL, EMG) and neural (e.g., ABR, FFR).
 
 <a name="how-it-works"></a>
 
-## 1. How it works
+## How it works
 PHZLAB is inspired by [EEGLAB](https://sccn.ucsd.edu/eeglab/index.php), 
 and borrows the idea of a having a single variable (a struct called PHZ)
 to hold data and metadata for a given file or files. All functions operate
@@ -44,11 +44,11 @@ See the examples folder for template scripts that you can use.
 
 <a name="tutorial"></a>
 
-## 2. Tutorial
+## Tutorial
 
 <a name="tutorial-loading"></a>
 
-### 2.i Loading data
+### Loading data
 
 Usually you will create an empty PHZ variable and manually add your data into
 it.
@@ -107,13 +107,27 @@ Save this file to disk:
 phz_save(PHZ, 'phzfiles/datafile1.phz');
 ```
 
+<a name="tutorial-preprocessing"></a>
+
+### Preprocessing
+
+Subtract the mean of a baseline period from each epoch.
+```matlab
+PHZ = phz_blsub(PHZ, [-1 0]);
+```
+
+Mark trials for rejection that contain values above a threshold.
+```matlab
+PHZ = phz_reject(PHZ, 0.05);
+```
+
 <a name="tutorial-combining"></a>
 
-### Combine many files into one
+### Combine many PHZ files into one
 
-This lets us process the whole dataset at once, as well as dynamically draw
-plots with different settings. `phz_combine` will combine all .phz files in
-the given folder.
+PHZLAB can combine all .phz files in a given folder into a single PHZ variable.
+This lets you apply processing functions to the whole dataset at once, and
+means we can make plots that include all data very quickly.
 ```matlab
 PHZ = phz_combine('phzfiles');
 ```
@@ -131,20 +145,6 @@ PHZ = phz_combine('phzfiles', ...
 ```
 
 <a name="tutorial-preprocessing"></a>
-
-### Preprocessing
-
-Subtract the mean of a baseline period from each epoch.
-```matlab
-PHZ = phz_blsub(PHZ, [-1 0]);
-```
-
-Mark trials for rejection that contain values above a threshold.
-```matlab
-PHZ = phz_reject(PHZ, 0.05);
-```
-
-<a name="tutorial-plotting"></a>
 
 ### Plotting
 
