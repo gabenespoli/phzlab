@@ -32,7 +32,7 @@
 %   'smooth'    = Calls phz_smooth.
 %   'transform' = Calls phz_transform.
 %   'blsub'     = Calls phz_blsub.
-%   'rej'       = Calls phz_rej.
+%   'reject'    = Calls phz_reject.
 %   'norm'      = Calls phz_norm.
 % 
 %   The following functions can be called as parameter/value pairs, and
@@ -118,7 +118,7 @@ for i = 1:2:length(varargin)
         case {'smooth','smoothing'},    PHZ = phz_smooth(PHZ,varargin{i+1},verbose);
         case 'transform',               PHZ = phz_transform(PHZ,varargin{i+1},verbose);
         case {'blsub','blc'},           PHZ = phz_blsub(PHZ,varargin{i+1},verbose);
-        case {'rej','reject'},          PHZ = phz_rej(PHZ,varargin{i+1},verbose);
+        case {'rej','reject'},          PHZ = phz_reject(PHZ,varargin{i+1},verbose);
         case {'norm','normtype'},       PHZ = phz_norm(PHZ,varargin{i+1},verbose);
         
         case 'region',                  region = varargin{i+1};
