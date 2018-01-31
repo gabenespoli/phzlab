@@ -159,6 +159,7 @@ participant = ''; %#ok<NASGU>
 group = ''; %#ok<NASGU>
 condition = ''; %#ok<NASGU>
 session = ''; %#ok<NASGU>
+units = '';
 
 channel = [];
 
@@ -183,6 +184,7 @@ for i = 1:2:length(varargin)
         case 'group',                   group = varargin{i+1}; %#ok<NASGU>
         case 'condition',               condition = varargin{i+1}; %#ok<NASGU>
         case 'session',                 session = varargin{i+1}; %#ok<NASGU>
+        case 'units',                   units = varargin{i+1};
 
         case 'filetype',                filetype = varargin{i+1};
         case {'save'},                  savefolder = varargin{i+1};
