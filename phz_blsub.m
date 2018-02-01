@@ -11,7 +11,7 @@
 %               vector specifying the start and end times in seconds, or a 
 %               1-by-N vector (length > 2) of indices. Setting REGION to 
 %               zero restores a previous subtraction. Default value is
-%               the first region in PHZ.region.
+%               the region called 'baseline' in PHZ.region.
 %
 % OUTPUT  
 %   PHZ.data                = Baseline-subtracted data.
