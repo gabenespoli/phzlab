@@ -150,9 +150,9 @@ PHZ = phz_create( ...
     'units',        'V');
 ```
 
-Change the units to millivolts, and add a high-pass filter and a notch filter
-to remove line noise. If these are Biopac data, you can use the special
-Biopac transform function to account for this when converting the units:
+Change the units to millivolts. If these are Biopac data, you can use the
+special Biopac transform function to account for the hardware gain setting on
+the amplifier when converting the units:
 ```matlab
 % manual calculation and changing units
 PHZ = phz_transform(PHZ, 1000);
