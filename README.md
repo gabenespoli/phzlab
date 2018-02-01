@@ -190,9 +190,19 @@ phz_save(PHZ, 'phzfiles/datafile1.phz');
 
 ### 2.ii Preprocessing
 
-Subtract the mean of a baseline period from each epoch.
+Subtract the mean of a baseline period from each epoch. You can manually enter
+a time range, or, if you've set the appropriate `PHZ.region` field, you can use
+that name instead:
 ```matlab
+% manually enter time region
 PHZ = phz_blsub(PHZ, [-1 0]);
+
+% use the PHZ.region baseline field
+PHZ.region.baseline = [-1 0];
+PHZ = phz_blsub(PHZ, 'baseline');
+
+% if no region is given, the region called 'baseline' is used
+PHZ = phz_blsub(PHZ);
 ```
 
 Mark trials for rejection that contain values above a threshold.
