@@ -7,25 +7,25 @@ peripheral (e.g., SCL, EMG) and neural (e.g., ABR, FFR).
 
 ## Table of Contents
 
-- [1. How it works](#how-it-works)
-- [2. Tutorial](#tutorial)
-  - [1a. Loading data](#tutorial-loading)
-  - [2b. Preprocessing](#tutorial-preprocessing)
-  - [3c. Combine many PHZ files into one](#tutorial-combining)
-  - [4d. Plotting](#tutorial-plotting)
-  - [5e. Exporting](#tutorial-exporting)
-- [3. List of Functions](#functions)
-  - [1a. File I/O](#functions-fileio)
-  - [2b. Processing](#functions-processing)
-  - [3c. nalysis](#functions-analysis)
-  - [4d. Visualization and Export](#functions-visualization)
-  - [5e. Specialty Functions](#functions-specialty)
-- [4. Installation](#installation)
-  - [1a. Git](#installation-git)
-  - [2b. Manual download](#installation-download)
-  - [3c. Add PHZLAB to the MATLAB path](#add-to-path)
-- [5. Acknowledgements](#acknowledgements)
-- [6. License](#license)
+1. [How it works](#how-it-works)
+2. [Tutorial](#tutorial)
+    1. [Loading data](#tutorial-loading)
+    2. [Preprocessing](#tutorial-preprocessing)
+    3. [Combine many PHZ files into one](#tutorial-combining)
+    4. [Plotting](#tutorial-plotting)
+    5. [Exporting](#tutorial-exporting)
+3. [List of Functions](#functions)
+    1. [File I/O](#functions-fileio)
+    2. [Processing](#functions-processing)
+    3. [Analysis](#functions-analysis)
+    4. [Visualization and Export](#functions-visualization)
+    5. [Specialty Functions](#functions-specialty)
+4. [Installation](#installation)
+    1. [Git](#installation-git)
+    2. [Manual download](#installation-download)
+    3. [Add PHZLAB to the MATLAB path](#add-to-path)
+5. [Acknowledgements](#acknowledgements)
+6. [License](#license)
 
 <a name="how-it-works"></a>
 
@@ -122,7 +122,7 @@ The following is a very basic walk through of how PHZLAB is used. See the
 
 <a name="tutorial-loading"></a>
 
-### 2a. Loading data
+### 2.i Loading data
 
 Usually you will create an empty PHZ variable and manually add your data into
 it.
@@ -184,7 +184,7 @@ phz_save(PHZ, 'phzfiles/datafile1.phz');
 
 <a name="tutorial-preprocessing"></a>
 
-### 2b. Preprocessing
+### 2.ii Preprocessing
 
 Subtract the mean of a baseline period from each epoch.
 ```matlab
@@ -198,7 +198,7 @@ PHZ = phz_reject(PHZ, 0.05);
 
 <a name="tutorial-combining"></a>
 
-### 2c. Combine many PHZ files into one
+### 2.iii Combine many PHZ files into one
 
 PHZLAB can combine all .phz files in a given folder into a single PHZ variable.
 This lets you apply processing functions to the whole dataset at once, and
@@ -221,7 +221,7 @@ PHZ = phz_combine('phzfiles', ...
 
 <a name="tutorial-preprocessing"></a>
 
-### 2d. Plotting
+### 2.iv Plotting
 
 Plot the average waveform of all trials:
 ```matlab
@@ -262,7 +262,7 @@ phz_plot(PHZ, 'summary', {'group', 'trials'}, 'feature', 'mean', 'reject', 0.1)
 
 <a name="tutorial-exporting"></a>
 
-### 2e. Exporting
+### 2.v Exporting
 
 Use the same input argument structure as your call to phz_plot to write those
 data to a csv file. Just add a filename argument.
@@ -282,7 +282,7 @@ examples.
 
 <a name="functions-fileio"></a>
 
-### 3a. File I/O
+### 3.i File I/O
 - `phz_create`: Create a PHZ structure from a data file.
 - `phz_combine`: Combine many PHZ structures into a single one.
 - `phz_save`: Save a PHZ structure.
@@ -291,7 +291,7 @@ examples.
 
 <a name="functions-processing"></a>
 
-### 3b. Processing
+### 3.ii Processing
 - `phz_filter`: Butterworth filtering (requires Signal Processing Toolbox).
 - `phz_epoch`: Split a single channel of data into trials.
 - `phz_labels`: Add names to each trial of epoched data.
@@ -306,7 +306,7 @@ examples.
 
 <a name="functions-analysis"></a>
 
-### 3c. Analysis
+### 3.iii Analysis
 - `phz_subset`: Mark data only from specified grouping variables.
 - `phz_region`: Keep only data from a certain time region.
 - `phz_feature`: Convert data to the specified feature.
@@ -314,14 +314,14 @@ examples.
 
 <a name="functions-visualization"></a>
 
-### 3d. Visualization and Export
+### 3.iv Visualization and Export
 - `phz_review`: Inspect individual trials.
 - `phz_plot`: Visualize data as line or bar graphs.
 - `phz_writetable`: Export features as a CSV file (e.g., for R).
 
 <a name="functions-specialty"></a>
 
-### 3e. Specialty Functions
+### 3.v Specialty Functions
 - `phzABR_equalizeTrials`: Equalize the number of trials of each polarity.
 - `phzABR_summary`: Add or subtract polarities.
 - `phzABR_plot`: Summary plot for ABR data (coming soon).
@@ -336,7 +336,7 @@ examples.
 
 <a name="installation-git"></a>
 
-### 4a. Using git
+### 4.i Using git
 
 From a terminal, move to the directory where you want to put
 PHZLAB (likely the default MATLAB folder) and clone the git repository there.
@@ -355,7 +355,7 @@ git pull
 
 <a name="installation-download"></a>
 
-### 4b. Manual download
+### 4.ii Manual download
 
 Use the download link in the upper-right corner of this
 webpage (https://github.com/gabenespoli/phzlab). Unzip the file and put it
@@ -363,7 +363,7 @@ somewhere where you can easily add it to your MATLAB path.
 
 <a name="add-to-path"></a>
 
-### 4c. Add the folder to your MATLAB path
+### 4.iii Add the folder to your MATLAB path
 
 ```matlab
 addpath('~/Documents/MATLAB/phzlab')
