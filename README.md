@@ -169,7 +169,10 @@ PHZ = phz_filter(PHZ, [10 500 60]);
 
 Split a continuous data file into epochs and label them. This requires that you
 already have the start time for each epoch. You must also specify the window
-around each start time to extract. All epochs must be the same length.
+around each start time to extract. All epochs must be the same length. (Given
+the diversity of ways of recording epoch times, PHZLAB does not have a "catch
+all" way of extracting them, but it does have a couple of helper functions. See
+phzUtil_findAudioMarkers.m and phzBiopac_readJournalMarkers.m.)
 ```matlab
 % times is a vector of start times in samples
 PHZ = phz_epoch(PHZ, times, [-1 5]);
