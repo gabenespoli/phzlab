@@ -33,14 +33,14 @@ peripheral (e.g., SCL, EMG) and neural (e.g., ABR, FFR).
 PHZLAB is inspired by [EEGLAB](https://sccn.ucsd.edu/eeglab/index.php), 
 and borrows the idea of a having a single variable (a struct called PHZ)
 to hold data and metadata for a given file or files. All functions operate
-on this PHZ variable, keeping a log of processing (PHZ.history), as well
-as the PHZLAB settings required to reproduce all processing (PHZ.proc).
+on this `PHZ` variable, keeping a log of processing (`PHZ.history`), as well
+as the PHZLAB settings required to reproduce all processing (`PHZ.proc`).
 There is no GUI (graphical user interface) for PHZLAB, only a set of
 functions that can be called from the command window or incorporated into
 your own scripts. Once processed, data can be exported for statistical
 analysis, and publication-ready plots can be easily produced.
 
-The PHZ structure variable has the following fields:
+The `PHZ` structure variable has the following fields:
 ```matlab
 % general info fields
 PHZ.study
@@ -68,49 +68,50 @@ PHZ.etc
 PHZ.history
 ```
 
-The **general info** fields are strings, and only *PHZ.datatype* is used by
-PHZLAB, to label plots. *PHZ.study* is mostly for posterity.
+The **general info** fields are strings, and only `PHZ.datatype` is used by
+PHZLAB, to label plots. `PHZ.study` is mostly for posterity.
 
 The **grouping variables** fields are categorical variables, and contain the
-unique values from the corresponding categorical vectors in PHZ.lib.tags.
-PHZ.lib.tags contains categorical vectors, the same length as the number of
+unique values from the corresponding categorical vectors in `PHZ.lib.tags`.
+`PHZ.lib.tags` contains categorical vectors, the same length as the number of
 trials, with labels for each grouping variable. The reason these tags are
 'hidden' in the lib field is that when you type `PHZ` in the MATLAB command
 window, you can quickly see what trial types and conditions are represented
 in this dataset. For example, if there are 6 different trials in this dataset
-from two different participants, maybe PHZ.lib.tags.participant = [1 1 1 2 2 2],
-which means that PHZ.participant = [1 2]. These fields are automatically created
-by PHZLAB (in phz_check.m). If you wish to manually edit some tags, edit the
-vectors in PHZ.lib.tags and then run phz_check.
+from two different participants, maybe
+`PHZ.lib.tags.participant = [1 1 1 2 2 2]`,
+which means that `PHZ.participant = [1 2]`. These fields are automatically
+created by PHZLAB (in phz_check.m). If you wish to manually edit some tags,
+edit the vectors in `PHZ.lib.tags` and then run phz_check.
 
 The **data** fields contain the actual data and some information pertaining
-specifically to them. *PHZ.data* is the actual data, and is a trials (rows) by
+specifically to them. `PHZ.data` is the actual data, and is a trials (rows) by
 time (columns) numeric matrix. The number of rows (trials) should always be the
-same as the length of the PHZ.lib.tags fields. *PHZ.times* is a vector the same
-length as the number of columns in PHZ.data, and contains the corresponding time
-values for each sample. *PHZ.region* contains a bunch of 1-by-2 vectors of start
+same as the length of the `PHZ.lib.tags` fields. `PHZ.times` is a vector the same
+length as the number of columns in `PHZ.data`, and contains the corresponding time
+values for each sample. `PHZ.region` contains a bunch of 1-by-2 vectors of start
 and end times for regions of interest. Defining these regions will allow you to
-call them by name from PHZLAB's functions. *PHZ.units* is a string of the units
-of the data, and is mainly used to label plots. *PHZ.srate* is the sampling rate
+call them by name from PHZLAB's functions. `PHZ.units` is a string of the units
+of the data, and is mainly used to label plots. `PHZ.srate` is the sampling rate
 of the data, and is mainly used to calculate frequency-domain features.
-*PHZ.resp* is a place where you can store behavioural responses for each trial,
+`PHZ.resp` is a place where you can store behavioural responses for each trial,
 as well as the accuracy and reaction time of those responses. This will allow
 you to draw plots of these responses, or restrict your dataset based on these
 values.
 
-The **system** fields contain some "under the hood" stuff. *PHZ.proc* and
-*PHZ.history* both contain a chronological account of what has been done to this
-variable. PHZ.history is a cell array of strings, with time stamps and functions
-that were called of everything that has happened. PHZ.proc is a struct that
+The **system** fields contain some "under the hood" stuff. `PHZ.proc` and
+`PHZ.history` both contain a chronological account of what has been done to this
+variable. `PHZ.history` is a cell array of strings, with time stamps and functions
+that were called of everything that has happened. `PHZ.proc` is a struct that
 contains only the processing functions that were applied, as well as the
-settings that were used. *PHZ.lib* contains information about tags, plotting
-specifications, and the filename on disk. *PHZ.lib.spec* has a field for each
+settings that were used. `PHZ.lib` contains information about tags, plotting
+specifications, and the filename on disk. `PHZ.lib.spec` has a field for each
 of the grouping variables, that is a cell array the same length as the number
 of unique values in that variable. These fields can be used to control the
 colors and types of lines used in plots. See `help plot` for more information
-on MATLAB's plot spec. *PHZ.etc* is for you to put whatever other information
+on MATLAB's plot spec. `PHZ.etc` is for you to put whatever other information
 you would like to keep with this file. PHZLAB doesn't do anything with this
-field (currently the only exception is PHZ.etc.stim, which is used by the ABR
+field (currently the only exception is `PHZ.etc.stim`, which is used by the ABR
 functions).
 
 <a name="tutorial"></a>
