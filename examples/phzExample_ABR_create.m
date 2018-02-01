@@ -33,8 +33,8 @@ PHZ = phz_create( ...
 
 %% Some pre-epoching preprocessing
 % convert to microvolts (uV)
-% gain on Biopac amplifier was 1000
-PHZ = phzBiopac_transform(PHZ, 1000, 'u');
+% gain on Biopac amplifier was 10000
+PHZ = phzBiopac_transform(PHZ, 10000, 'u');
 
 % filter 60Hz line noise
 % we could filter after epoching, but we might get edge effects
