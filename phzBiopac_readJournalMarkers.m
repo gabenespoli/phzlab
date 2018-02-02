@@ -1,4 +1,4 @@
-% PHZUTIL_GETBIOPACMARKERS  Get marker times from Biopac journal text.
+% PHZBIOPAC_READJOURNALMARKERS  Get marker times from Biopac journal text.
 % 
 % USAGE
 %   times = phzUtil_getBiopacMarkers
@@ -67,7 +67,7 @@
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see http://www.gnu.org/licenses/.
 
-function [times,labels] = phzUtil_getBiopacMarkers(varargin)
+function [times,labels] = phzBiopac_readJournalMarkers(varargin)
 
 if nargin == 0 && nargout == 0, help phzUtil_getBiopacMarkers, return, end
 
