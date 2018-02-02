@@ -45,14 +45,13 @@ if exist(filename, 'file') && force == 1
     filename = appendUniqueNumber(filename);
     return
 else
-    fprintf('  Filename already exists: ''%s''', filename)
+    fprintf('  Filename already exists: ''%s''\n', filename)
 end
 
 goodInput = false;
 while goodInput == false
-    s = input(['File already exists. ',...
-               '[o]verwrite, [s]kip, [c]ancel, ',...
-               '[a]ppend number, or [e]dit filename?: '],'s');
+    s = input(['  [o]verwrite, [s]kip, [c]ancel, ',...
+                 '[a]ppend number, or [e]dit filename?: '],'s');
     switch lower(s)
         case 'o'
             goodInput = true;
@@ -85,7 +84,7 @@ goodName = false;
 counter = 2;
 [pathstr,name,ext] = fileparts(filename);
 while goodName == false
-    filename = fullfile(pathstr,name,'_',num2str(counter),ext);
+    filename = fullfile(pathstr,[name,'_',num2str(counter),ext]);
     if ~exist(filename,'file')
         goodName = true;
     else
