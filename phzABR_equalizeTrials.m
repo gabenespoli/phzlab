@@ -7,7 +7,7 @@
 %
 % INPUT
 %   grpVar    = [string] One of the grouping variables 'participant',
-%               'group', 'condition', 'session', or 'trial'. If the
+%               'group', 'condition', 'session', or 'trials'. If the
 %               numbers of trials with each label is unequal, then trials
 %               are removed at random (from the label(s) with more trials)
 %               until all groups have an equal number of trials. This
