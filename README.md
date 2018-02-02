@@ -216,7 +216,7 @@ PHZ = phz_reject(PHZ, 0.05);
 
 PHZLAB can combine all .phz files in a given folder into a single PHZ variable.
 This lets you apply processing functions to the whole dataset at once, and
-allows you easily make plots plots that include all data.
+allows you easily make plots that include all data.
 ```matlab
 PHZ = phz_combine('phzfiles');
 ```
@@ -315,7 +315,7 @@ examples.
 - `phz_reject`: Mark trials with values exceeding a threshold or SD.
 - `phz_blsub`: Subtract mean of baseline region from each trial.
 - `phz_norm`: Normalize across specified grouping variables.
-- `phz_dicard`: Remove trials marked by reject, subset, and review.
+- `phz_discard`: Remove trials marked by reject, subset, and review.
 - `phz_proc`: Apply many processing functions in one step.
 
 <a name="functions-analysis"></a>
