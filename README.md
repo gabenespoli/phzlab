@@ -10,8 +10,8 @@ peripheral (e.g., SCL, EMG) and neural (e.g., ABR, FFR).
 1. [How it works](#how-it-works)
 2. [Tutorial](#tutorial)
     1. [Loading data](#tutorial-loading)
-    2. [Preprocessing](#tutorial-preprocessing)
-    3. [Combine many PHZ files into one](#tutorial-combining)
+    2. [Processing](#tutorial-preprocessing)
+    3. [Combining PHZ files](#tutorial-combining)
     4. [Plotting](#tutorial-plotting)
     5. [Exporting](#tutorial-exporting)
 3. [List of Functions](#functions)
@@ -188,7 +188,7 @@ phz_save(PHZ, 'phzfiles/datafile1.phz');
 
 <a name="tutorial-preprocessing"></a>
 
-### 2.ii Preprocessing
+### 2.ii Processing
 
 Subtract the mean of a baseline period from each epoch. You can manually enter
 a time range, or, if you've set the appropriate `PHZ.region` field, you can use
@@ -212,7 +212,7 @@ PHZ = phz_reject(PHZ, 0.05);
 
 <a name="tutorial-combining"></a>
 
-### 2.iii Combine many PHZ files into one
+### 2.iii Combining PHZ files
 
 PHZLAB can combine all .phz files in a given folder into a single PHZ variable.
 This lets you apply processing functions to the whole dataset at once, and
