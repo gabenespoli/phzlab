@@ -31,6 +31,12 @@ pretty = false;
 dark = false;
 
 % user-defined
+if any(strcmp(varargin(1:2:end),'verbose'))
+    i = find(strcmp(varargin(1:2:end),'verbose')) * 2 - 1;
+    verbose = varargin{i+1};
+    varargin([i,i+1]) = [];
+end
+
 for i = 1:2:length(varargin)
     switch lower(varargin{i})
         case 'subset',                  PHZ = phz_subset(PHZ,varargin{i+1},verbose);
