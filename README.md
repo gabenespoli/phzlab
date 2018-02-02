@@ -367,7 +367,7 @@ Toolbox**.
 
 <a name="installation-git"></a>
 
-### 4.ii Using git
+### 4.ii Install using git
 
 From a terminal, move to the directory where you want to put
 PHZLAB (likely the default MATLAB folder) and clone the git repository there.
@@ -386,7 +386,7 @@ git pull
 
 <a name="installation-download"></a>
 
-### 4.iii Manual download
+### 4.iii Install with manual download
 
 Use the download link in the upper-right corner of this
 webpage (https://github.com/gabenespoli/phzlab). Unzip the file and put it
