@@ -429,6 +429,15 @@ addpath('~/Documents/MATLAB/phzlab')
 
 ## 5. Acknowledgements
 
+I would like to thank the [SMART Lab](http://www.smartlaboratory.org/)
+(especially [Frank Russo](http://smartlaboratory.org/portfolio/frankrusso/),
+[Ella Dubinsky](http://smartlaboratory.org/portfolio/ella-dubinsky/),
+and [Fran Copelli](http://smartlaboratory.org/portfolio/fran-copelli/)),
+[Alex Andrews](http://www.tenkettles.com/), and
+[Carson Pun](https://www.ryerson.ca/psychology/about-us/our-people/administrative-staff/carson-pun/)
+for their invaluable thoughts, suggestions, inspiration, and feedback on the
+many versions of PHZLAB that it took to get here.
+
 <a name="license"></a>
 
 ## 6. License
