@@ -225,6 +225,7 @@ str = '';
 r = nan(size(times));
 lag = nan(size(times));
 labels = cell(size(times));
+keepinds = true(size(times));
 for i = 1:length(times)
     str = phzUtil_progressbar(str,i/length(times));
 
@@ -232,6 +233,7 @@ for i = 1:length(times)
     if (times(i) + win(1) < 1) || (times(i) + win(2) > size(data, 2))
         warning(['Skipping trial ', num2str(i), ' because it is too ',...
             'close to edge of the datafile for the requested window.'])
+        keepinds(i) = false;
         continue
     end
 
@@ -275,9 +277,9 @@ for i = 1:length(times)
 end
 
 xcorrInfo        = struct();
-xcorrInfo.r      = r;
-xcorrInfo.lag    = lag;
-xcorrInfo.labels = categorical(labels, {'regular', 'inverted'});
+xcorrInfo.r      = r(keepinds);
+xcorrInfo.lag    = lag(keepinds);
+xcorrInfo.labels = categorical(labels(keepinds), {'regular', 'inverted'});
 
 end
 
