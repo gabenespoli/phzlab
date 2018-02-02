@@ -21,9 +21,10 @@ peripheral (e.g., SCL, EMG) and neural (e.g., ABR, FFR).
     4. [Visualization and Export](#functions-visualization)
     5. [Specialty Functions](#functions-specialty)
 4. [Installation](#installation)
-    1. [Git](#installation-git)
-    2. [Manual download](#installation-download)
-    3. [Add PHZLAB to the MATLAB path](#add-to-path)
+    1. [System Requirements](#installation-system-requirements)
+    2. [Install with Git](#installation-git)
+    3. [Install with manual download](#installation-download)
+    4. [Add PHZLAB to the MATLAB path](#add-to-path)
 5. [Acknowledgements](#acknowledgements)
 6. [License](#license)
 
@@ -348,9 +349,25 @@ examples.
 
 ## 4. Installation
 
+<a name="installation-system-requirements"></a>
+
+### 4.i System Requirements
+
+PHZLAB requires MATLAB to run. Since PHZLAB uses the table and categorical
+variable types, it will not run in MATLAB versions prior to R2013b, or in
+Octave.
+
+Some PHZLAB functions depend on MATLAB Toolboxes. Details about the dependencies
+can be found in the help section of the functions themselves.
+
+- `phzBiopac_readJournalMarkers` requires the **Statistics and Machine Learning
+Toolbox**.
+
+- `phz_filter` requires the **Signal Processing Toolbox**.
+
 <a name="installation-git"></a>
 
-### 4.i Using git
+### 4.ii Using git
 
 From a terminal, move to the directory where you want to put
 PHZLAB (likely the default MATLAB folder) and clone the git repository there.
@@ -369,7 +386,7 @@ git pull
 
 <a name="installation-download"></a>
 
-### 4.ii Manual download
+### 4.iii Manual download
 
 Use the download link in the upper-right corner of this
 webpage (https://github.com/gabenespoli/phzlab). Unzip the file and put it
@@ -377,7 +394,7 @@ somewhere where you can easily add it to your MATLAB path.
 
 <a name="add-to-path"></a>
 
-### 4.iii Add the folder to your MATLAB path
+### 4.iv Add the folder to your MATLAB path
 
 ```matlab
 addpath('~/Documents/MATLAB/phzlab')
