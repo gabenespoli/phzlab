@@ -15,6 +15,7 @@ PHZ = phz_check(PHZ);
 region = [];
 force = 0;
 verbose = true;
+summaryFunction = 'add';
 
 % user-defined
 if any(strcmp(varargin(1:2:end),'verbose'))
@@ -38,13 +39,16 @@ for i = 1:2:length(varargin)
         
         case 'region',                  region = varargin{i+1};
         case {'force'},                 force = varargin{i+1};
+        case {'summaryfunction','summary'}, summaryFunction = varargin{i+1};
     end
 end
 
 % data preprocessing
-PHZ = phz_region(PHZ,region,verbose);
-PHZ = phzABR_equalizeTrials(PHZ);
-PHZ = phz_summary(PHZ, 'none'); % average across all trials
+PHZ = phz_region(PHZ, region, verbose);
+PHZ = phzABR_summary(PHZ, summaryFunction, verbose);
+if size(PHZ.data, 1) > 1
+    PHZ = phz_summary(PHZ, 'none'); % average across all trials
+end
 
 % get filename
 if ~isempty(filename)
