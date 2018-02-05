@@ -43,8 +43,10 @@ end
 
 % data preprocessing
 PHZ = phz_region(PHZ,region,verbose);
+PHZ = phzABR_equalizeTrials(PHZ);
 PHZ = phz_summary(PHZ, 'none'); % average across all trials
 
+% get filename
 if ~isempty(filename)
     [pathstr, name, ext] = fileparts(filename);
     if ~strcmpi(ext, '.txt')
@@ -54,6 +56,7 @@ if ~isempty(filename)
     filename = phzUtil_getUniqueSaveName(filename, force);
 end
 
+% save to disk
 if ~isempty(filename)
     fid = fopen(filename, 'w+');
     fprintf(fid, '%f\n', PHZ.data);
