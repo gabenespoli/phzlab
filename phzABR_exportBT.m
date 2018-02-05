@@ -6,7 +6,7 @@
 %   phzABR_exportBT(PHZ,'Param1','Value1',etc.)
 %
 
-function phzABR_exportBT(PHZ, filename, varargin)
+function PHZ = phzABR_exportBT(PHZ, filename, varargin)
 
 if nargout == 0 && nargin == 0, help phzABR_exportToBT, return, end
 PHZ = phz_check(PHZ);
