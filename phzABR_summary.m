@@ -40,7 +40,7 @@
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see http://www.gnu.org/licenses/.
 
-function PHZ = phz_abrSummary(PHZ, summaryFunction, verbose)
+function PHZ = phzABR_summary(PHZ, summaryFunction, verbose)
 
 % defaults
 if nargin < 3, verbose = true; end
