@@ -276,6 +276,8 @@ for i = 1:length(times)
     end
 end
 
+times            = times(keepinds);
+
 xcorrInfo        = struct();
 xcorrInfo.r      = r(keepinds);
 xcorrInfo.lag    = lag(keepinds);
