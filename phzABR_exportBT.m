@@ -46,6 +46,7 @@ end
 % data preprocessing
 PHZ = phz_region(PHZ, region, verbose);
 PHZ = phzABR_summary(PHZ, summaryFunction, verbose);
+PHZ = phz_discard(PHZ);
 if size(PHZ.data, 1) > 1
     PHZ = phz_summary(PHZ, 'none'); % average across all trials
 end
