@@ -72,8 +72,8 @@ markerData = phz_create('filename', 'data/filename.mat', ...
 % 2. Then split the file and label the trials
 % split data into epochs
 PHZ = phz_epoch(PHZ, ...
-    [-0.04 0.213], ... % window around each marker to extract
     times, ...
+    [-0.04 0.213], ... % window around each marker to extract
     'timeUnits', 'samples');
 
 % add trial (polarity) labels from xcorrInfo
