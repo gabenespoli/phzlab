@@ -21,7 +21,7 @@
 %     'smooth'    = Calls phz_smooth.
 %     'transform' = Calls phz_transform.
 %     'blsub'     = Calls phz_blsub.
-%     'rej'       = Calls phz_rej.
+%     'reject'    = Calls phz_reject.
 %     'norm'      = Calls phz_norm.
 % 
 %   These are always executed in the order listed here, after the above
@@ -127,7 +127,7 @@ for j = 1:length(files)
             case {'smooth','smoothing'},    PHZ = phz_smooth(PHZ,   processing{i+1}, verbose);
             case 'transform',               PHZ = phz_transform(PHZ,processing{i+1}, verbose);
             case 'blsub',                   PHZ = phz_blsub(PHZ,    processing{i+1}, verbose);
-            case {'rej','reject'},          PHZ = phz_rej(PHZ,      processing{i+1}, verbose);
+            case {'rej','reject'},          PHZ = phz_reject(PHZ,   processing{i+1}, verbose);
             case {'norm','normtype'},       PHZ = phz_norm(PHZ,     processing{i+1}, verbose);
         end
     end
