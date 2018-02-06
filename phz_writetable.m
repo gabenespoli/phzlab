@@ -137,6 +137,7 @@ end
 % verify input
 if isempty(feature), error('A feature must be specified.'), end
 if ~iscell(feature), feature = {feature}; end
+if ischar(keepVars), keepVars = cellstr(keepVars); end
 
 % data preprocessing
 PHZ = phz_region(PHZ,region,verbose);
