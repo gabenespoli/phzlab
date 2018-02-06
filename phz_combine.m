@@ -100,7 +100,7 @@ for i = 1:2:length(varargin)
         case {'equal','equalizetrials'},equalGrpVar = varargin{i+1};
         case 'region',                  region = varargin{i+1};
         case {'summary','keepvars'},    keepVars = varargin{i+1};
-        case {'save','filename'},       filename = addToCell(filename, varargin{i+1});
+        case {'save','filename','file'},filename = addToCell(filename, varargin{i+1});
         case 'verbose',                 verbose = varargin{i+1};
     end
 end
