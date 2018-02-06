@@ -26,6 +26,7 @@
 % 
 %   These are always executed in the order listed here, after the above
 %   processing funtions. See the help of each function for more details.
+%     'equal'     = Calls phzABR_equalizeTrials.
 %     'region'    = Calls phz_region.
 %     'summary'   = Calls phz_summary. Note that this will summarize each
 %                   file individually.
@@ -58,6 +59,7 @@ function PHZS = phz_combine(varargin)
 if nargout == 0 && nargin == 0, help phz_combine, return, end
 
 % defaults
+equalGrpVar = [];
 region = [];
 keepVars = [];
 filename = {};
@@ -95,6 +97,7 @@ for i = 1:2:length(varargin)
         case {'subset','filter','filt','rect','rectify','smooth','smoothing',...
                 'transform','blsub','blc','rej','reject','norm','normtype'}
             processing = [processing varargin(i:i+1)]; %#ok<AGROW>
+        case {'equal','equalizetrials'},equalGrpVar = varargin{i+1};
         case 'region',                  region = varargin{i+1};
         case {'summary','keepvars'},    keepVars = varargin{i+1};
         case {'save','filename'},       filename = addToCell(filename, varargin{i+1});
@@ -132,6 +135,7 @@ for j = 1:length(files)
         end
     end
     
+    PHZ = phzABR_equalizeTrials(PHZ, equalGrpVar, verbose);
     PHZ = phz_region(PHZ, region, verbose);
     PHZ = phz_summary(PHZ, keepVars, verbose);
     
