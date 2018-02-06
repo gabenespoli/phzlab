@@ -58,6 +58,7 @@ if ~isempty(filename)
         filename = fullfile(pathstr, [name, '.txt']);
     end
     filename = phzUtil_getUniqueSaveName(filename, force);
+    if isempty(filename), return, end
 end
 
 % save to disk
