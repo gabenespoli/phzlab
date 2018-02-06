@@ -127,7 +127,7 @@ for i = 1:2:length(varargin)
             
         case {'unstack','cast'},        unstackVars = varargin{i+1};
             
-        case {'save','filename'},       filename = addToCell(filename,varargin{i+1});
+        case {'save','filename','file'},filename = addToCell(filename,varargin{i+1});
         case {'info','infoname'},       infoname = addToCell(infoname,varargin{i+1});
         case {'force'},                 force = varargin{i+1};
             
