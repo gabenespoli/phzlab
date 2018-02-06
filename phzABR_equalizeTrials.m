@@ -45,6 +45,7 @@ function PHZ = phzABR_equalizeTrials(PHZ, grpVar, verbose)
 if nargout == 0 && nargin == 0, help phzABR_equalizeTrials, return, end
 if nargin < 2, grpVar = 'trials'; end
 if nargin < 3, verbose = true; end
+if isempty(grpVar), return, end
 
 % equalize number of trials in each label of a grouping variable
 grpVars = {'participant','group','condition','session','trials'};
