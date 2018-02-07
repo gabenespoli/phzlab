@@ -287,7 +287,7 @@ if ismember('review',fieldnames(PHZ.proc))
     PHZ.proc.review.keep  = verifyLogical(PHZ.proc.review.keep,[name,'.proc.review.keep'],verbose);
 end
 if ismember('views',fieldnames(PHZ.lib.tags))
-    PHZ.proc.review.views = verifyNumeric(PHZ.proc.review.views,[name,'.proc.review.views'],verbose);
+    PHZ.lib.tags.views = verifyNumeric(PHZ.lib.tags.views,[name,'.lib.tags.views'],verbose);
 end
 
 % blsub
@@ -674,6 +674,7 @@ libTagsOrder = {
     'session'
     'trials'
     'region'
+    'views'
     };
 if ~all(ismember(fieldnames(PHZ.lib.tags),libTagsOrder))
     error(['Invalid fields present in PHZ.lib.tags structure. ',...
