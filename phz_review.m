@@ -59,6 +59,8 @@
 %
 %   f = Enter specific font size in command window.
 %
+%   ? = Show these keyboard controls beside the plot.
+%
 % OUTPUT
 %   PHZ.proc.review.keep = [logical] Trials that have been
 %       manually marked for rejection. 1 = keep, 0 = reject.
@@ -135,6 +137,7 @@ rejectionThreshold = [];
 PHZ_plot = PHZ; % make copy so we can change smoothing
 keepGoing = true;
 pos = [];
+showKeyboardControls = false;
 
 while keepGoing
 
@@ -144,7 +147,13 @@ while keepGoing
     else
         h = figure('Position', pos); % use window position from last loop
     end
-    plot(PHZ_plot.times, PHZ_plot.data(currentTrial,:));
+    ax1 = axes('Position', [0 0 1 1], 'Visible', 'off');
+    if showKeyboardControls
+        ax2 = axes('Position', [.13 .11 .575 .806]);
+    else
+        ax2 = axes('Position', [.13 .11 .775 .806]);
+    end
+    plot(ax2, PHZ_plot.times, PHZ_plot.data(currentTrial,:));
     if ~isempty(rejectionThreshold)
         lineHandle = line([PHZ_plot.times(1) PHZ_plot.times(end)], ...
             [rejectionThreshold rejectionThreshold]);
@@ -175,7 +184,35 @@ while keepGoing
     ylabel({ytitle; ytitle2})
     xlabel('Time (s)')
     title(plotTitle)
-    set(gca, 'Fontsize', fontsize)
+    set(ax2, 'Fontsize', fontsize)
+
+    % show keyboard controls
+    if showKeyboardControls
+        descr = {'Navigation:';
+            '\rightarrow / \downarrow / j / l / n = next';
+            '\leftarrow / \uparrow / k / h / p = previous';
+            'g = enter trial number';
+            'G = random trial';
+            ' ';
+            'Toggles:';
+            'r / space = rejection mark';
+            't = rejection threshold';
+            'i = trial info';
+            'y = y-axis scale';
+            's = smoothing';
+            'S = edit smoothing';
+            ' ';
+            'Misc:';
+            '+/= = increase font';
+            '-/_ = decrease font';
+            'f = enter font size';
+            '? = show/hide controls';
+            ' ';
+            'Esc/q = quit'};
+
+        text(ax1, .735, .5, descr, 'fontsize', fontsize)
+
+    end
 
     % wait for valid user input
     key = [];
@@ -279,6 +316,13 @@ while keepGoing
 
         case {27, 113} % escape, q
             keepGoing = false;
+
+        case 63 % ? (question mark, shift-/)
+            if showKeyboardControls
+                showKeyboardControls = false;
+            else
+                showKeyboardControls = true;
+            end
             
         otherwise
             fprintf('Invalid input. Use ''q'' to quit.\n')
