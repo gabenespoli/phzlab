@@ -361,6 +361,7 @@ PHZ.history = checkAndFixColumn(PHZ.history,[name,'.history'],nargout,verbose);
 end
 
 function PHZ = resetSpec(PHZ,field)
+PHZ.lib.spec.(field) = cell(1,length(PHZ.(field)));
 for j = 1:length(PHZ.(field))
     PHZ.lib.spec.(field){j} = '';
 end
