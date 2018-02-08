@@ -78,6 +78,12 @@ PHZ.data = PHZ.data(keep, :);
 for fields = {'participant','group','condition','session','trials'}
     field = fields{1};
     PHZ.lib.tags.(field) = PHZ.lib.tags.(field)(keep);
+
+    % if we've lost a whole category, remove it from PHZ.lib.spec
+    cats = PHZ.(field);
+    newcats = unique(PHZ.lib.tags.(field));
+    ind = ismember(cats, newcats); % ind of cats to keep
+    PHZ.lib.spec.(field) = PHZ.lib.spec.(field)(ind);
 end
 
 qnum = {'q1','q2','q3','q4','q5'};
