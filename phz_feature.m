@@ -362,13 +362,13 @@ if ~isempty(val) && length(val) == 3
     method = val{3};
     val = cellfun(@eval,val(1:2));
 
-    if strcmp(method, 'bin')
+    if strcmp(method, '-') % bin width
         featureTitle = [featureTitle,' at ',num2str(val(1)),...
         ' Hz +/- ', num2str(val(2)), ' bins'];
         PHZ = phzUtil_binmean(PHZ,val(1),val(2));
         PHZ.freqs = val(1);
 
-    elseif strcmp(method, 'range')
+    elseif strcmp(method, ':') % range
         featureTitle = [featureTitle,' from ',num2str(val(1)),...
                         ' to ',num2str(val(2)),' Hz'];
         ind = phzUtil_getind(PHZ.freqs, val);
