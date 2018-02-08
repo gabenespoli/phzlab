@@ -39,8 +39,7 @@
 %   are always executed in the order listed here, after all of the
 %   processing funtions. See the help of each function for more details.
 %   'region'    = Calls phz_region.
-%   'summary'   = Calls phz_summary. The default summary is
-%                 'none', which returns all trials.
+%   'summary'   = Calls phz_summary.
 % 
 % OUTPUT
 %   d                 = [table] MATLAB table.
