@@ -59,6 +59,9 @@
 %                   an average (e.g., 'fft100-1' returns the average
 %                   of 3 bins centered on 100 Hz).
 %
+%   'fft100:200'  = Using a colon will return the average over the range of
+%                   frequiencies.
+%
 %   'itfft'       = Intertrial FFT. Whereas the 'fft' feature averages
 %                   trials before caluclating the FFT, 'itfft' calculates
 %                   the FFT on each trial before averaging trials together.
@@ -355,10 +358,23 @@ if ~strcmp(PHZ.proc.feature,'time')
 [PHZ, preSummaryData] = phz_summary(PHZ,keepVars,verbose);
 
 % binmean for spectral features
-if ~isempty(val) && isnumeric(val)
-    featureTitle = [featureTitle,' at ',num2str(val(1)),' Hz'];
-    PHZ = phzUtil_binmean(PHZ,val(1),val(2));
-    PHZ.freqs = val(1);
+if ~isempty(val) && length(val) == 3
+    method = val{3};
+    val = cellfun(@eval,val(1:2));
+
+    if strcmp(method, 'bin')
+        featureTitle = [featureTitle,' at ',num2str(val(1)),...
+        ' Hz +/- ', num2str(val(2)), ' bins'];
+        PHZ = phzUtil_binmean(PHZ,val(1),val(2));
+        PHZ.freqs = val(1);
+
+    elseif strcmp(method, 'range')
+        featureTitle = [featureTitle,' from ',num2str(val(1)),...
+                        ' to ',num2str(val(2)),' Hz'];
+        ind = phzUtil_getind(PHZ.freqs, val);
+        PHZ.data = mean(PHZ.data(:,ind(1):ind(2)),2);
+        PHZ.freqs = val;
+    end
 end
 
 end
@@ -371,15 +387,15 @@ val = [];
 if length(feature) >= 3 && strcmp(feature(1:3),'fft')
     if length(feature) > 3, val = feature(4:end); end
     featureStr = 'fft';
-    
+
 elseif length(feature) >= 5 && strcmp(feature(1:5),'itfft')
     if length(feature) > 5, val = feature(6:end); end
     featureStr = 'itfft';
-    
+
 elseif length(feature) >= 4 && strcmp(feature(1:4),'itpc')
     if length(feature) > 4, val = feature(5:end); end
     featureStr = 'itpc';
-    
+
 elseif length(feature) >= 4 && strcmp(feature(1:4),'itrc')
     if length(feature) > 4, val = feature(5:end); end
     featureStr = 'itrc';
@@ -387,29 +403,39 @@ elseif length(feature) >= 4 && strcmp(feature(1:4),'itrc')
 elseif length(feature) == 3 && strcmp(feature,'snr')
     val = 'target-baseline';
     featureStr = feature;
-    
+
 elseif length(feature) >= 4 && strcmp(feature(1:4),'snr-')
     if length(feature) > 4, val = feature(5:end); end
     featureStr = 'snr';
-    
+
 else
     featureStr = feature;
-    
+
 end
 
 % convert val(s) to numeric ([freq binWidth]) or cell ({baseline target})
 if ~isempty(val)
-    ind = strfind(val,'-');
-    if ind, val = {val(1:ind - 1) val(ind + 1:end)};
+    indHyphen = strfind(val,'-');
+    indColon = strfind(val,':');
+    if ~isempty(indHyphen) && ~isempty(indColon)
+        error('Cannot specify both a bin width with ''-'' and a range with '':''.')
+    elseif ~isempty(indHyphen)
+        method = '-';
+        ind = indHyphen;
+    elseif ~isempty(indColon)
+        method = ':';
+        ind = indColon;
     else
-        val = {val '0'}; % default if no bin width specified
+        val = {val '0' 'bin'}; % default one bin, bin width of 0
     end
-    
-    % convert to numeric if possible
-    try val = cellfun(@eval,val);
-    catch
+
+    % set value of val
+    if ~isempty(indHyphen) || ~isempty(indColon)
+        val = {val(1:ind - 1), val(ind + 1:end)};
+        val{3} = method;
+    else
     end
-    
+
 end
 end
 
