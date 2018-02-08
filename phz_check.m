@@ -120,8 +120,8 @@ for i = {'participant','group','condition','session','trials'}, field = i{1};
             resetStr = '';
         end
 
-        % if empty grouping var, reset (auto-create) from tags
-        if isempty(PHZ.(field))
+        % if empty grouping var or too many tags represented, reset (auto-create) from tags
+        if isempty(PHZ.(field)) || ~all(ismember(cellstr(PHZ.(field)),cellstr(PHZ.lib.tags.(field))))
             PHZ.(field) = unique(PHZ.lib.tags.(field))';
             if verbose == 2, verbose = true; else, verbose = false; end
             PHZ = phz_history(PHZ,[name,'.',field,' was reset',resetStr,'.'],verbose,0);
