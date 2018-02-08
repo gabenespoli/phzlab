@@ -144,7 +144,8 @@ if do_discard
 end
 
 % restrict to region
-if isempty(region) && isstruct(PHZ.region) % PHZ.region = 'whole epoch';
+if ( isempty(region) && isstruct(PHZ.region) ) || ... % PHZ.region = 'whole epoch';
+        ( ismember(featureStr, {'snr'}) )
 else
     PHZ = phz_region(PHZ,region,verbose);
 end
@@ -425,14 +426,16 @@ if ~isempty(val)
     elseif ~isempty(indColon)
         method = ':';
         ind = indColon;
-    else
-        val = {val '0' 'bin'}; % default one bin, bin width of 0
+    elseif ~strcmp(featureStr, 'snr')
+        val = {val '0' ':'}; % default one bin, bin width of 0
     end
 
     % set value of val
     if ~isempty(indHyphen) || ~isempty(indColon)
         val = {val(1:ind - 1), val(ind + 1:end)};
-        val{3} = method;
+        if ~strcmp(featureStr, 'snr')
+            val{3} = method;
+        end
     else
     end
 
