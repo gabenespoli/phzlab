@@ -4,7 +4,7 @@
 %   PHZ_PLOT(PHZ,'Param1',Value1,etc.)
 % 
 % INPUT   
-%   PHZ           = [struct] PHZLAB data structure
+%   PHZ           = [struct] PHZLAB data structure.
 % 
 %   'smooth'      = [1|0] For line plots, apply a moving point average.
 % 
