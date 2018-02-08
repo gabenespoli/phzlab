@@ -138,13 +138,11 @@ if isempty(feature), error('A feature must be specified.'), end
 if ~iscell(feature), feature = {feature}; end
 if ischar(keepVars), keepVars = cellstr(keepVars); end
 
-% data preprocessing
-PHZ = phz_region(PHZ,region,verbose);
-
 disp('  Calculating features...')
 for i = 1:length(feature)
+    fprintf('\n Feature %i/%i: %s\n', i, length(feature), feature{i})
     
-    [s,featureTitle] = phz_feature(PHZ,feature{i},'summary',keepVars,'verbose',verbose);
+    [s,featureTitle] = phz_feature(PHZ,feature{i},'summary',keepVars,'region',region,'verbose',verbose);
     % (run phz_summary through phz_feature because fft feature needs to average
     %  over the summaryType by participant before doing the fft)
     
@@ -160,7 +158,11 @@ for i = 1:length(feature)
             addVars = cellstr(keepVars);
         end
         
-        d = table(s.lib.tags.(addVars{1}),'VariableNames',addVars(1));
+        if length(keepVars) == 1 && strcmp(keepVars{1},'none')
+            d = table({'all'}, 'VariableNames',{'trials'});
+        else
+            d = table(s.lib.tags.(addVars{1}),'VariableNames',addVars(1));
+        end
         d.Properties.VariableUnits = {''};
         d.Properties.VariableDescriptions = {''};
         d.Properties.Description = [PHZ.study,' ',upper(PHZ.datatype),' data'];
@@ -192,7 +194,9 @@ for i = 1:length(feature)
     end
     
     % add feature data to table
-    d.(strrep(s.proc.feature,'-','_')) = s.data;
+    s.proc.feature = strrep(s.proc.feature,'-','_');
+    s.proc.feature = strrep(s.proc.feature,':','to');
+    d.(s.proc.feature) = s.data;
     d.Properties.VariableUnits{end} = s.units;
     d.Properties.VariableDescriptions{end} = featureTitle;
     
