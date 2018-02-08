@@ -69,6 +69,7 @@ lags = nan(size(r));
 
 % cross correlation (restrict to MAXLAG here)
 do_waitbar=0;
+str = '';
 tic
 for i = 1:size(data,1) % loop epochs
     [r(i,:),lags(i,:)] = xcorr(data(i,:),stim,maxlag,'coeff');
@@ -77,14 +78,14 @@ for i = 1:size(data,1) % loop epochs
     switch do_waitbar
         case 0
             if toc>2
-                h=waitbar(i/size(data,1),'SRC is taking some time...');
+                fprintf('  SRC is taking some time')
+                str = phzUtil_progressbar(str,i/size(data,1));
                 do_waitbar=1;
             end
         case 1
-            waitbar(i/size(data,1),h);
+            str = phzUtil_progressbar(str,i/size(data,1));
     end
 end
-if do_waitbar, close(h), end
 
 % only consider positive lags (restrict to MINLAG here)
 startind = floor(size(r,2) / 2) + minlag;
