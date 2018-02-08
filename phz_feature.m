@@ -150,34 +150,34 @@ end
 %   each case MUST set a featureTitle, and will usually adjust
 %       PHZ.data and PHZ.units.
 switch lower(featureStr)
-    
+
     case 'time'
         featureTitle = '';
-        
+
     case 'mean'
         featureTitle = 'Mean';
         PHZ.data  = mean(PHZ.data,2);
-        
+
     case 'max'
         featureTitle = 'Max';
         PHZ.data  = max(PHZ.data,[],2);
-        
+
     case 'min'
         featureTitle = 'Min';
         PHZ.data  = min(PHZ.data,[],2);
-        
+
     case 'maxi'
         featureTitle = 'Max Latency';
         [~,ind] = max(PHZ.data,[],2);
         PHZ.data = PHZ.times(ind)';
         PHZ.units = 's';
-        
+
     case 'mini'
         featureTitle = 'Min Latency';
         [~,ind] = min(PHZ.data,[],2);
         PHZ.data = PHZ.times(ind)';
         PHZ.units = 's';
-        
+
     case 'slope'
         featureTitle = 'Max Slope';
         PHZ = phz_smooth(PHZ,'mean0.05');
@@ -185,7 +185,7 @@ switch lower(featureStr)
         for i = 1:size(PHZ.data,1), maxSlope(i) = max(gradient(PHZ.data(i,:))); end
         PHZ.data = maxSlope;
         PHZ.units = '';
-        
+
     case 'slopei'
         featureTitle = 'Max Slope Latency';
         PHZ = phz_smooth(PHZ,'mean0.05');
@@ -193,16 +193,16 @@ switch lower(featureStr)
         for i = 1:size(PHZ.data,1), [~,ind(i)] = max(gradient(PHZ.data(i,:))); end
         PHZ.data = PHZ.times(ind)';
         PHZ.units = 's';
-        
+
     case {'rms'}
         featureTitle = 'RMS';
         PHZ.data  = rms(PHZ.data,2);
-        
+
     case {'area'}
         featureTitle = 'Area Under Curve';
         PHZ.data  = trapz(PHZ.data,2);
         PHZ.units = [PHZ.units,'^2'];
-        
+
     case {'acc','acc1','acc2','acc3','acc4','acc5'}
         featureTitle = 'Accuracy';
         if strcmp(feature,'acc'), feature = 'acc1'; end
@@ -213,19 +213,19 @@ switch lower(featureStr)
         else
             PHZ.units = '';
         end
-        
+
     case {'rt', 'rt1', 'rt2', 'rt3', 'rt4', 'rt5'}
         featureTitle = 'Reaction Time';
         PHZ.units = 's';
         if strcmp(feature,'rt'), feature = 'rt1'; end
         PHZ.data = PHZ.resp.(['q',feature(3),'_rt']);
-        
+
     case 'itfft'
         % get fft of each trial
         [PHZ.data,PHZ.freqs,PHZ.units,featureTitle] = phzFeature_fft(PHZ.data,PHZ.srate,PHZ.units);
         PHZ = rmfield(PHZ,'times');
         featureTitle = ['Intertrial ',featureTitle];
-        
+
     case 'fft'
         % summarize in time domain (adding 'participant' to summary if it isn't already)
         if any(ismember({'participant','all','none'},keepVars))
@@ -233,33 +233,33 @@ switch lower(featureStr)
         elseif length(PHZ.participant) > 1
             PHZ = phz_summary(PHZ,[{'participant'} keepVars]);
         end
-        
+
         % get fft of each summary
         [PHZ.data,PHZ.freqs,PHZ.units,featureTitle] = phzFeature_fft(PHZ.data,PHZ.srate,PHZ.units);
         PHZ = rmfield(PHZ,'times');
-        
+
     case 'itpc'
         featureTitle = 'Intertrial Phase Coherence';
         % Method adapted from Tierney & Kraus, 2013, Journal of Neuroscience.
-        
+
         if ~ismember('summary', fieldnames(PHZ.proc)) && ~ismember('summary', fieldnames(PHZ.proc.pre))
-            
+
             % summarize (adding 'participant' to summary if it isn't already)
             if any(ismember({'participant','all','none'}, keepVars))
                 PHZ = phz_summary(PHZ,keepVars);
             else
                 PHZ = phz_summary(PHZ, [{'participant'} keepVars]);
             end
-            
+
             PHZ = phzFeature_itpc(PHZ, keepVars);
-            
+
         else
-            
+
             % if PHZS has already been summary'd, phzFeature_itpc will have to
             %   load each file again to calculate it
             newData = [];
             trialsPerFile = size(PHZ.data,1) / length(PHZ.lib.files);
-            
+
             for i = 1:length(PHZ.lib.files)
                 disp(['Calculating ITPC for file ',...
                     num2str(i),'/',num2str(length(PHZ.lib.files)),...
@@ -275,7 +275,7 @@ switch lower(featureStr)
             PHZ.freqs = TMP.freqs;
             PHZ = rmfield(PHZ,'times');
         end
-        
+
 %     case 'itrc', featureTitle = 'Intertrial Phase Consistency';
         % Method adapted from Tierney & Kraus, 2013, Journal of Neuroscience.
         
@@ -284,7 +284,6 @@ switch lower(featureStr)
         
         % calls phz_summary, which calls phzFeature_itrc
 
-
     case 'src'
         if ~ismember('stim', fieldnames(PHZ.etc))
             error('Cannot find stim field in PHZ.etc.')
@@ -292,13 +291,13 @@ switch lower(featureStr)
         featureTitle = 'Stimulus-Response Correlation';
         PHZ.units = '';
         PHZ.data = phzFeature_src(PHZ.data,PHZ.etc.stim,PHZ.srate,val);
-        
+
         % note: SRC will operate on each row of PHZ.data (i.e. each trial).
         %   If you are dealing with FFR responses, you don't want each
         %   trial to actually be a single trial, but rather the averaged
         %   response of many trials from a single participant or condition.
         %   This comment also applies to 'srclag'.
-        
+
     case 'srclag'
         if ~ismember('stim', fieldnames(PHZ.etc))
             error('Cannot find stim field in PHZ.etc.')
@@ -306,19 +305,19 @@ switch lower(featureStr)
         featureTitle = 'Stimulus-Response Lag';
         PHZ.units = 's';
         [~,PHZ.data] = phzFeature_src(PHZ.data,PHZ.etc.stim,PHZ.srate,val);
-        
+
         % note: See comment above in the 'src' section.
-        
+
     case 'snr'
         featureTitle = 'Signal-to-Noise Ratio';
         PHZ.units = 'SNR';
-        
+
         % method taken from Skoe & Kraus (2010) Ear & Hearing
         tg = phz_region(PHZ,val{1},false);              bl = phz_region(PHZ,val{2},false);
         tg = phz_transform(tg,'^2',false);              bl = phz_transform(bl,'^2',false);
         tg = phz_feature(tg,'mean','verbose',false);    bl = phz_feature(bl,'mean','verbose',false);
         tg = phz_transform(tg,'sqrt',false);            bl = phz_transform(bl,'sqrt',false);
-        
+
         PHZ.data = tg.data ./ bl.data;
         PHZ.region = [val{1},' / ',val{2}]; % this has to be done last
 
