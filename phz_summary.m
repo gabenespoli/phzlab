@@ -198,8 +198,8 @@ function [keepVars, loseVars, summaryFunction] = verifyKeepVars(keepVars, summar
 % convert summary function to common format
 switch lower(summaryFunction)
     case {'*', 'mean', 'avg', 'average'},   summaryFunction = 'mean';
-    case {'+', 'add'},                      summaryFunction = 'add';
-    case {'-', 'sub', 'subtract'},          summaryFunction = 'subtract';
+    case {'+', 'add', 'efr'},               summaryFunction = 'add';
+    case {'-', 'sub', 'subtract', 'ffr'},   summaryFunction = 'subtract';
     otherwise, error('Invalid summaryFunction.')
 end
 

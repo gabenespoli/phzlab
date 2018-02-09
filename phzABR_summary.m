@@ -14,7 +14,7 @@
 %   PHZ               = [struct] PHZLAB data structure.
 %
 %   summaryFunction   = [string] Function to use to combine trials. Can
-%                       be either 'add', 'subtract', or 'mean'.
+%                       be either 'add'/'efr', 'subtract'/'ffr', or 'mean'.
 % NOTE
 % How summaryFunction works with phz_summary:
 %   The default method for summarizing trials is to average them together
