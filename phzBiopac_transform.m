@@ -42,11 +42,12 @@
 % REFERENCE
 %   https://www.biopac.com/knowledge-base/calibration-in-volts-millivolts-microvolts/
 
-function PHZ = phzBiopac_transform(PHZ, gain, units)
+function PHZ = phzBiopac_transform(PHZ, gain, units, verbose)
 
 if nargin == 0 && nargout == 0, help phzBiopac_transform, end
 if nargin < 2, error('Gain must be specified.'), end
-if nargin < 3, units = ''; end
+if nargin < 3 || isempty(units), units = ''; end
+if nargin < 4, verbose = true; end
 
 switch units
     case {'tera',  'T'},    unitsGain = 10e-12;
@@ -71,6 +72,6 @@ end
 multiplier = unitsGain / gain / 10;
 units = [units, PHZ.units];
 
-PHZ = phz_transform(PHZ, {multiplier, units});
+PHZ = phz_transform(PHZ, {multiplier, units}, verbose);
 
 end
