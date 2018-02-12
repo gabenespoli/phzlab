@@ -20,6 +20,11 @@
 % 
 %   'nfft'        = [numeric] Number of points in the FFT. Default is the
 %                   next power of two after the length of the epoch.
+%
+%   'detrend'     = [true|false] Whether or not to remove the mean from the
+%                   signal before calculating the FFT. This is done twice:
+%                   before and after applying the window. Default true.
+%
 % OUTPUT
 %   data          = [numeric] Matrix where each row is the spectrum of the
 %                   corresponding row in the input matrix.
@@ -56,6 +61,7 @@ if nargout == 0 && nargin == 0, help phzFeature_fft, return, end
 spectrum = 'amplitude';
 winType = 'hanning';
 nfft = 1;
+do_detrend = true;
 
 % user-defined
 for i = 1:2:length(varargin)
@@ -63,6 +69,7 @@ for i = 1:2:length(varargin)
         case 'spectrum',    spectrum = varargin{i+1};
         case 'wintype',     winType  = varargin{i+1};
         case 'nfft',        nfft = varargin{i+1};
+        case 'detrend',     do_detrend = varargin{i+1};
     end
 end
 
@@ -72,12 +79,20 @@ switch nfft
     case 1,     nfft = 2^nextpow2(size(data,2));
 end
 
+if do_detrend
+    data = transpose(detrend(transpose(data), 'constant'));
+end
+
 % windowing
 switch lower(winType)
     case {'hanning','hann'}
         data = data .* repmat(hann(size(data,2))',[size(data,1) 1]);
     case 'nowindow'
     otherwise, error('Unknown window type.')
+end
+
+if do_detrend
+    data = transpose(detrend(transpose(data), 'constant'));
 end
 
 % do fft
