@@ -100,7 +100,7 @@ if strcmpi(units, 'SD')
     ind = max(abs(PHZ.data), [], 2) > adjThreshold;
 
 else
-    ind = max(PHZ.data, [], 2) > threshold;
+    ind = max(abs(PHZ.data), [], 2) > threshold;
 
 end
 
