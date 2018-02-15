@@ -30,6 +30,8 @@
 %                                 deviations from the mean of all trials.
 % 
 %   PHZ = phz_reject(PHZ,'reset') >> Unmark trials for rejection.
+%
+%   phz_reject(PHZ) >> Display the min and max values of the data.
 
 % Copyright (C) 2018 Gabriel A. Nespoli, gabenespoli@gmail.com
 % 
@@ -49,6 +51,10 @@
 function PHZ = phz_reject(PHZ,threshold,verbose)
 
 if nargout == 0 && nargin == 0, help phz_reject, return, end
+if nargin == 1
+    fprintf('  Data range is %g to %g %s.\n', min(PHZ.data(:)), max(PHZ.data(:)), PHZ.units)
+    return
+end
 if nargin > 1 && isempty(threshold), return, end
 if nargin < 3, verbose = true; end
 
