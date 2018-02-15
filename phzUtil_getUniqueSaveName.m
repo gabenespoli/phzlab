@@ -37,15 +37,19 @@
 function filename = phzUtil_getUniqueSaveName(filename, force)
 if nargin < 2, force = 0; end
 
-if ~exist(filename, 'file')
-    return
-end
-
-if exist(filename, 'file') && force == 1
-    filename = appendUniqueNumber(filename);
+if ~exist(filename, 'file') 
     return
 else
-    fprintf('  Filename already exists: ''%s''\n', filename)
+    if force == 2
+        fprintf('  Overwriting existing file: ''%s''...\n', filename)
+        return
+    elseif force == 1
+        fprintf('  Appending unique number to existing filename: ''%s''...\n', filename)
+        filename = appendUniqueNumber(filename);
+        return
+    else
+        fprintf('  Filename already exists: ''%s''\n', filename)
+    end
 end
 
 goodInput = false;
@@ -62,7 +66,7 @@ while goodInput == false
             goodInput = true;
 
         case 'c'
-            error('Filename exists.')
+            error('Filename exists. Execution cancelled by the user.')
 
         case 'a'
             filename = appendUniqueNumber(filename);
