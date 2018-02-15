@@ -161,7 +161,7 @@ while keepGoing
     end
 
     % make titles and axis labels
-    plotTitle = ['Trial #', num2str(currentTrial)];
+    plotTitle = ['Trial ', num2str(currentTrial), ' / ', num2str(size(PHZ.data,1))];
     if showTags
         plotTitle = [plotTitle; {getTrialTagTitle(PHZ.lib.tags, currentTrial)}];
     end
