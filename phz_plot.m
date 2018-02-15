@@ -65,7 +65,7 @@
 %   'smooth'    = Calls phz_smooth.
 %   'transform' = Calls phz_transform.
 %   'blsub'     = Calls phz_blsub.
-%   'rej'       = Calls phz_reject.
+%   'reject'    = Calls phz_reject.
 %   'norm'      = Calls phz_norm.
 % 
 %   These are always executed in the order listed here, after the above
