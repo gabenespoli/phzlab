@@ -66,10 +66,10 @@ filename = phzUtil_getUniqueSaveName(filename,force);
 if isempty(filename), return, end
 
 PHZ.lib.filename = filename;
-PHZ = phz_history(PHZ,['Saved to ''',filename,'''.'],0);
+PHZ = phz_history(PHZ,['  Saved to ''',filename,'''.'],0);
 if verbose, fprintf('  Saving...'), end
 save(filename,'PHZ')
 if verbose, fprintf(' Done.\n'), end
-if verbose, fprintf('Saved to ''%s''.\n',filename);
+if verbose, fprintf('  Saved to ''%s''.\n',filename);
 
 end
