@@ -54,33 +54,34 @@ if nargin < 3, verbose = true; end
 
 % if new baseline-subtraction is requested, do it
 if do_blsub || do_restore
-    
+
     % restore previously-subtracted baseline
     if do_restore
-        
+
         % check that no other processing has been done since phz_blsub
         names = fieldnames(PHZ.proc);
         if ~ismember(names{end},{'blsub'})
             error(['Other processing has been done since baseline ',... 
                 'subtraction. Cannot undo previous baseline subtraction.'])
         end
-        
+
         PHZ.data = PHZ.data + repmat(PHZ.proc.blsub.values,1,size(PHZ.data,2));
-        
+
         PHZ.proc = rmfield(PHZ.proc,'blsub');
         PHZ = phz_history(PHZ,'Added back previously removed baseline.',verbose);
     end
-    
+
     % subtract mean of new baseline region
     if do_blsub
-        
+
         % get and subtract baseline
+        % can't use phz_feature directly because it would discard first
         PHZb = phz_region(PHZ,region,0);
         PHZ = getBLSUBstructure(PHZ);
-        
+
         PHZ.proc.blsub.values = mean(PHZb.data,2);
         PHZ.data = PHZ.data - repmat(PHZ.proc.blsub.values,[1 size(PHZ.data,2)]);
-        
+
         % make region endpoints
         if ischar(region)
             regionStr = [region,' ',phzUtil_num2strRegion(PHZ.region.(region))];
@@ -89,7 +90,7 @@ if do_blsub || do_restore
             regionStr = phzUtil_num2strRegion(region);
         end
         PHZ.proc.blsub.region = region;
-        
+
         % add to history
         PHZ = phz_history(PHZ,['Subtracted mean of ',...
             regionStr,' from data.'],verbose);
