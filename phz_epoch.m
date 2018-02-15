@@ -27,6 +27,13 @@
 % 
 %   'timeUnits'   = [string] Specifies the units of the values in TIMES.
 %                   Options are the same as 'winUnits'. Default 'samples'.
+%
+%   'timesAdjust' = [numeric] Number to use to adjust the resultant times
+%                   in PHZ.times. This is useful if, for example, your
+%                   marker times occur 1 second prior to the actual
+%                   stimulus onset. In this case, a TIMESADJUST value of
+%                   -1 would be appropriate. If the EXTRACTWINDOW is
+%                   [0 8], PHZ.times would then go from -1 to 7.
 % 
 % OUTPUT
 %   PHZ.data              = Epoched data. Each row is a different epoch.
@@ -58,6 +65,7 @@ if size(PHZ.data,1) > 1, error('PHZ.data seems to already be epoched...'), end
 % defaults
 winUnits = 'seconds';
 timeUnits = 'samples';
+timesAdjust = 0;
 verbose = true;
 
 % user-defined
@@ -65,6 +73,7 @@ for i = 1:2:length(varargin)
     switch lower(varargin{i})
         case 'winunits',            winUnits = varargin{i+1};
         case 'timeunits',           timeUnits = varargin{i+1};
+        case 'timesadjust',         timesAdjust = varargin{i+1};
         case 'verbose',             verbose = varargin{i+1};
     end
 end
@@ -73,12 +82,14 @@ PHZ.proc.epoch.extractWindow = extractWindow;
 PHZ.proc.epoch.winUnits = winUnits;
 PHZ.proc.epoch.times = times;
 PHZ.proc.epoch.timesUnits = timeUnits;
+PHZ.proc.epoch.timesAdjust = timesAdjust;
 
 times = convertToSamples(times,timeUnits,PHZ.srate);
 extractWindow = convertToSamples(extractWindow,winUnits,PHZ.srate);
 
 [PHZ.data,rminds] = extractEpochs(PHZ.data,times,extractWindow,verbose);
 PHZ.times = (extractWindow(1):1:extractWindow(2)) / PHZ.srate; % convert times to seconds
+PHZ.times = PHZ.times + timesAdjust;
 
 if isempty(rminds)
     PHZ = phz_history(PHZ,'Extracted epochs from data.',verbose);
