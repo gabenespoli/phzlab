@@ -101,14 +101,14 @@ end
 % check that ~reject all trials or ~reject no trials
 if sum(ind) == size(PHZ.data,1)
     fprintf('! This threshold would reject all trials. Aborting phz_reject.m...\n')
-    fprintf('  The min threshold to reject a trial in this dataset is %f.', ...
+    fprintf('  The min threshold to reject a trial in this dataset is %f.\n', ...
         min(max(abs(PHZ.data), [], 2)))
     return
 end
 
 if sum(ind) == 0
     fprintf('! This threshold would not reject any trials. Aborting phz_reject.m...\n')
-    fprintf('  The max value in this dataset is %f.', ...
+    fprintf('  The max value in this dataset is %f.\n', ...
         max(abs(PHZ.data(:))))
     return
 end
