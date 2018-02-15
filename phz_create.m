@@ -261,7 +261,9 @@ for i = 1:length(files)
             end
             
             PHZ.data = transpose(raw.data(:,channel));
-            PHZ.times = (raw.start_sample:1:length(PHZ.data)-1) / PHZ.srate;
+            start_sample = raw.start_sample;
+            end_sample   = raw.start_sample + length(PHZ.data) - 1;
+            PHZ.times = (start_sample:end_sample) / PHZ.srate;
             
         otherwise, error('Unknown file type.')
     end
