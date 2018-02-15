@@ -157,8 +157,8 @@ while ~foundMarkers
     
     % plot if desired
     if foundMarkers && plotMarkers
-        h = plotMarkerChannel(data,srate,threshold,times,plotMarkerTimes);
-        [threshold,times,foundMarkers,returnFlag] = prompt(data,srate,threshold,times,h);
+        plotMarkerChannel(data,srate,threshold,times,plotMarkerTimes);
+        [threshold,times,foundMarkers,returnFlag] = prompt(data,srate,threshold,times);
     end
     
     if returnFlag, disp('  No epochs were extracted.'), return, end
