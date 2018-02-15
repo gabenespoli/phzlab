@@ -113,7 +113,7 @@ for j = 1:length(files)
     fileProgress = [num2str(j), '/', num2str(length(files)), ...
         ': ''',files{j},''''];
     
-    disp(['Combining PHZ data from file ', fileProgress])
+    disp(['  Combining PHZ data from file ', fileProgress])
 
     % load data
     if verbose, disp(['Loading data from file ', fileProgress]), end
