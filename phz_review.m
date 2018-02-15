@@ -91,12 +91,13 @@
 function PHZ = phz_review(PHZ, startTrial, verbose)
 
 if nargout == 0 && nargin == 0, help phz_review, return, end
-if nargout == 0
-    warning('No output argument is specified. Rejection marks won''t be saved.')
-end
 
 if nargin < 2, startTrial = []; end
 if nargin < 3, verbose = true; end
+
+if nargout == 0 && verbose
+    warning('No output argument is specified. Rejection marks won''t be saved.')
+end
 
 if ischar(startTrial) && strcmpi(startTrial, 'reset')
     if ismember('review', fieldnames(PHZ.proc))
@@ -191,8 +192,8 @@ while keepGoing
         descr = {'Navigation:';
             '\rightarrow / \downarrow / j / l / n = next';
             '\leftarrow / \uparrow / k / h / p = previous';
-            'g = enter trial number';
-            'G = random trial';
+            'g = random trial';
+            'G = enter trial number';
             ' ';
             'Toggles:';
             'r / space = rejection mark';
@@ -205,7 +206,7 @@ while keepGoing
             'Misc:';
             '+/= = increase font';
             '-/_ = decrease font';
-            'f = enter font size';
+            'F = enter font size';
             '? = show/hide controls';
             ' ';
             'Esc/q = quit'};
@@ -248,7 +249,7 @@ while keepGoing
             currentTrial = currentTrial - 1;
             if currentTrial < 1, currentTrial = size(PHZ.data,1); end
 
-        case 103 % g
+        case 71 % G (capital g)
             PHZ = addView(PHZ, currentTrial);
             goto = input(['Enter trial number (1-', num2str(size(PHZ.data,1)), '): ']);
             if ~isempty(goto)
@@ -259,7 +260,7 @@ while keepGoing
                 end
             end 
 
-        case 71 % G (capital g)
+        case 103 % g
             PHZ = addView(PHZ, currentTrial);
             currentTrial = randi(size(PHZ.data,1));
 
@@ -298,7 +299,7 @@ while keepGoing
                 showTags = true;
             end
 
-        case 102 % f
+        case 70 % F (capital f)
             fontsize = input(['Enter new font size (current = ', ...
                 num2str(fontsize), '): ']);
 
