@@ -76,7 +76,12 @@ if length(region) == 2
             num2str(region(1)),   ' ', ...
             num2str(region(end)), ']'];
     end
-    region = getind(PHZ.(indField),region(1)):getind(PHZ.(indField),region(2));
+    ind1 = getind(PHZ.(indField), region(1));
+    ind2 = getind(PHZ.(indField), region(2));
+    if ind1 == ind2
+        warning('Region is only 1 sample long.')
+    end
+    region = ind1:ind2;
 end
 
 if isempty(region), error('Region is empty.'), end
