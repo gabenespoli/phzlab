@@ -67,16 +67,19 @@ verbose = false;
 
 % user-defined
 if nargin > 0 
-    if ischar(varargin{1}) && isdir(varargin{1})
+    if iscell(varargin{1})
+        folder = '';
+        files = varargin{1};
+
+    elseif ischar(varargin{1}) && isdir(varargin{1})
         folder = varargin{1};
         files = dir(folder);
         files = {files.name};
         files = files(contains(files, {'.phz'}));
         files = files(~startsWith(files, '.')); % ignore dotfiles
 
-    elseif iscell(varargin{1})
-        folder = '';
-        files = varargin{1};
+    else
+        error([varargin{1}, ' is not a directory.'])
 
     end
     varargin(1) = [];
