@@ -88,6 +88,10 @@ ytitle = {'Stimulus', ...
 
 % prepare for spectral plots (restrict by region)
 PHZ2 = phz_region(PHZ, region);
+fftopts = {'units', PHZ2.units};
+if ismember('fft', fieldnames(PHZ.lib))
+    fftopts = [fftopts, phzUtil_struct2paramValuePairs(PHZ.lib.fft)];
+end
 
 reg = PHZ2.data(1,:) - mean(PHZ2.data(1,:));
 inv = PHZ2.data(2,:) - mean(PHZ2.data(1,:));
@@ -140,7 +144,7 @@ plots = 2:2:10;
 for i = 1:5
     subplot(5,2,plots(i))
     [fftdata, freqs, featureTitle, units] = ...
-        phzUtil_fft(data2{i}, PHZ2.srate, 'units', PHZ2.units);
+        phzUtil_fft(data2{i}, PHZ2.srate, fftopts{:});
     plot(freqs, fftdata, plotSpec{i}, 'LineWidth', linewidth)
     ylabel([featureTitle, ' (', units, ')'])
     xlim(xlf)
