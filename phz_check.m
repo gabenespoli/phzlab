@@ -654,6 +654,8 @@ PHZ = orderfields(PHZ,mainOrder);
 libOrder = {
     'tags'
     'spec'
+    'fft'
+    'stim'
     
     'filename'
     'datafile'
