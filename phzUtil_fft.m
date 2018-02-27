@@ -86,8 +86,9 @@ end
 switch lower(winType)
     case {'hanning','hann'}
         data = data .* repmat(hann(size(data,2))',[size(data,1) 1]);
-    case 'nowindow'
-    otherwise, error('Unknown window type.')
+    case {'nowindow','none'}
+    otherwise
+        error('Unknown window type.')
 end
 
 if do_detrend
