@@ -1,42 +1,37 @@
 %PHZFEATURE_FFT  Single-sided FFT.
 %
 % USAGE
-%   [data,freqs,units,featureTitle] = phzFeature_fft(data,srate,units)
-%   [...] = phzFeature_fft(...,'Param1',Value1,etc.)
+%   PHZ = phzFeature_fft(PHZ)
+%   PHZ = phzFeature_fft(PHZ,'Param1',Value1,etc.)
+%   [PHZ,featureTitle] = phzFeature_fft(PHZ,...)
 % 
 % INPUT
-%   data          = [numeric] A trials-by-time array of data.
-% 
-%   srate         = [numeric] Sampling frequency of the data.
-% 
-%   units         = [string] The units of the data, to be adjusted if
-%                   power spectrum.
-% 
-%   'spectrum'    = ['amplitude'|'power'|'phase'|'complex'] Specifies the
-%                   type of spectrum to calculate. Default 'amplitude'.
-% 
-%   'wintype'     = ['hanning'|'none'] Type of windowing to apply to the
-%                   epoch. Default 'hanning'.
-% 
-%   'nfft'        = [numeric] Number of points in the FFT. Default is the
-%                   next power of two after the length of the epoch.
+%   PHZ           = [struct] PHZLAB data structure.
 %
-%   'detrend'     = [true|false] Whether or not to remove the mean from the
-%                   signal before calculating the FFT. This is done twice:
-%                   before and after applying the window. Default true.
+%   Parameter-value pairs are passed directly to phzUtil_fft. See
+%       help phzUtil_fft explanation of the options.
+%
+%   Options can be stored as a struct in PHZ.lib.fft. This allows you to
+%       control the FFT when it is called from phz_plot or phz_writetable.
+%       For example, to use the power spectrum instead of the default
+%       amplitude spectrum, add the following to the PHZ structure:
+%
+%       PHZ.lib.fft.spectrum = 'power'
+%
+%       If you wish to override this setting later, adding a parameter-
+%       value pair to the phzFeature_fft call will do it.
 %
 % OUTPUT
-%   data          = [numeric] Matrix where each row is the spectrum of the
-%                   corresponding row in the input matrix.
+%   PHZ.data      = [numeric] Spectral data.
 % 
-%   freqs         = [numeric] Vector of frequencies corresponding to each
-%                   column of the output data.
+%   PHZ.freqs     = [numeric] Vector of frequencies corresponding to each
+%                   column of the output data. This replaces PHZ.times.
 % 
-%   units         = [string] The units of the data, adjusted to include 
+%   PHZ.units     = [string] The units of the data, adjusted to include 
 %                   '^2' if power spectrum.
 % 
-%   featureTitle  = [string] Formatted title of type of spectrum for plotting.
-% 
+%   featureTitle  = [string] Formatted title of type of spectrum for
+%                   plotting.
 
 % Copyright (C) 2018 Gabriel A. Nespoli, gabenespoli@gmail.com
 % 
@@ -53,70 +48,27 @@
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see http://www.gnu.org/licenses/.
 
-function [data,f,units,featureTitle] = phzFeature_fft(data,srate,units,varargin)
+function [PHZ,featureTitle] = phzFeature_fft(PHZ,varargin)
 
 if nargout == 0 && nargin == 0, help phzFeature_fft, return, end
 
-% defaults
-spectrum = 'amplitude';
-winType = 'hanning';
-nfft = 1;
-do_detrend = true;
+% param/value pairs are the fft opts to pass through to phzUtil_fft
+fftopts = varargin;
 
-% user-defined
-for i = 1:2:length(varargin)
-    switch lower(varargin{i})
-        case 'spectrum',    spectrum = varargin{i+1};
-        case 'wintype',     winType  = varargin{i+1};
-        case 'nfft',        nfft = varargin{i+1};
-        case 'detrend',     do_detrend = varargin{i+1};
-    end
+% add units from PHZ.units
+fftopts = [{'units', PHZ.units} fftopts];
+
+% get default fft options from PHZ.lib.fft
+if ismember('fft', fieldnames(PHZ.lib))
+    % put varargin 2nd, so that they override the defaults in PHZ.lib.fft
+    fftopts = [phzUtil_struct2paramValuePairs(PHZ.lib.fft) fftopts];
 end
 
-% cleanup user-defined
-switch nfft
-    case 0,     nfft = size(data,2);
-    case 1,     nfft = 2^nextpow2(size(data,2));
-end
+% call phzUtil_fft with parts of PHZ, passing all options
+[PHZ.data, PHZ.freqs, featureTitle, PHZ.units] = ...
+    phzUtil_fft(PHZ.data, PHZ.srate, fftopts{:});
 
-if do_detrend
-    data = transpose(detrend(transpose(data), 'constant'));
-end
-
-% windowing
-switch lower(winType)
-    case {'hanning','hann'}
-        data = data .* repmat(hann(size(data,2))',[size(data,1) 1]);
-    case 'nowindow'
-    otherwise, error('Unknown window type.')
-end
-
-if do_detrend
-    data = transpose(detrend(transpose(data), 'constant'));
-end
-
-% do fft
-data = fft(data,nfft,2);
-data = data/size(data,2);
-data = data(:,1:floor(nfft/2)+1); % make single-sided
-
-% create frequency vector
-f = srate/2*linspace(0,1,floor(nfft/2)+1);
-
-% convert spectrum
-switch lower(spectrum)
-    % if power spectrum, units are [PHZ.units,'^2']
-    case {'amplitude','amp','abs'}, featureTitle = 'Amplitude';
-        data = abs(data);
-        
-    case {'power','pwr','conj'}, featureTitle = 'Power';
-        data = data .* conj(data);
-        units = [units,'^2'];
-                                    
-    case {'phase','angle'}, featureTitle = 'Phase';
-        data = angle(data); 
-    
-    otherwise, featureTitle = 'Complex';
-end
+% remove times field (it will have freqs instead)
+PHZ = rmfield(PHZ, 'times');
 
 end

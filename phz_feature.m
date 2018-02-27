@@ -226,8 +226,7 @@ switch lower(featureStr)
 
     case 'itfft'
         % get fft of each trial
-        [PHZ.data,PHZ.freqs,PHZ.units,featureTitle] = phzFeature_fft(PHZ.data,PHZ.srate,PHZ.units);
-        PHZ = rmfield(PHZ,'times');
+        [PHZ,featureTitle] = phzFeature_fft(PHZ);
         featureTitle = ['Intertrial ',featureTitle];
 
     case 'fft'
@@ -239,8 +238,7 @@ switch lower(featureStr)
         end
 
         % get fft of each summary
-        [PHZ.data,PHZ.freqs,PHZ.units,featureTitle] = phzFeature_fft(PHZ.data,PHZ.srate,PHZ.units);
-        PHZ = rmfield(PHZ,'times');
+        [PHZ,featureTitle] = phzFeature_fft(PHZ);
 
     case 'itpc'
         featureTitle = 'Intertrial Phase Coherence';
