@@ -1,16 +1,13 @@
 %PHZUTIL_FFT  Single-sided FFT.
 %
 % USAGE
-%   [data,freqs,units,featureTitle] = phzUtil_fft(data,srate,units)
+%   [data,freqs,featureTitle,units] = phzUtil_fft(data,srate)
 %   [...] = phzUtil_fft(...,'Param1',Value1,etc.)
 % 
 % INPUT
 %   data          = [numeric] A trials-by-time array of data.
 % 
 %   srate         = [numeric] Sampling frequency of the data.
-% 
-%   units         = [string] The units of the data, to be adjusted if
-%                   power spectrum.
 % 
 %   'spectrum'    = ['amplitude'|'power'|'phase'|'complex'] Specifies the
 %                   type of spectrum to calculate. Default 'amplitude'.
@@ -25,15 +22,15 @@
 %                   signal before calculating the FFT. This is done twice:
 %                   before and after applying the window. Default true.
 %
+%   'units'       = [string] The units of the data, to be adjusted if
+%                   power spectrum.
+%
 % OUTPUT
 %   data          = [numeric] Matrix where each row is the spectrum of the
 %                   corresponding row in the input matrix.
 % 
 %   freqs         = [numeric] Vector of frequencies corresponding to each
 %                   column of the output data.
-% 
-%   units         = [string] The units of the data, adjusted to include 
-%                   '^2' if power spectrum.
 % 
 %   featureTitle  = [string] Formatted title of type of spectrum for plotting.
 % 
@@ -53,7 +50,7 @@
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see http://www.gnu.org/licenses/.
 
-function [data,f,units,featureTitle] = phzUtil_fft(data,srate,units,varargin)
+function [data,f,featureTitle,units] = phzUtil_fft(data,srate,varargin)
 
 if nargout == 0 && nargin == 0, help phzUtil_fft, return, end
 
@@ -62,6 +59,7 @@ spectrum = 'amplitude';
 winType = 'hanning';
 nfft = 1;
 do_detrend = true;
+units = '';
 
 % user-defined
 for i = 1:2:length(varargin)
@@ -70,6 +68,7 @@ for i = 1:2:length(varargin)
         case 'wintype',     winType  = varargin{i+1};
         case 'nfft',        nfft = varargin{i+1};
         case 'detrend',     do_detrend = varargin{i+1};
+        case 'units',       units = varargin{i+1};
     end
 end
 
@@ -105,17 +104,20 @@ f = srate/2*linspace(0,1,floor(nfft/2)+1);
 
 % convert spectrum
 switch lower(spectrum)
-    % if power spectrum, units are [PHZ.units,'^2']
-    case {'amplitude','amp','abs'}, featureTitle = 'Amplitude';
+    case {'amplitude','amp','abs'}
+        featureTitle = 'Amplitude';
         data = abs(data);
-        
-    case {'power','pwr','conj'}, featureTitle = 'Power';
+
+    % if power spectrum, units are [PHZ.units,'^2']
+    case {'power','pwr','conj'}
+        featureTitle = 'Power';
         data = data .* conj(data);
         units = [units,'^2'];
-                                    
-    case {'phase','angle'}, featureTitle = 'Phase';
+
+    case {'phase','angle'}
+        featureTitle = 'Phase';
         data = angle(data); 
-    
+
     otherwise, featureTitle = 'Complex';
 end
 

@@ -139,8 +139,8 @@ end
 plots = 2:2:10;
 for i = 1:5
     subplot(5,2,plots(i))
-    [fftdata, freqs, units, featureTitle] = ...
-    phzFeature_fft(data2{i}, PHZ2.srate, PHZ2.units);
+    [fftdata, freqs, featureTitle, units] = ...
+        phzUtil_fft(data2{i}, PHZ2.srate, 'units', PHZ2.units);
     plot(freqs, fftdata, plotSpec{i}, 'LineWidth', linewidth)
     ylabel([featureTitle, ' (', units, ')'])
     xlim(xlf)
