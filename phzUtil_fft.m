@@ -63,12 +63,13 @@ units = '';
 
 % user-defined
 for i = 1:2:length(varargin)
+    val = varargin{i+1};
     switch lower(varargin{i})
-        case 'spectrum',    spectrum = varargin{i+1};
-        case 'wintype',     winType  = varargin{i+1};
-        case 'nfft',        nfft = varargin{i+1};
-        case 'detrend',     do_detrend = varargin{i+1};
-        case 'units',       units = varargin{i+1};
+        case 'spectrum',    if ~isempty(val), spectrum = val; end
+        case 'wintype',     if ~isempty(val), winType  = val; end
+        case 'nfft',        if ~isempty(val), nfft = val; end
+        case 'detrend',     if ~isempty(val), do_detrend = val; end
+        case 'units',       if ~isempty(val), units = val; end
     end
 end
 
