@@ -46,6 +46,9 @@
 function PHZ = phz_save(PHZ,filename,verbose,force)
 
 if nargout == 0 && nargin == 0, help phz_save, return, end
+if ~isstruct(PHZ)
+    error('PHZ structure must be the first input.')
+end
 if nargin < 2, filename = ''; end
 if nargin < 3, verbose = true; end
 if nargin < 4, force = 0; end
