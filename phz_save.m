@@ -55,12 +55,15 @@ if nargin < 4, force = 0; end
 
 if isempty(filename)
     % get filename with dialog box
-    [filename,pathname] = uiputfile({'*.phz';'*.*'},'Select file to write',[inputname(1),'.phz']);
+    [filename,pathname] = uiputfile({'*.phz';'*.*'}, ...
+        'Select file to write',[inputname(1),'.phz']);
     filename = fullfile(pathname,filename);
 else
     % use filename from input argument
     [pathname,filename,ext] = fileparts(filename);
-    if isempty(ext) || ~ismember(ext,{'.phz','.mat'}), ext = '.phz'; end
+    if isempty(ext) || ~ismember(ext,{'.phz','.mat'})
+        ext = '.phz';
+    end
     filename = fullfile(pathname,[filename,ext]);
 end
 
