@@ -48,7 +48,7 @@ else
         filename = appendUniqueNumber(filename);
         return
     else
-        fprintf('  Filename already exists: ''%s''\n', filename)
+        fprintf('\n! Filename already exists: ''%s''\n', filename)
     end
 end
 
