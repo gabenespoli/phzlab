@@ -140,7 +140,7 @@ if ischar(keepVars), keepVars = cellstr(keepVars); end
 
 disp('  Calculating features...')
 for i = 1:length(feature)
-    fprintf('\n Feature %i/%i: %s\n', i, length(feature), feature{i})
+    fprintf('\n  Feature %i/%i: %s\n', i, length(feature), feature{i})
     
     [s,featureTitle] = phz_feature(PHZ,feature{i},'summary',keepVars,'region',region,'verbose',verbose);
     % (run phz_summary through phz_feature because fft feature needs to average
