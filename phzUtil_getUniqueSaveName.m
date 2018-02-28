@@ -65,7 +65,7 @@ while goodInput == false
             disp('Aborting...')
             goodInput = true;
 
-        case 'c'
+        case {'c','x'}
             error('Filename exists. Execution cancelled by the user.')
 
         case 'a'
