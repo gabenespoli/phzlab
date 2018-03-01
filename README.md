@@ -184,7 +184,7 @@ PHZ = phz_labels(PHZ, labels);
 
 Save this file to disk:
 ```matlab
-phz_save(PHZ, 'phzfiles/datafile1.phz');
+phz_save(PHZ, 'folder/for/phzfiles/datafile1.phz');
 ```
 
 <a name="tutorial-preprocessing"></a>
@@ -219,7 +219,7 @@ PHZLAB can combine all .phz files in a given folder into a single PHZ variable.
 This lets you apply processing functions to the whole dataset at once, and
 allows you to easily make plots that include all data.
 ```matlab
-PHZ = phz_combine('phzfiles');
+PHZ = phz_combine('folder/for/phzfiles');
 ```
 
 If there is too much data to put into a single file, PHZLAB will throw an error
@@ -228,7 +228,7 @@ and suggest that you do some preprocessing (including averaging, e.g., by using
 `phz_combine`. You won't be able to change this processing later without
 re-combining the files with different settings:
 ```matlab
-PHZ = phz_combine('phzfiles', ...
+PHZ = phz_combine('folder/for/phzfiles', ...
                   'blsub',    [-1 0], ...
                   'reject',   0.05, ...
                   'summary',  {'participant', 'group', 'trials'});
