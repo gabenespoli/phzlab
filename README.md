@@ -217,7 +217,7 @@ PHZ = phz_reject(PHZ, 0.05);
 
 PHZLAB can combine all .phz files in a given folder into a single PHZ variable.
 This lets you apply processing functions to the whole dataset at once, and
-allows you easily make plots that include all data.
+allows you to easily make plots that include all data.
 ```matlab
 PHZ = phz_combine('phzfiles');
 ```
