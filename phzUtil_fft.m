@@ -32,8 +32,11 @@
 %   freqs         = [numeric] Vector of frequencies corresponding to each
 %                   column of the output data.
 % 
-%   featureTitle  = [string] Formatted title of type of spectrum for plotting.
+%   featureTitle  = [string] Formatted title of type of spectrum
+%                   (for plotting).
 % 
+%   units         = [string] If power spectrum is used, '^2' is appended
+%                   to the units string.
 
 % Copyright (C) 2018 Gabriel A. Nespoli, gabenespoli@gmail.com
 % 
@@ -62,6 +65,7 @@ do_detrend = true;
 units = '';
 
 % user-defined
+% if empty, the default is used
 for i = 1:2:length(varargin)
     val = varargin{i+1};
     switch lower(varargin{i})
@@ -110,17 +114,18 @@ switch lower(spectrum)
         featureTitle = 'Amplitude';
         data = abs(data);
 
-    % if power spectrum, units are [PHZ.units,'^2']
     case {'power','pwr','conj'}
         featureTitle = 'Power';
         data = data .* conj(data);
+        % make units squared for power spectrum
         units = [units,'^2'];
 
     case {'phase','angle'}
         featureTitle = 'Phase';
         data = angle(data); 
 
-    otherwise, featureTitle = 'Complex';
+    otherwise
+        featureTitle = 'Complex';
 end
 
 end
