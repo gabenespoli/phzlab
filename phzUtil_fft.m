@@ -12,11 +12,19 @@
 %   'spectrum'    = ['amplitude'|'power'|'phase'|'complex'] Specifies the
 %                   type of spectrum to calculate. Default 'amplitude'.
 % 
+%   'nfft'        = [numeric] Number of points in the FFT. Default is the
+%                   next power of two after the length of the epoch.
+%
 %   'wintype'     = ['hanning'|'none'] Type of windowing to apply to the
 %                   epoch. Default 'hanning'.
 % 
-%   'nfft'        = [numeric] Number of points in the FFT. Default is the
-%                   next power of two after the length of the epoch.
+%   'ramp'        = [numeric] Only apply hanning window to onset and
+%                   offset of the signal. This number should be a length
+%                   of time in milliseconds. A hanning window will be
+%                   created that is twice this length; the first half will
+%                   be applied to the onset, and the second half will be
+%                   applied to the offset. This option is only used when
+%                   'wintype' is 'hanning'.
 %
 %   'detrend'     = [true|false] Whether or not to remove the mean from the
 %                   signal before calculating the FFT. This is done twice:
@@ -59,8 +67,9 @@ if nargout == 0 && nargin == 0, help phzUtil_fft, return, end
 
 % defaults
 spectrum = 'amplitude';
-winType = 'hanning';
 nfft = 1;
+winType = 'hanning';
+ramp = [];
 do_detrend = true;
 units = '';
 
@@ -70,8 +79,9 @@ for i = 1:2:length(varargin)
     val = varargin{i+1};
     switch lower(varargin{i})
         case 'spectrum',    if ~isempty(val), spectrum = val; end
-        case 'wintype',     if ~isempty(val), winType  = val; end
         case 'nfft',        if ~isempty(val), nfft = val; end
+        case 'wintype',     if ~isempty(val), winType = val; end
+        case 'ramp',        if ~isempty(val), ramp = val; end
         case 'detrend',     if ~isempty(val), do_detrend = val; end
         case 'units',       if ~isempty(val), units = val; end
     end
@@ -90,23 +100,45 @@ end
 % windowing
 switch lower(winType)
     case {'hanning','hann'}
-        data = data .* repmat(hann(size(data,2))',[size(data,1) 1]);
+        if isempty(ramp)
+            win = transpose(hann(size(data,2))); % make hanning row vector
+
+        else
+            % this part adapted from the bt_fft2.m function from the
+            %   Auditory Neuroscience Lab's Brainstem Toolbox:
+            %   http://www.brainvolts.northwestern.edu
+            ramp = round(ramp / 1000 * srate); % length of ramp in samples
+            ramp2 = ramp * 2; % length of both ramps
+            if ramp2 > size(data, 2)
+                error('Ramp size is too long for the length of trials.')
+            end
+            hanramp = transpose(hann(ramp2)); % make hanning row vector
+            win = [hanramp(1:ramp) ...
+                   ones(1, size(data, 2) - ramp2) ...
+                   hanramp(ramp + 1:end)];
+        end
+
     case {'nowindow','none'}
+
     otherwise
         error('Unknown window type.')
 end
+
+% apply the window to all trials
+win = repmat(win, [size(data, 1), 1]);
+data = data .* win;
 
 if do_detrend
     data = transpose(detrend(transpose(data), 'constant'));
 end
 
 % do fft
-data = fft(data,nfft,2);
-data = data/size(data,2);
-data = data(:,1:floor(nfft/2)+1); % make single-sided
+data = fft(data, nfft, 2);
+data = data / nfft;
+data = data(:, 1:floor(nfft / 2) + 1); % make single-sided
 
 % create frequency vector
-f = srate/2*linspace(0,1,floor(nfft/2)+1);
+f = srate / 2 * linspace(0, 1, floor(nfft / 2) + 1);
 
 % convert spectrum
 switch lower(spectrum)
