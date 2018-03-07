@@ -52,7 +52,7 @@ PHZ.region.target3  = [0 0.01];    % onset
 % should be the same length as each epoch, so that the regions of
 %   interest are the same for both
 da = load(stimulus);
-PHZ.etc.stim = da.stim;
+PHZ.lib.stim = da.stim;
 
 %% Split data into epochs
 % 1. First find marker times and get polarity labels
@@ -66,7 +66,7 @@ markerData = phz_create('filename', 'data/filename.mat', ...
     0.05, ...                    % threshold
     0.08 * markerData.srate, ... % timeBetween in samples
     'window',      [-0.04 0.213] * markerData.srate, ... % convert to samples
-    'stimulus',    PHZ.etc.stim, ... % precise times and auto-label polarities
+    'stimulus',    PHZ.lib.stim, ... % precise times and auto-label polarities
     'plotMarkers', false); % ABR has too many trials for reliable plotting here
 
 % 2. Then split the file and label the trials
@@ -80,8 +80,8 @@ PHZ = phz_epoch(PHZ, ...
 PHZ = phz_labels(PHZ, xcorrInfo.labels);
 
 % make sure the stim is the same size as the epoch
-if size(PHZ.etc.stim,2) ~= size(PHZ.data,2)
-    warning('PHZ.etc.stim is not the same length as a trial.')
+if size(PHZ.lib.stim,2) ~= size(PHZ.data,2)
+    warning('PHZ.lib.stim is not the same length as a trial.')
 end
 
 end

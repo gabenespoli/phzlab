@@ -112,8 +112,7 @@ of unique values in that variable. These fields can be used to control the
 colors and types of lines used in plots. See `help plot` for more information
 on MATLAB's plot spec. `PHZ.etc` is for you to put whatever other information
 you would like to keep with this file. PHZLAB doesn't do anything with this
-field (currently the only exception is `PHZ.etc.stim`, which is used by the ABR
-functions).
+field.
 
 <a name="tutorial"></a>
 

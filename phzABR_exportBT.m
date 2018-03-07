@@ -11,8 +11,8 @@
 %   filename    = [string] Filename to save the data as text. Extension
 %                 should be .txt.
 %
-%   'stimulus   = [true|false] Export the waveform in PHZ.etc.stim
-%                   instead. Default false.
+%   'stimulus   = [true|false] Export the waveform in PHZ.lib.stim
+%                 instead. Default false.
 %
 %   'force'     = [0|1|2] See phzUtil_getUniqueSaveName.m.
 %
@@ -74,7 +74,7 @@ for i = 1:2:length(varargin)
 end
 
 if stimulus
-    data = PHZ.etc.stim;
+    data = PHZ.lib.stim;
 
 else
     % data preprocessing

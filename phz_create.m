@@ -118,10 +118,7 @@
 %                   values can be changed using the phz_field function.
 % 
 %   etc           = [struct] Empty structure for user to store data of any
-%                   type. There are some PHZLAB functions that access 
-%                   certain fields from PHZ.etc (e.g., FFR
-%                   stimulus-response correlation), but in general you can 
-%                   do whatever you want here.
+%                   type. 
 % 
 %   history       = [cell] Every time a PHZLAB function is called on this
 %                   file, a new row is added to PHZ.history (using the

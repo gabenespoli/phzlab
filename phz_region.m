@@ -87,9 +87,9 @@ end
 if isempty(region), error('Region is empty.'), end
 
 % restrict ABR stim to same region
-if ismember('stim', fieldnames(PHZ.etc)) && ...
-    length(PHZ.etc.stim) == size(PHZ.data,2)
-    PHZ.etc.stim = PHZ.etc.stim(region);
+if ismember('stim', fieldnames(PHZ.lib)) && ...
+    length(PHZ.lib.stim) == size(PHZ.data,2)
+    PHZ.lib.stim = PHZ.lib.stim(region);
 end
 
 % restrict PHZ.data to specified region
