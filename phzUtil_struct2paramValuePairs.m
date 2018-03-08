@@ -1,4 +1,4 @@
-function C = phzUtil_struct2paramval(S)
+function C = phzUtil_struct2paramValuePairs(S)
 % convert a struct S to a cell of parameter-value pairs C.
 % e.g., the struct
 %       S.name = 'Gabe'
