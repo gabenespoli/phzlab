@@ -2,16 +2,16 @@
 %   Brainstem Toolbox (http://www.brainvolts.northwestern.edu/form/freeware.php)
 %
 % USAGE
-%   phzABR_exportBT(PHZ, filename)
+%   phzABR_exportBT(PHZ)
 %   phzABR_exportBT(PHZ,'Param1','Value1',etc.)
 %
 % INPUT
 %   PHZ         = [struct] PHZLAB data structure.
 %
-%   filename    = [string] Filename to save the data as text. Extension
+%   'filename'  = [string] Filename to save the data as text. Extension
 %                 should be .txt.
 %
-%   'stimulus   = [true|false] Export the waveform in PHZ.lib.stim
+%   'stimulus'  = [true|false] Export the waveform in PHZ.lib.stim
 %                 instead. Default false.
 %
 %   'force'     = [0|1|2] See phzUtil_getUniqueSaveName.m.
@@ -34,7 +34,7 @@
 %   'summary'   = ['add'|'sub'] Calls phzABR_summary.m.
 %
 
-function PHZ = phzABR_exportBT(PHZ, filename, varargin)
+function PHZ = phzABR_exportBT(PHZ, varargin)
 
 if nargout == 0 && nargin == 0, help phzABR_exportToBT, return, end
 PHZ = phz_check(PHZ);
@@ -42,6 +42,7 @@ PHZ = phz_check(PHZ);
 % defaults
 verbose = true;
 force = 0;
+filename = '';
 stimulus = false;
 region = [];
 summaryFunction = 'add';
@@ -70,6 +71,7 @@ for i = 1:2:length(varargin)
         case {'force'},                 force = varargin{i+1};
         case {'summaryfunction','summary'}, summaryFunction = varargin{i+1};
         case {'stimulus','stim'},       stimulus = varargin{i+1};
+        case {'filename','save'},       filename = varargin{i+1};
     end
 end
 
