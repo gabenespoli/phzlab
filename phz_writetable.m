@@ -40,6 +40,8 @@
 %   processing funtions. See the help of each function for more details.
 %   'region'    = Calls phz_region.
 %   'summary'   = Calls phz_summary.
+%   'abrsummary'= Calls phzABR_summary. If specified, this is called 
+%                 before phz_summary.
 % 
 % OUTPUT
 %   d                 = [table] MATLAB table.
@@ -91,6 +93,7 @@ end
 feature = [];
 region = [];
 keepVars = [];
+summaryFunction = '';
 
 unstackVars = [];
 
@@ -123,6 +126,7 @@ for i = 1:2:length(varargin)
         case 'region',                  region = varargin{i+1};
         case {'feature','features'},    feature = varargin{i+1};
         case {'summary','keepvars'},    keepVars = varargin{i+1};
+        case {'abrsummary','summaryfunction'}, summaryFunction = varargin{i+1};
             
         case {'unstack','cast'},        unstackVars = varargin{i+1};
             
@@ -137,6 +141,7 @@ end
 if isempty(feature), error('A feature must be specified.'), end
 if ~iscell(feature), feature = {feature}; end
 if ischar(keepVars), keepVars = cellstr(keepVars); end
+if ~isempty(summaryFunction), PHZ = phzABR_summary(PHZ, summaryFunction, verbose); end
 
 disp('  Calculating features...')
 for i = 1:length(feature)
