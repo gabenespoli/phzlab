@@ -18,7 +18,7 @@ verbose = true;
 region = '';
 plotSpec = {'k', 'b', 'b', 'g', 'r'};
 linewidth = 1.5;
-fontsize = 12;
+fontsize = 14;
 if ismember('epoch', fieldnames(PHZ.proc))
     xl = PHZ.proc.epoch.extractWindow;
 else
