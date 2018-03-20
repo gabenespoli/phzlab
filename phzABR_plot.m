@@ -3,11 +3,66 @@
 %   These signals are the stimulus, the regular trials, the inverted
 %   trials, the EFR (adding the two polarities) and the FFR (subtracting
 %   the two polarities. Usage is similar to phz_plot.
+%
+% Usage:
+%   phzABR_plot(PHZ, 'Param', Value, etc.)
+%
+% Input:
+%   PHZ           = PHZLAB data structure of ABR data. Should have the
+%                   PHZ.lib.stim field with the stimulus waveform.
+%
+%   'region'      = [string] Calls phz_region when making the spectral
+%                   plots, but not the time-domain plots. Default is the
+%                   whole epoch.
+%
+%   'yl', 'xl'    = [numeric 1x2] Axis limits for the time domain plots
+%                   on the left-hand side. 
+%   
+%   'ylf', xlf'   = [numeric 1x2] Axis limits for the spectral plots
+%                   on the right-hand side.
+%   
+%   'linewidth'   = [numeric] Specify the width of the plotted lines in
+%                   pixels. Default 1.5.
+%
+%   'fontsize'    = [numeric] Specify the font size of titles. Default 14.
+%   
+%   'plotspec'    = [cell 1x5] Specify the colour and line type for the 5
+%                   plots. See `help plot` for a list of possibilities.
+%                   Default {'k', 'b', 'b', 'g', 'r'}, which makes the
+%                   stimulus black, the regular and inverted trials blue,
+%                   the EFR (adding) green, and the FFR (subtracting) red.
+%
+%   'pretty'      = [true|false] Makes the background white and removes the  
+%                   top x-axis and right y-axis, making plots look more
+%                   "presentation-ready". Default false.
+%
+%   These are executed in the order that they appear in the function call. 
+%   See the help of each function for more details.
+%   'subset'    = Calls phz_subset.
+%   'rectify'   = Calls phz_rect.
+%   'filter'    = Calls phz_filter.
+%   'smooth'    = Calls phz_smooth.
+%   'transform' = Calls phz_transform.
+%   'blsub'     = Calls phz_blsub.
+%   'reject'    = Calls phz_reject.
+%   'norm'      = Calls phz_norm.
+
+% Copyright (C) 2018 Gabriel A. Nespoli, gabenespoli@gmail.com
+% 
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% 
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+% 
+% You should have received a copy of the GNU General Public License
+% along with this program.  If not, see http://www.gnu.org/licenses/.
 
 function phzABR_plot(PHZ, varargin)
-
-% time domain plots always show whole epoch; if region arg is used, only
-% the spectrum is restricted to this region
 
 if length(PHZ.trials) ~= 2
     error('Must have exactly 2 trial types (usually regular and inverted)')
