@@ -82,8 +82,8 @@ in this dataset. For example, if there are 6 different trials in this dataset
 from two different participants, maybe
 `PHZ.lib.tags.participant = [1 1 1 2 2 2]`,
 which means that `PHZ.participant = [1 2]`. These fields are automatically
-created by PHZLAB (in phz_check.m). If you wish to manually edit some tags,
-edit the vectors in `PHZ.lib.tags` and then run phz_check.
+created by PHZLAB (in `phz_check.m`). If you wish to manually edit some tags,
+edit the vectors in `PHZ.lib.tags` and then run `phz_check`.
 
 The **data** fields contain the actual data and some information pertaining
 specifically to them. `PHZ.data` is the actual data, and is a trials (rows) by
@@ -172,7 +172,7 @@ already have the start time for each epoch. You must also specify the window
 around each start time to extract. All epochs must be the same length. (Given
 the diversity of ways of recording epoch times, PHZLAB does not have a "catch
 all" way of extracting them, but it does have a couple of helper functions. See
-phzUtil_findAudioMarkers.m and phzBiopac_readJournalMarkers.m.)
+`phzUtil_findAudioMarkers.m` and `phzBiopac_readJournalMarkers.m.`)
 ```matlab
 % times is a vector of start times in samples
 PHZ = phz_epoch(PHZ, times, [-1 5]);
@@ -277,14 +277,14 @@ Take the mean from a specific time region:
 phz_plot(PHZ, ...
          'summary', {'group', 'trials'}, ...
          'feature', 'mean', ...
-         'region', [0 4])
+         'region',  [0 4])
 
 % use the region fields
 PHZ.region.target = [0 4];
 phz_plot(PHZ, ...
          'summary', {'group', 'trials'}, ...
          'feature', 'mean', ...
-         'region', 'target')
+         'region',  'target')
 ```
 
 See what it would look like with a different rejection threshold:
@@ -292,8 +292,8 @@ See what it would look like with a different rejection threshold:
 phz_plot(PHZ, ...
          'summary', {'group', 'trials'}, ...
          'feature', 'mean', ...
-         'region', [0 4], ...
-         'reject', 0.1)
+         'region',  [0 4], ...
+         'reject',  0.1)
 ```
 
 <a name="tutorial-exporting"></a>
@@ -304,9 +304,9 @@ Use the same input argument structure as your call to phz_plot to write those
 data to a csv file. Just add a filename argument.
 ```matlab
 phz_writetable(PHZ, ...
-               'summary', {'group', 'trials'}, ...
-               'feature', 'mean', ...
-               'region', [0 4], ...
+               'summary',  {'group', 'trials'}, ...
+               'feature',  'mean', ...
+               'region',   [0 4], ...
                'filename', 'mydata.csv')
 ```
 
@@ -363,8 +363,8 @@ examples.
 ### 3.v Specialty Functions
 - `phzABR_equalizeTrials`: Equalize the number of trials of each polarity.
 - `phzABR_summary`: Add or subtract polarities.
-- `phzABR_plot`: Summary plot for ABR data (coming soon).
-- `phz_BTexport`: Export data to [Brainstem Toolbox](http://www.brainvolts.northwestern.edu/) (coming soon).
+- `phzABR_plot`: Summary plot for ABR data.
+- `phz_BTexport`: Export data to [Brainstem Toolbox](http://www.brainvolts.northwestern.edu/).
 - `phzBiopac_transform`: Convert data by gain and desired units.
 - `phzBiopac_readJournalMarkers`: Read marker times from Biopac AcqKnowledge journal text.
 - `phzUtil_findAudioMarkers`: Search for audio onsets in a signal.
