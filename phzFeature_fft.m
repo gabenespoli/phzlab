@@ -12,14 +12,15 @@
 %       help phzUtil_fft explanation of the options.
 %
 %   Options can be stored as a struct in PHZ.lib.fft. This allows you to
-%       control the FFT when it is called from phz_plot or phz_writetable.
-%       For example, to use the power spectrum instead of the default
-%       amplitude spectrum, add the following to the PHZ structure:
+%       control the FFT when it is called from phz_plot, phz_writetable,
+%       or phz_feature for spectral features. For example, to use the
+%       power spectrum instead of the default amplitude spectrum, add the
+%       following to the PHZ structure:
 %
 %       PHZ.lib.fft.spectrum = 'power'
 %
-%       If you wish to override this setting later, adding a parameter-
-%       value pair to the phzFeature_fft call will do it.
+%       If you wish to override the settings in PHZ.lib.fft, adding a
+%       parameter-value pair to the phzFeature_fft call will do it.
 %
 % OUTPUT
 %   PHZ.data      = [numeric] Spectral data.
