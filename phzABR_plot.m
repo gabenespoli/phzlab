@@ -15,10 +15,10 @@
 %                   plots, but not the time-domain plots. Default is the
 %                   whole epoch.
 %
-%   'yl', 'xl'    = [numeric 1x2] Axis limits for the time domain plots
+%   'ylt', 'xlt'  = [numeric 1x2] Axis limits for the time domain plots
 %                   on the left-hand side. 
 %   
-%   'ylf', xlf'   = [numeric 1x2] Axis limits for the spectral plots
+%   'ylf', 'xlf'  = [numeric 1x2] Axis limits for the spectral plots
 %                   on the right-hand side.
 %   
 %   'linewidth'   = [numeric] Specify the width of the plotted lines in
@@ -75,11 +75,11 @@ plotSpec = {'k', 'b', 'b', 'g', 'r'};
 linewidth = 1.5;
 fontsize = 14;
 if ismember('epoch', fieldnames(PHZ.proc))
-    xl = PHZ.proc.epoch.extractWindow;
+    xlt = PHZ.proc.epoch.extractWindow;
 else
-    xl = [];
+    xlt = [];
 end
-yl = [-1 1] * 30;
+ylt = [-1 1] * 30;
 ylf = [0 1]; % "f" for freq domain plots
 xlf = [0 1000];
 pretty = false;
@@ -108,10 +108,10 @@ for i = 1:2:length(varargin)
         case {'plotspec'},              plotSpec = varargin{i+1};
         case {'linewidth','lineweight'},linewidth = varargin{i+1};
         case 'fontsize',                fontsize = varargin{i+1};
-        case {'yl','ylim'},             yl = varargin{i+1};
-        case {'xl','xlim'},             xl = varargin{i+1};
-        case {'ylf'},                   ylf = varargin{i+1};
-        case {'xlf'},                   xlf = varargin{i+1};
+        case {'yl','ylim','ylt','yll'}, ylt = varargin{i+1};
+        case {'xl','xlim','xlt','xll'}, xlt = varargin{i+1};
+        case {'ylf','ylr'},             ylf = varargin{i+1};
+        case {'xlf','xlr'},             xlf = varargin{i+1};
         case 'pretty',                  pretty = varargin{i+1};
         case 'dark',                    dark = varargin{i+1};
     end
@@ -176,7 +176,7 @@ for i = 1:5
     subplot(5,2,plots(i))
     plot(PHZ.times, data{i}, plotSpec{i}, 'LineWidth', linewidth)
     ylabel(ytitle{i})
-    if ~isempty(xl), xlim(xl), end
+    if ~isempty(xlt), xlim(xlt), end
     if plots(i) == 1
         if dark
             title('Time Domain', 'color', [1 1 1] * 0.7)
@@ -184,7 +184,7 @@ for i = 1:5
             title('Time Domain')
         end
     else
-        ylim(yl)
+        ylim(ylt)
     end
     if plots(i) == 9
         xlabel('Time (s)')
