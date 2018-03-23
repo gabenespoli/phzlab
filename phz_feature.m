@@ -250,6 +250,7 @@ switch lower(featureStr)
 
         % transform each vector to a unit vector (magnitude of 1)
         PHZ.data = PHZ.data ./ abs(PHZ.data);
+        PHZ.data(isnan(PHZ.data)) = 0;
 
         % summarize (adding 'participant' to summary if it isn't already)
         if any(ismember({'participant','all','none'}, keepVars))
