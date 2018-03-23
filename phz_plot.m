@@ -1,9 +1,10 @@
-%PHZ_PLOT  Plot data from PHZ and PHZS structures.
+%PHZ_PLOT  Plot data from PHZ structures.
 % 
-% USAGE    
-%   PHZ_PLOT(PHZ,'Param1',Value1,etc.)
+% Usage:
+%   phz_plot(PHZ, 'Param1', Value1, etc.)
+%   phz_plot(PHZ, preset, 'Param1', Value1, etc.)
 % 
-% INPUT   
+% Input:
 %   PHZ           = [struct] PHZLAB data structure.
 %
 %   preset        = [string] Presets can be specified in PHZ.lib.plots by
@@ -21,6 +22,7 @@
 %   'dispn'       = [1|0] Display the number of trials or participants
 %                   included in each line or bar plotted. Enter 
 %                   'participant', 'trials', 'both', or 'none'.
+%                   Currently doesn't work.
 % 
 %   'legend'      = [string] For line plots, specify the location of the 
 %                   legend Enter 'nw' (default) for top-left, etc., 
@@ -126,13 +128,11 @@ region = [];
 feature = [];
 keepVars = {'none'};
 summaryFunction = '';
-
 do_plotsmooth = false;
 dispn = 'none';
 legendLoc = 'nw';
 linewidth = 2;
 fontsize = 14;
-
 yl = [];
 xl = [];
 sameyl = [];
@@ -142,11 +142,8 @@ simpleytitle = false;
 do_title = true;
 do_close = false;
 plotall = false;
-
 filename = '';
-
 verbose = true;
-
 sigstarVars = [];
 
 % user presets
@@ -172,38 +169,37 @@ if any(strcmp(varargin(1:2:end),'verbose'))
 end
 
 for i = 1:2:length(varargin)
+    val = varargin{i+1};
     switch lower(varargin{i})
-        case 'subset',                  PHZ = phz_subset(PHZ,varargin{i+1},verbose);
-        case {'rect','rectify'},        PHZ = phz_rectify(PHZ,varargin{i+1},verbose);
-        case {'filter','filt'},         PHZ = phz_filter(PHZ,varargin{i+1},'verbose',verbose);
-        case {'smooth','smoothing'},    PHZ = phz_smooth(PHZ,varargin{i+1},verbose);
-        case 'transform',               PHZ = phz_transform(PHZ,varargin{i+1},verbose);
-        case {'blsub','blc'},           PHZ = phz_blsub(PHZ,varargin{i+1},verbose);
-        case {'rej','reject'},          PHZ = phz_reject(PHZ,varargin{i+1},verbose);
-        case {'norm','normtype'},       PHZ = phz_norm(PHZ,varargin{i+1},verbose);
-        
-        case 'region',                  region = varargin{i+1};
-        case 'feature',                 feature = varargin{i+1};
-        case {'summary','keepvars'},    keepVars = varargin{i+1};
-        case {'abrsummary','summaryfunction'}, summaryFunction = varargin{i+1};
-            
-        case {'plotsmooth'},            do_plotsmooth = varargin{i+1};
-        case {'dispn','n'},             dispn = varargin{i+1};    
-        case {'legend','legendloc'},    legendLoc = varargin{i+1};            
-        case {'linewidth','lineweight'},linewidth = varargin{i+1};
-        case 'fontsize',                fontsize = varargin{i+1};
-        case {'yl','ylim','ylt','ylf'}, yl = varargin{i+1};
-        case {'xl','xlim','xlt','xlf'}, xl = varargin{i+1};
-        case 'sameyl',                  sameyl = varargin{i+1};
-        case 'pretty',                  pretty = varargin{i+1};
-        case 'dark',                    dark = varargin{i+1};
-        case 'simpleytitle',            simpleytitle = varargin{i+1};
-        case {'do_title','title'},      do_title = varargin{i+1};
-        case {'plotall','all'},         plotall = varargin{i+1};
-        case {'filename','save','file'},filename = varargin{i+1};
-        case {'close'},                 do_close = varargin{i+1};
-            
-        case 'sigstar',                 sigstarVars = varargin{i+1};
+        case 'subset',                          PHZ = phz_subset(PHZ,val,verbose);
+        case {'rect','rectify'},                PHZ = phz_rectify(PHZ,val,verbose);
+        case {'filter','filt'},                 PHZ = phz_filter(PHZ,val,'verbose',verbose);
+        case {'smooth','smoothing'},            PHZ = phz_smooth(PHZ,val,verbose);
+        case 'transform',                       PHZ = phz_transform(PHZ,val,verbose);
+        case {'blsub','blc'},                   PHZ = phz_blsub(PHZ,val,verbose);
+        case {'rej','reject'},                  PHZ = phz_reject(PHZ,val,verbose);
+        case {'norm','normtype'},               PHZ = phz_norm(PHZ,val,verbose);
+        case 'region',                          region = val;
+        case 'feature',                         feature = val;
+        case {'summary','keepvars'},            keepVars = val;
+        case {'abrsummary','summaryfunction'},  summaryFunction = val;
+        case {'plotsmooth'},                    do_plotsmooth = val;
+        case {'dispn','n'},                     dispn = val;    
+        case {'legend','legendloc'},            legendLoc = val;            
+        case {'linewidth','lineweight'},        linewidth = val;
+        case 'fontsize',                        fontsize = val;
+        case {'yl','ylim','ylt','ylf'},         yl = val;
+        case {'xl','xlim','xlt','xlf'},         xl = val;
+        case 'sameyl',                          sameyl = val;
+        case 'pretty',                          pretty = val;
+        case 'dark',                            dark = val;
+        case 'simpleytitle',                    simpleytitle = val;
+        case {'do_title','title'},              do_title = val;
+        case {'plotall','all'},                 plotall = val;
+        case {'filename','save','file'},        filename = val;
+        case {'close'},                         do_close = val;
+        case 'sigstar',                         sigstarVars = val;
+        otherwise, warning(['Unknown parameter ', varargin{i}])
     end
 end
 

@@ -129,9 +129,7 @@ for i = 1:2:length(varargin)
         case {'blsub','blc'},           PHZ = phz_blsub(PHZ,varargin{i+1},verbose);
         case {'rej','reject'},          PHZ = phz_reject(PHZ,varargin{i+1},verbose);
         case {'norm','normtype'},       PHZ = phz_norm(PHZ,varargin{i+1},verbose);
-
         case 'region',                  region = varargin{i+1};
-
         case {'plotspec'},              plotSpec = varargin{i+1};
         case {'linewidth','lineweight'},linewidth = varargin{i+1};
         case 'fontsize',                fontsize = varargin{i+1};
