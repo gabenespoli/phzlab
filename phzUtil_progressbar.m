@@ -1,9 +1,9 @@
 %PHZUTIL_PROGRESSBAR  Text progress bar in the command window.
 % 
-% USAGE
+% Usage:
 %   w = phzUtil_progressbar(w,val,str)
 % 
-% INPUT
+% Input:
 %   w     = [string] Pass an empty value ('') to initiate the progress bar.
 %           This function will return a value for w (the number of
 %           characters to delete on the next loop), so pass that value in
@@ -16,12 +16,12 @@
 %   str   = [string] Optional text to display on the line above the
 %           progress bar. 
 % 
-% OUTPUT
-% 
+% Output:
 %   w     = The string that was printed for the current update of the
 %           progress bar. Pass this variable in on the next loop so that
 %           the function knows how many characters to delete before
 %           printing the next progress update.
+%
 
 % Copyright (C) 2018 Gabriel A. Nespoli, gabenespoli@gmail.com
 % 
@@ -40,6 +40,8 @@
 
 function w = phzUtil_progressbar(w,val,str)
 
+waitchar = '=';
+
 if nargin < 3
     str = '';
     extraChars = 1;
@@ -55,7 +57,7 @@ if usejava('desktop') % using matlab gui
     pct = num2str(floor(val * 100));
     pct = [repmat(' ',1,3-length(pct)),pct,'%% '];
 
-    w = ['[',repmat('.',1,dot),repmat(' ',1,20 - dot) '] ',pct];
+    w = ['[',repmat(waitchar,1,dot),repmat(' ',1,20 - dot) '] ',pct];
     w = [str w '\n'];
 
     fprintf([del w])
@@ -72,7 +74,7 @@ else % using -nodisplay option to run matlab in a terminal
 
     dot = floor(val * 20);
     if dot > w
-        fprintf('%s', repmat('.', 1, dot - w))
+        fprintf('%s', repmat(waitchar, 1, dot - w))
         w = dot;
     end
 
