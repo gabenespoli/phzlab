@@ -62,7 +62,7 @@ fftopts = [{'units', PHZ.units} fftopts];
 % get default fft options from PHZ.lib.fft
 if ismember('fft', fieldnames(PHZ.lib))
     % put varargin 2nd, so that they override the defaults in PHZ.lib.fft
-    fftopts = [phzUtil_struct2paramValuePairs(PHZ.lib.fft) fftopts];
+    fftopts = [phzUtil_struct2pairs(PHZ.lib.fft) fftopts];
 end
 
 % call phzUtil_fft with parts of PHZ, passing all options

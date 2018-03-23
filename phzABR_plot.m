@@ -150,7 +150,7 @@ ytitle = {'Stimulus', ...
 PHZ2 = phz_region(PHZ, region);
 fftopts = {'units', PHZ2.units};
 if ismember('fft', fieldnames(PHZ.lib))
-    fftopts = [fftopts, phzUtil_struct2paramValuePairs(PHZ.lib.fft)];
+    fftopts = [fftopts, phzUtil_struct2pairs(PHZ.lib.fft)];
 end
 
 reg = PHZ2.data(1,:) - mean(PHZ2.data(1,:));

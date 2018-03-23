@@ -1,4 +1,4 @@
-function C = phzUtil_struct2paramValuePairs(S)
+function C = phzUtil_struct2pairs(S)
 % Convert a struct S to a cell of parameter-value pairs C.
 % If the input is already an even-length cell vector, it is just returned.
 % e.g., the struct
