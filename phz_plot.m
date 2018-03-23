@@ -75,15 +75,14 @@
 %   'feature'   = Calls phz_feature and makes bar plots instead of line
 %                 plots (excepting FFT and ITPC).
 % 
+%   'abrsummary'= Calls phzABR_summary.
+% 
 %   'summary'   = Calls phz_summary. The default summary is 'all', which 
 %                 averages across all trials. A maximum of 2 summary 
 %                 variables can be specified; the first is plotted as 
 %                 separate lines/bars, and the second is plotted across
 %                 separate plots.
 %
-%   'abrsummary' = Calls phzABR_summary. If specified, this is called
-%                 before phz_summary.
-% 
 % OUTPUT 
 %   A new figure is created and the specified plot is displayed.
 % 
