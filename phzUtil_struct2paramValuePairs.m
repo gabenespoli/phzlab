@@ -1,13 +1,23 @@
 function C = phzUtil_struct2paramValuePairs(S)
-% convert a struct S to a cell of parameter-value pairs C.
+% Convert a struct S to a cell of parameter-value pairs C.
+% If the input is already an even-length cell vector, it is just returned.
 % e.g., the struct
 %       S.name = 'Gabe'
 %       S.id = 3
 % becomes
 %       C = {'name', 'Gabe', 'id', 3}
 
-if ~isstruct(S)
+if iscell(S) && isvector(S)
+    if mod(length(S), 2) == 0
+        C = S;
+        return
+    else
+        error('There are an odd number arguments in parameter-value pairs')
+    end
+
+elseif ~isstruct(S)
     error('Input must be a struct.')
+
 end
 
 names = fieldnames(S);
