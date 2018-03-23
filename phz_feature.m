@@ -74,9 +74,9 @@
 %                   cross-correlation between each epoch and a stimulus
 %                   waveform. The stimulus waveform must be provided in
 %                   PHZ.lib.stim and must be the same length as a single
-%                   trial. SRC is usually used for FFR data. Note that SRC 
+%                   trial. SRC is usually used for ABR data. Note that SRC 
 %                   will operate on each row of PHZ.data. If you are 
-%                   dealing with FFR responses, you probably want to
+%                   dealing with ABR responses, you probably want to
 %                   average across trials first (e.g., with phz_summary)
 %                   before calculating src.
 % 
@@ -281,7 +281,7 @@ switch lower(featureStr)
         PHZ.data = phzFeature_src(PHZ.data,PHZ.lib.stim,PHZ.srate,val);
 
         % note: SRC will operate on each row of PHZ.data (i.e. each trial).
-        %   If you are dealing with FFR responses, you don't want each
+        %   If you are dealing with ABR responses, you don't want each
         %   trial to actually be a single trial, but rather the averaged
         %   response of many trials from a single participant or condition.
         %   This comment also applies to 'srclag'.
