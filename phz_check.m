@@ -654,7 +654,10 @@ PHZ = orderfields(PHZ,mainOrder);
 libOrder = {
     'tags'
     'spec'
+
     'fft'
+    'plots'
+    'abrplots'
     'stim'
     
     'filename'

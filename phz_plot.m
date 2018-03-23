@@ -5,6 +5,16 @@
 % 
 % INPUT   
 %   PHZ           = [struct] PHZLAB data structure.
+%
+%   preset        = [string] Presets can be specified in PHZ.lib.plots by
+%                   creating a field there (e.g., PHZ.lib.plots.plot1).
+%                   Default settings for this plot can be specified like
+%                   so: PHZ.lib.plots.plot1.smooth = 1. Putting the name
+%                   of the preset as the second argument (in this case
+%                   'plot1') is the same as inserting those arguments as
+%                   parameter-value pairs. Add other arguments after to
+%                   override the preset's default. The special preset
+%                   'default' applies if no preset is specified.
 % 
 %   'smooth'      = [1|0] For line plots, apply a moving point average.
 % 
@@ -111,7 +121,7 @@ function phz_plot(PHZ,varargin)
 if nargout == 0 && nargin == 0, help phz_plot, return, end
 PHZ = phz_check(PHZ);
 
-% defaults
+% phzlab defaults
 region = [];
 feature = [];
 keepVars = {'none'};
@@ -138,6 +148,21 @@ filename = '';
 verbose = true;
 
 sigstarVars = [];
+
+% user presets
+if mod(length(varargin), 2) % if varargin is odd
+    if ismember('plots', fieldnames(PHZ.lib)) && ...
+        ismember(varargin{1}, fieldnames(PHZ.lib.plots))
+
+        preset = phzUtil_struct2pairs(PHZ.lib.plots.(varargin{1}));
+        varargin(1) = [];
+        varargin = [preset varargin];
+
+    else
+        error(['Either the preset doesn''t exist in PHZ.lib.plots', ...
+              ' or there are an invalid number of arguments.'])
+    end
+end
 
 % user-defined
 if any(strcmp(varargin(1:2:end),'verbose'))

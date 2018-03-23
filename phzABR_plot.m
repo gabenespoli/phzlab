@@ -6,10 +6,14 @@
 %
 % Usage:
 %   phzABR_plot(PHZ, 'Param', Value, etc.)
+%   phzABR_plot(PHZ, preset, 'Param', Value, etc.)
 %
 % Input:
 %   PHZ           = PHZLAB data structure of ABR data. Should have the
 %                   PHZ.lib.stim field with the stimulus waveform.
+%
+%   preset        = [string] Use this preset from PHZ.lib.abrplots.
+%                   See help phz_plot for details.
 %
 %   'region'      = [string] Calls phz_region when making the spectral
 %                   plots, but not the time-domain plots. Default is the
@@ -71,7 +75,7 @@ if length(PHZ.trials) ~= 2
     error('Must have exactly 2 trial types (usually regular and inverted)')
 end
 
-% defaults
+% phzlab defaults
 verbose = true;
 region = '';
 plotSpec = {'k', 'b', 'b', 'g', 'r'};
@@ -88,6 +92,25 @@ xlf = [0 1000];
 pretty = false;
 dark = false;
 titletext = '';
+
+% user presets
+if mod(length(varargin), 2) % if varargin is odd
+    preset = varargin{1};
+    varargin(1) = [];
+    disp('even')
+else
+    preset = 'default';
+end
+if ismember('abrplots', fieldnames(PHZ.lib)) && ...
+    ismember(preset, fieldnames(PHZ.lib.abrplots))
+
+    preset = phzUtil_struct2pairs(PHZ.lib.abrplots.(preset));
+    varargin = [preset varargin];
+
+elseif ~strcmpi(preset, 'default')
+    error(['Either the preset doesn''t exist in PHZ.lib.abrplots', ...
+          ' or there are an invalid number of arguments.'])
+end
 
 % user-defined
 if any(strcmp(varargin(1:2:end),'verbose'))
