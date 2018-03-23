@@ -157,6 +157,7 @@ for j = 1:length(files)
         
         PHZS.proc = [];
         PHZS.proc.combine{j} = PHZ.proc;
+        PHZS.etc.combine{j} = PHZ.etc;
 
         continue
     end    
@@ -178,6 +179,7 @@ for j = 1:length(files)
     
     % proc field
     PHZS.proc.combine{j} = PHZ.proc;
+    PHZS.etc.combine{j} = PHZ.etc;
     
     % basic fields (strings)
     PHZS.lib.files{j} = currentFile;
