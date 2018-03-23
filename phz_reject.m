@@ -123,13 +123,16 @@ end
 PHZ.proc.reject.threshold = threshold;
 PHZ.proc.reject.units = units;
 PHZ.proc.reject.keep = ~ind;
+
+rejratestr = [num2str(round(phz_rejrate(PHZ, '%'), 1)), '%'];
+trialrejstr = [num2str(sum(ind)),' / ', num2str(length(ind)), ' trials'];
+
+PHZ.proc.reject.rejrate = [trialrejstr, ' (', rejratestr, ')'];
 PHZ.proc.reject.discarded = false;
 
 % add to PHZ.history
 PHZ = phz_history(PHZ,['Threshold of ', historyThreshold, ' marked ', ...
-    num2str(sum(ind)),' / ', num2str(length(ind)), ...
-    ' trials for rejection (', ...
-    num2str(round(phz_rejrate(PHZ,'%'),1)), '%).'], verbose);
+    trialrejstr, ' for rejection (', rejratestr, ').'], verbose);
     
 end
 
