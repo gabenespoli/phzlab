@@ -1,15 +1,26 @@
-%PHZFEATURE_ITRC  Inter-trial Response Consitency (usually for FFR data)
-%   R = FFR_ITRC(FFR) takes the average of half the trials and calculates
-%       the cross-correlation with the average of the other half of trials.
-%       This is repeated 100 times (default) with different random
-%       samplings. The mean of the resulting correlations is returned as a
-%       measure of ITRC. If there are two polarities specified in FFR.pols,
-%       FFR_ITRC ensures that each random sample has an equal number of
-%       each polarity.
+%PHZFEATURE_ITRC  Inter-trial Response Consitency (usually for ABR data).
+%   Takes the average of half the trials and calculates the
+%   cross-correlation with the average of the other half of trials. This
+%   is repeated with many different random samplings. The mean of the
+%   resulting correlations is returned as a measure of ITRC.
 %
-%   R = FFR_ITRC(FFR,REPS) additionally specifies the number of random
-%       samplings (default 100).
+% Usage:
+%   r = phzFeature_itrc(PHZ, reps, equalizeTrials)
 %
+% Input:
+%   PHZ   = [struct] PHZLAB data structure.
+%
+%   reps  = [numeric] Number of times to repeat sampling. Default 100.
+%           You can set this by doing PHZ.lib.itrc.reps = 100 too.
+%
+%   equalizeTrials = [true|false] Make sure there are an equal number of
+%           each trial type in each average. There must be exactly two
+%           trial types for this to work. Default true. You can set this
+%           to false by setting PHZ.lib.itrc.equalizeTrials = false.
+%
+% Output:
+%   r       = [numeric] Average of a REPS number of cross-correlations.
+%   
 % Adapted from Tierney & Kraus, 2013, Journal of Neuroscience.
 
 % Copyright (C) 2018 Gabriel A. Nespoli, gabenespoli@gmail.com
@@ -27,77 +38,80 @@
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see http://www.gnu.org/licenses/.
 
-function r = phzFeature_itrc(FFR,varargin)
+function r = phzFeature_itrc(PHZ, reps, equalizeTrials)
 
-% defaults
-reps = 100;
-
-% check input arguments
 if nargin == 0 && nargout == 0, help phzFeature_itrc, return, end
-if nargin > 1
-    if ~isempty(varargin{1}) && ~isnan(varargin{1})
-        reps = varargin{1};
+if nargin < 2 || isempty(reps)
+    if ismember('itrc', fieldnames(PHZ.lib)) && ...
+        ismember('reps', fieldnames(PHZ.lib.itrc))
+        reps = PHZ.lib.itrc.reps;
+    else
+        reps = 100;
+    end
+end
+if nargin < 3 || isempty(equalizeTrials)
+    if ismember('itrc', fieldnames(PHZ.lib)) && ...
+        ismember('equalizeTrials', fieldnames(PHZ.lib.itrc))
+        equalizeTrials = PHZ.lib.itrc.equalizeTrials;
+    else
+        equalizeTrials = true;
     end
 end
 
-% if 2 polarities, separate polarities
-p = unique(FFR.pols);
-if length(p) == 2
-    pol1=FFR.data(FFR.pols == p(1),:);
-    pol2=FFR.data(FFR.pols == p(2),:);
-elseif length(p) == 1
-    pol1=FFR.data;
-else
-    error('There are an unusual number of polarities. Cannot calculate ITRC.')
+% separate polarities if equalizing trials
+if equalizeTrials 
+    if length(PHZ.trials) == 2
+        reg = PHZ.data(PHZ.lib.tags.trials == PHZ.trials(1), :);
+        inv = PHZ.data(PHZ.lib.tags.trials == PHZ.trials(2), :);
+
+    elseif length(PHZ.trials) == 1
+        warning('There is only one trial type. Not equalizing polarities.')
+        equalizeTrials = false;
+
+    else
+        error('There are an invalid number of trials for equalizing trials.')
+
+    end
 end
 
 % create output container
-r = nan(reps,1);
+r = nan(reps, 1);
 
-% create waitbar
-h = waitbar(0,['Calculating inter-trial response consistency (',num2str(FFR.trials),' trials)...']);
-
+w = '';
 for i = 1:reps % loop for x random samplings
-    switch length(p)
-        case 2
-            % split each polarity into two randomly-selected samples
-            [sample1A,sample1B] = get2randomSamples(pol1);
-            [sample2A,sample2B] = get2randomSamples(pol2);
-            
-            % average waveforms in each sample
-            sample1 = mean([sample1A; sample2A],1);
-            sample2 = mean([sample1B; sample2B],1);
-            
-        case {0,1}
-            [sample1,sample2] = get2randomSamples(FFR.data);
-            sample1 = mean(sample1,1);
-            sample2 = mean(sample2,1);
-            
-        otherwise
-            error('More than 2 polarities specified.')
+    w = phzUtil_progressbar(w, i / reps, ...
+        'Calculating inter-trial response consistency...');
+
+    if equalizeTrials
+
+        % split each polarity into two randomly-selected samples
+        [reg1, reg2] = get2randomSamples(reg);
+        [inv1, inv2] = get2randomSamples(inv);
+
+        % average waveforms in each sample
+        sample1 = mean([reg1; inv1], 1);
+        sample2 = mean([reg2; inv2], 1);
+
+    else
+        % split data into two randomly-selected samples and average them
+        [sample1, sample2] = get2randomSamples(PHZ.data);
+        sample1 = mean(sample1, 1);
+        sample2 = mean(sample2, 1);
+
     end
-    
+
     % cross-correlate the average waveforms at lag zero
-    C = xcorr(sample1,sample2,0,'coeff');
-    
-    % fill output container
-    r(i) = C;
-    
-    % update waitbar
-    waitbar(i/reps,h)
-    
+    r(i) = xcorr(sample1, sample2, 0, 'coeff');
+
 end
 
 % average output containers
 r = mean(r);
 
-% close waitbar
-close(h)
-
 end
 
-function [sample1,sample2] = get2randomSamples(data)
-ind = randperm(size(data,1));
-sample1 = data(ind(1:floor(length(ind)/2)),:);
-sample2 = data(ind(ceil(1+length(ind)/2):end),:);
+function [sample1, sample2] = get2randomSamples(data)
+ind = randperm(size(data, 1));
+sample1 = data(ind(1:floor(length(ind) / 2)), :);
+sample2 = data(ind(ceil(1 + length(ind) / 2):end), :);
 end
