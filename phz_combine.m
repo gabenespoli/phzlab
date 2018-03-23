@@ -156,7 +156,7 @@ for j = 1:length(files)
             PHZ.lib = rmfield(PHZ.lib, 'filename'); end
         
         PHZS.proc = [];
-        PHZS.proc.pre{j} = PHZ.proc;
+        PHZS.proc.combine{j} = PHZ.proc;
 
         continue
     end    
@@ -177,7 +177,7 @@ for j = 1:length(files)
     end
     
     % proc field
-    PHZS.proc.pre{j} = PHZ.proc;
+    PHZS.proc.combine{j} = PHZ.proc;
     
     % basic fields (strings)
     PHZS.lib.files{j} = currentFile;
