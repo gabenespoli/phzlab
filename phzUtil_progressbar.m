@@ -63,8 +63,8 @@ if usejava('desktop') % using matlab gui
 else % using -nodisplay option to run matlab in a terminal
 
     if isempty(w)
-        % fprintf('%s\n', str)
-        % fprintf('[%s]\n', repmat(' ', 1, 20))
+        fprintf('  %s\n', str(1:end-2)) % \n has already been appended
+        fprintf('  [%s]\n', repmat(' ', 1, 20))
         fprintf('  [')
         w = 0;
         return
