@@ -10,13 +10,13 @@
 % Input:
 %   PHZ   = [struct] PHZLAB data structure.
 %
-%   reps  = [numeric] Number of times to repeat sampling. Default 100.
-%           You can set this by doing PHZ.lib.itrc.reps = 100 too.
+%   reps  = [numeric] Number of times to repeat sampling. You can control
+%           this by setting PHZ.lib.itrc.reps. Default 100.
 %
 %   equalizeTrials = [true|false] Make sure there are an equal number of
 %           each trial type in each average. There must be exactly two
-%           trial types for this to work. Default true. You can set this
-%           to false by setting PHZ.lib.itrc.equalizeTrials = false.
+%           trial types for this to work. You can control this by setting
+%           PHZ.lib.itrc.equalizeTrials. Default true.
 %
 % Output:
 %   r       = [numeric] Average of a REPS number of cross-correlations.
