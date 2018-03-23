@@ -36,6 +36,9 @@
 %                   top x-axis and right y-axis, making plots look more
 %                   "presentation-ready". Default false.
 %
+%   'title'       = [string] Add a title to the top center of the figure.
+%                   Default empty ('') for no title.
+%
 %   These are executed in the order that they appear in the function call. 
 %   See the help of each function for more details.
 %   'subset'    = Calls phz_subset.
@@ -84,6 +87,7 @@ ylf = [0 1]; % "f" for freq domain plots
 xlf = [0 1000];
 pretty = false;
 dark = false;
+titletext = '';
 
 % user-defined
 if any(strcmp(varargin(1:2:end),'verbose'))
@@ -114,6 +118,7 @@ for i = 1:2:length(varargin)
         case {'xlf','xlr'},             xlf = varargin{i+1};
         case 'pretty',                  pretty = varargin{i+1};
         case 'dark',                    dark = varargin{i+1};
+        case {'title','titletext'},     titletext = varargin{i+1};
     end
 end
 
@@ -223,6 +228,15 @@ end
 
 if pretty, set(gcf,'color','w'), end
 if dark, set(gcf,'color','k'), end
+if ~isempty(titletext)
+    ax=axes('Units',    'Normal', ...
+            'Position', [.075 .075 .85 .89], ...
+            'Visible',  'off');
+    set(get(ax, 'Title'), ...
+        'Visible',  'on', ...
+        'fontsize', fontsize + 2)
+    title(titletext);
+end
 end
 
 function do_pretty
