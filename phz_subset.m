@@ -8,10 +8,10 @@
 % INPUT
 %   PHZ       = [struct] PHZLAB data structure.
 % 
-%   subset    = [cell|logical|numeric] If cell array of length 2, the
-%               first value is a field to restrict by (i.e., 'participant',
-%               'group', 'condition', 'session', 'trials') and the 
-%               second item is a number, string, or cell array of
+%   subset    = [cell|logical|numeric|string] If cell array of length 2,
+%               the first value is a field to restrict by (i.e.,
+%               'participant', 'group', 'condition', 'session', 'trials')
+%               and the second item is a number, string, or cell array of
 %               strings with the value(s) of the field to include.
 %           
 %               If a logcial vector (i.e., 1's & 0's) the same length 
@@ -21,6 +21,14 @@
 %               If a numeric vector, values cannot be below zero or 
 %               greater than the number of trials. Values that are 
 %               specified are included.
+%
+%               If a string, it is evaluated (using the eval function). It
+%               must evaluate to one of the types above. If you are
+%               subsetting by indices based on the resp field, use PHZ as
+%               the variable name, since the string will be evaluated in
+%               the context of this function, where the PHZ structure
+%               variable name is PHZ. This is useful for controlling
+%               different plots with PHZ.lib.plots.
 %
 %   message   = [string] Message to include in the PHZ.proc structure,
 %               usually to log the reason for this subset.
@@ -74,6 +82,11 @@ if nargin > 2
             msg = varargin{i};
         end
     end
+end
+
+% evaulate string first
+if ischar(subset)
+    subset = eval(subset);
 end
 
 % get indices to keep
