@@ -79,7 +79,7 @@ else % using -nodisplay option to run matlab in a terminal
     end
 
     if val == 1
-        fprintf('] 100%%\n')
+        fprintf('] Done.\n')
     end
 
 end
