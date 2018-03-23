@@ -412,7 +412,7 @@ if ~isempty(val)
         method = ':';
         ind = indColon;
     elseif ~strcmp(featureStr, 'snr')
-        val = {val '0' ':'}; % default one bin, bin width of 0
+        val = {val '0' '-'}; % default one bin, bin width of 0
     end
 
     % set value of val
