@@ -290,5 +290,8 @@ switch summaryFunction
             error('Cannot subtract unless there are exactly 2 trials.')
         end
         summaryData = preData(1,:) - preData(2,:);
+
+    otherwise
+        error('Invalid summary function.')
 end
 end
