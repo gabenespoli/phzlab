@@ -43,6 +43,15 @@
 %   'title'       = [string] Add a title to the top center of the figure.
 %                   Default empty ('') for no title.
 %
+%   'close'       = [0|1] Enter 1 to close the plot window after drawing
+%                   it. This is useful when making (and saving) many plots 
+%                   with a script.
+% 
+%   'save'        = [string] Enter a filename to save the created figure
+%                   to disk as a file. The filetype is determined from the
+%                   file extension. Supports png, pdf, and eps output. if 
+%                   no extension is given, .png is used.
+%   
 %   These are executed in the order that they appear in the function call. 
 %   See the help of each function for more details.
 %   'subset'    = Calls phz_subset.
@@ -92,6 +101,8 @@ xlf = [0 1000];
 pretty = false;
 dark = false;
 titletext = '';
+do_close = false;
+filename = '';
 
 % user presets
 if mod(length(varargin), 2) % if varargin is odd
@@ -140,6 +151,8 @@ for i = 1:2:length(varargin)
         case 'pretty',                  pretty = varargin{i+1};
         case 'dark',                    dark = varargin{i+1};
         case {'title','titletext'},     titletext = varargin{i+1};
+        case {'close'},                 do_close = val;
+        case {'filename','save','file'},filename = val;
     end
 end
 
@@ -258,6 +271,11 @@ if ~isempty(titletext)
         'fontsize', fontsize + 2)
     title(titletext);
 end
+
+if ~isempty(filename), phzUtil_savefig(gcf, filename), end
+
+if do_close, close(gcf), end
+
 end
 
 function do_pretty
