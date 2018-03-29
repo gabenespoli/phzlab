@@ -248,23 +248,20 @@ switch lower(featureStr)
         [PHZ,featureTitle] = phzFeature_fft(PHZ);
 
     case 'itpc'
-        featureTitle = 'Intertrial Phase Coherence';
-
         % Method adapted from Tierney & Kraus, 2013, Journal of Neuroscience.
+        % trials are collapsed
+
+        featureTitle = 'Intertrial Phase Coherence';
 
         % get complex fft
         PHZ = phzFeature_fft(PHZ, 'spectrum', 'complex');
 
         % transform each vector to a unit vector (magnitude of 1)
         PHZ.data = PHZ.data ./ abs(PHZ.data);
-        PHZ.data(isnan(PHZ.data)) = 0;
 
-        % summarize (adding 'participant' to summary if it isn't already)
-        if any(ismember({'participant','all','none'}, keepVars))
-            PHZ = phz_summary(PHZ,keepVars);
-        else
-            PHZ = phz_summary(PHZ, [{'participant'} keepVars]);
-        end
+        % if the complex fft was zero, dividing by abs will be nan
+        % set these to zero
+        PHZ.data(isnan(PHZ.data)) = 0;
 
         % average trials
         PHZ = phz_summary(PHZ,keepVars);
