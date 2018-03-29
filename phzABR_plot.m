@@ -151,8 +151,8 @@ for i = 1:2:length(varargin)
         case 'pretty',                  pretty = varargin{i+1};
         case 'dark',                    dark = varargin{i+1};
         case {'title','titletext'},     titletext = varargin{i+1};
-        case {'close'},                 do_close = val;
-        case {'filename','save','file'},filename = val;
+        case {'close'},                 do_close = varargin{i+1};
+        case {'filename','save','file'},filename = varargin{i+1};
     end
 end
 
