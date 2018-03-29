@@ -50,6 +50,13 @@
 %                   the time domain before calculating (kind of like an
 %                   "evoked" average).
 %
+%   'itfft'       = Intertrial FFT. Whereas the 'fft' feature averages
+%                   trials before caluclating the FFT, 'itfft' calculates
+%                   the FFT on each trial before averaging trials together.
+%                   (kind of like an "induced" average).
+%
+%   'itpc'        = Intertrial phase coherence.
+%
 %   'fft100'      = Entering 'fft' followed by a number will calculate
 %                   the value of the FFT at that frequency (e.g.,
 %                   'fft100' returns the value of the 100 Hz bin).
