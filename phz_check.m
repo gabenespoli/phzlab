@@ -294,7 +294,8 @@ end
 % ---
 if ismember('blsub',fieldnames(PHZ.proc))
     if ~isstruct(PHZ.proc.blsub)
-        error([name,'.blsub should be a structure.']), end
+        error([name,'.blsub should be a structure.'])
+    end
     PHZ.proc.blsub.region = verifyNumeric(PHZ.proc.blsub.region,[name,'.proc.blsub.region'],verbose);
     PHZ.proc.blsub.region = checkAndFix1x2(PHZ.proc.blsub.region,[name,'.proc.blsub.region'],nargout,verbose);
     
