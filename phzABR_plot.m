@@ -1,8 +1,9 @@
 %PHZABR_PLOT  Special plotting function to inspect ABR responses.
 %   Plots 5 signals and their associated spectra, for a total of 10 plots.
 %   These signals are the stimulus, the regular trials, the inverted
-%   trials, the EFR (adding the two polarities) and the FFR (subtracting
-%   the two polarities. Usage is similar to phz_plot.
+%   trials, the envelope FFR (adding the two polarities) and the 
+%   spectral FFR (subtracting the two polarities. Usage and options
+%   are similar to phz_plot.
 %
 % Usage:
 %   phzABR_plot(PHZ, 'Param', Value, etc.)
@@ -34,7 +35,8 @@
 %                   plots. See `help plot` for a list of possibilities.
 %                   Default {'k', 'b', 'b', 'g', 'r'}, which makes the
 %                   stimulus black, the regular and inverted trials blue,
-%                   the EFR (adding) green, and the FFR (subtracting) red.
+%                   the envelope FFR (adding) green, and the spectral
+%                   response (subtracting) red.
 %
 %   'pretty'      = [true|false] Makes the background white and removes the  
 %                   top x-axis and right y-axis, making plots look more
@@ -177,8 +179,8 @@ ytitle = {'Stimulus', ...
           [' (', num2str(PHZ.proc.summary.nTrials(1)),' trials)']}, ...
           {char(PHZ.lib.tags.trials(2));
           [' (', num2str(PHZ.proc.summary.nTrials(2)),' trials)']}, ...
-          'EFR (adding)', ...
-          'FFR (subtracting)'};
+          {'Envelope FFR'; '(adding)'}, ...
+          {'Spectral FFR'; '(subtracting)'}};
 
 % prepare for spectral plots (restrict by region)
 PHZ2 = phz_region(PHZ, region);
