@@ -45,11 +45,13 @@
 % EXAMPLES
 %   phz_subset(PHZ,{'group','control'})  >> Only include data from the 
 %                                           control group.
-%   phz_subset(PHZ,{'session',1})        >> Only include data from session 1.
+%   phz_subset(PHZ,{'session',1})        >> Only include session 1 data.
 %   phz_subset(PHZ,PHZ.resp.q1_acc == 1) >> Only include data from trials
 %                                           with an accurate response.
-%   phz_subset(PHZ,PHZ.resp.q1_rt < 9)   >> Only include data from trials
-%                                           with reaction time less than 9 s.
+%   phz_subset(PHZ,PHZ.resp.q1_rt < 9)   >> Only include trials with
+%                                           reaction time less than 9 s.
+%   phz_subset(PHZ,'PHZ.resp.q1_rt < 9') >> As above, but using the string
+%                                           syntax.
 
 % Copyright (C) 2018 Gabriel A. Nespoli, gabenespoli@gmail.com
 % 
