@@ -75,8 +75,12 @@ elseif ischar(threshold)
         threshold = str2double(threshold(1:end-2));
 
     elseif strcmpi(threshold, 'reset')
-        PHZ.proc = rmfield(PHZ.proc, 'reject');
-        PHZ = phz_history(PHZ, 'Threshold rejection marks were discarded.', verbose);
+        if ismember('reject', fieldnames(PHZ.proc))
+            PHZ.proc = rmfield(PHZ.proc, 'reject');
+            PHZ = phz_history(PHZ, 'Threshold rejection marks were discarded.', verbose);
+        else
+            disp('  No rejection marks to reset.')
+        end
         return
 
     else
