@@ -159,7 +159,7 @@ for i = loseVars, field = i{1};
 end
 
 if ismember('blsub',fieldnames(PHZ.proc))
-    PHZ.proc.blsub.values = '<collapsed>';
+    PHZ.proc.blsub.values = [];
 end
 
 % the 'rej' field is not present in phzlab version >= 1

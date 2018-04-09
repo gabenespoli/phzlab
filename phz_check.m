@@ -302,8 +302,9 @@ if ismember('blsub',fieldnames(PHZ.proc))
         PHZ.proc.blsub.values = verifyNumeric(PHZ.proc.blsub.values,[name,'.proc.blsub.values'],verbose);
         PHZ.proc.blsub.values = checkAndFixColumn(PHZ.proc.blsub.values,[name,'.proc.blsub.values'],nargout,verbose);
     else
-        if ~strcmp(PHZ.proc.blsub.values,'<collapsed>')
-            error('Problem with PHZ.proc.blsub and/or PHZ.proc.summary.'), end
+        if ~isempty(PHZ.proc.blsub.values)
+            error('Problem with PHZ.proc.blsub and/or PHZ.proc.summary.')
+        end
     end
 end
 
