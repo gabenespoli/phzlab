@@ -65,11 +65,15 @@
 %                   it. This is useful when making (and saving) many plots 
 %                   with a script.
 % 
-%   'save'        = [string] Enter a filename to save the created figure
+%   'filename'    = [string] Enter a filename to save the created figure
 %                   to disk as a file. The filetype is determined from the
 %                   file extension. Supports png, pdf, and eps output. if 
 %                   no extension is given, .png is used.
-%   
+%
+%   'save'        = [empty|1|0] Leave this option empty ([]) to be implied
+%                   with filename; i.e., save if a filename given,
+%                   otherwise don't save. Enter 1 or 0 to force 
+%
 %   These are executed in the order that they appear in the function call. 
 %   See the help of each function for more details.
 %   'subset'    = Calls phz_subset.
@@ -144,6 +148,7 @@ do_title = true;
 do_close = false;
 plotall = false;
 filename = '';
+do_save = [];
 verbose = true;
 sigstarVars = [];
 
@@ -197,7 +202,8 @@ for i = 1:2:length(varargin)
         case 'simpleytitle',                    simpleytitle = val;
         case {'do_title','title','titletext'},  do_title = val;
         case {'plotall','all'},                 plotall = val;
-        case {'filename','save','file'},        filename = val;
+        case {'filename','file'},               filename = val;
+        case {'save'},                          do_save = val;
         case {'close'},                         do_close = val;
         case 'sigstar',                         sigstarVars = val;
         otherwise, warning(['Unknown parameter ', varargin{i}])
@@ -435,7 +441,33 @@ end
 
 if pretty, set(gcf,'color','w'), end
 
-if ~isempty(filename), phzUtil_savefig(gcf, filename), end
+% backwards compatibility: if do_save is a str, make that the filename
+if ischar(do_save) && isempty(filename)
+    filename = do_save;
+    do_save = true;
+end
+
+% default do_save bahaviour: only save if filename specified
+if isempty(do_save)
+    if isempty(filename)
+        do_save = false;
+    else
+        do_save = true;
+    end
+end
+
+if do_save
+    % if do_save specified as true, but no filename specified, prompt for
+    %   filename
+    if isempty(filename)
+        [name, pathstr] = uiputfile( ...
+           {'*.png';'*.eps';'*.pdf';'*.fig'}, ...
+            'Save as');
+        filename = fullfile(pathstr, name);
+    end
+
+    phzUtil_savefig(gcf, filename),
+end
 
 if do_close, close(gcf), end
 

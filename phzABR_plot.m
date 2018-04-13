@@ -1,4 +1,4 @@
-%PHZABR_PLOT  Special plotting function to inspect ABR responses.
+%PHZFFR_PLOT  Special plotting function to inspect ABR responses.
 %   Plots 5 signals and their associated spectra, for a total of 10 plots.
 %   These signals are the stimulus, the regular trials, the inverted
 %   trials, the envelope FFR (adding the two polarities) and the 
@@ -49,11 +49,15 @@
 %                   it. This is useful when making (and saving) many plots 
 %                   with a script.
 % 
-%   'save'        = [string] Enter a filename to save the created figure
+%   'filename'    = [string] Enter a filename to save the created figure
 %                   to disk as a file. The filetype is determined from the
 %                   file extension. Supports png, pdf, and eps output. if 
 %                   no extension is given, .png is used.
-%   
+%
+%   'save'        = [empty|1|0] Leave this option empty ([]) to be implied
+%                   with filename; i.e., save if a filename given,
+%                   otherwise don't save. Enter 1 or 0 to force 
+%
 %   These are executed in the order that they appear in the function call. 
 %   See the help of each function for more details.
 %   'subset'    = Calls phz_subset.
@@ -105,6 +109,7 @@ dark = false;
 titletext = '';
 do_close = false;
 filename = '';
+do_save = [];
 
 % user presets
 if mod(length(varargin), 2) % if varargin is odd
@@ -133,28 +138,31 @@ if any(strcmp(varargin(1:2:end),'verbose'))
 end
 
 for i = 1:2:length(varargin)
+    val = varargin{i+1};
     switch lower(varargin{i})
-        case 'subset',                  PHZ = phz_subset(PHZ,varargin{i+1},verbose);
-        case {'rect','rectify'},        PHZ = phz_rectify(PHZ,varargin{i+1},verbose);
-        case {'filter','filt'},         PHZ = phz_filter(PHZ,varargin{i+1},verbose);
-        case {'smooth','smoothing'},    PHZ = phz_smooth(PHZ,varargin{i+1},verbose);
-        case 'transform',               PHZ = phz_transform(PHZ,varargin{i+1},verbose);
-        case {'blsub','blc'},           PHZ = phz_blsub(PHZ,varargin{i+1},verbose);
-        case {'rej','reject'},          PHZ = phz_reject(PHZ,varargin{i+1},verbose);
-        case {'norm','normtype'},       PHZ = phz_norm(PHZ,varargin{i+1},verbose);
-        case 'region',                  region = varargin{i+1};
-        case {'plotspec'},              plotSpec = varargin{i+1};
-        case {'linewidth','lineweight'},linewidth = varargin{i+1};
-        case 'fontsize',                fontsize = varargin{i+1};
-        case {'yl','ylim','ylt','yll'}, ylt = varargin{i+1};
-        case {'xl','xlim','xlt','xll'}, xlt = varargin{i+1};
-        case {'ylf','ylr'},             ylf = varargin{i+1};
-        case {'xlf','xlr'},             xlf = varargin{i+1};
-        case 'pretty',                  pretty = varargin{i+1};
-        case 'dark',                    dark = varargin{i+1};
-        case {'title','titletext'},     titletext = varargin{i+1};
-        case {'close'},                 do_close = varargin{i+1};
-        case {'filename','save','file'},filename = varargin{i+1};
+        case 'subset',                  PHZ = phz_subset(PHZ,val,verbose);
+        case {'rect','rectify'},        PHZ = phz_rectify(PHZ,val,verbose);
+        case {'filter','filt'},         PHZ = phz_filter(PHZ,val,verbose);
+        case {'smooth','smoothing'},    PHZ = phz_smooth(PHZ,val,verbose);
+        case 'transform',               PHZ = phz_transform(PHZ,val,verbose);
+        case {'blsub','blc'},           PHZ = phz_blsub(PHZ,val,verbose);
+        case {'rej','reject'},          PHZ = phz_reject(PHZ,val,verbose);
+        case {'norm','normtype'},       PHZ = phz_norm(PHZ,val,verbose);
+        case 'region',                  region = val;
+        case {'plotspec'},              plotSpec = val;
+        case {'linewidth','lineweight'},linewidth = val;
+        case 'fontsize',                fontsize = val;
+        case {'yl','ylim','ylt','yll'}, ylt = val;
+        case {'xl','xlim','xlt','xll'}, xlt = val;
+        case {'ylf','ylr'},             ylf = val;
+        case {'xlf','xlr'},             xlf = val;
+        case 'pretty',                  pretty = val;
+        case 'dark',                    dark = val;
+        case {'title','titletext'},     titletext = val;
+        case {'close'},                 do_close = val;
+        case {'filename','file'},       filename = val;
+        case {'save'},                  do_save = val;
+        otherwise, warning(['Unknown parameter ', varargin{i}])
     end
 end
 
@@ -274,7 +282,33 @@ if ~isempty(titletext)
     title(titletext);
 end
 
-if ~isempty(filename), phzUtil_savefig(gcf, filename), end
+% backwards compatibility: if do_save is a str, make that the filename
+if ischar(do_save) && isempty(filename)
+    filename = do_save;
+    do_save = true;
+end
+
+% default do_save bahaviour: only save if filename specified
+if isempty(do_save)
+    if isempty(filename)
+        do_save = false;
+    else
+        do_save = true;
+    end
+end
+
+if do_save
+    % if do_save specified as true, but no filename specified, prompt for
+    %   filename
+    if isempty(filename)
+        [name, pathstr] = uiputfile( ...
+           {'*.png';'*.eps';'*.pdf';'*.fig'}, ...
+            'Save as');
+        filename = fullfile(pathstr, name);
+    end
+
+    phzUtil_savefig(gcf, filename),
+end
 
 if do_close, close(gcf), end
 
