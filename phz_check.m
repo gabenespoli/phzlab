@@ -657,9 +657,10 @@ libOrder = {
     'tags'
     'spec'
 
-    'fft'
+    'tables'
     'plots'
     'abrplots'
+    'fft'
     'stim'
     
     'filename'

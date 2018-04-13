@@ -1,15 +1,21 @@
 %PHZ_WRITETABLE  Write grouping variables and features to a table.
 % 
 % USAGE    
-%   PHZ = phz_writetable(PHZ,'feature',feature)
-%   PHZ = phz_writetable(PHZ,'Param1','Value1',etc.)
+%   PHZ = phz_writetable(PHZ, 'Param1', 'Value1', etc.)
+%   PHZ = phz_writetable(PHZ, preset, 'Param1','Value1',etc.)
 % 
 % INPUT
 %   PHZ       = [struct] PHZLAB data structure.
 % 
-%   feature   = [string|cell of strings] Specifies the feature(s) to 
-%               calculate. FEATURE is specified as a paramter/value pair 
-%               so that the input format is the same as phz_plot.
+%   preset    = [string] Presets can be specified in PHZ.lib.plots by
+%               creating a field there (e.g., PHZ.lib.plots.plot1).
+%               Default settings for this plot can be specified like
+%               so: PHZ.lib.plots.plot1.smooth = 1. Putting the name
+%               of the preset as the second argument (in this case
+%               'plot1') is the same as inserting those arguments as
+%               parameter-value pairs. Add other arguments after to
+%               override the preset's default. The special preset
+%               'default' applies if no preset is specified.
 % 
 %   'unstack' = [string|cell of strings] Rearranges the table so that 
 %               columns for grouping variables are "unstacked" across 
@@ -39,6 +45,8 @@
 %   are always executed in the order listed here, after all of the
 %   processing funtions. See the help of each function for more details.
 %   'region'    = Calls phz_region.
+%   'feature'   = Calls phz_feature. Input can be a cell of many features
+%                 or a string for a single feature.
 %   'summary'   = Calls phz_summary.
 %   'abrsummary'= Calls phzABR_summary. If specified, this is called 
 %                 before phz_summary.
@@ -102,6 +110,21 @@ infoname = {};
 force = 0;
 
 verbose = true;
+
+% user presets
+if mod(length(varargin), 2) % if varargin is odd
+    if ismember('tables', fieldnames(PHZ.lib)) && ...
+        ismember(varargin{1}, fieldnames(PHZ.lib.tables))
+
+        preset = phzUtil_struct2pairs(PHZ.lib.tables.(varargin{1}));
+        varargin(1) = [];
+        varargin = [preset varargin];
+
+    else
+        error(['Either the preset doesn''t exist in PHZ.lib.tables', ...
+              ' or there are an invalid number of arguments.'])
+    end
+end
 
 % user-defined
 if any(strcmp(varargin(1:2:end),'verbose'))
