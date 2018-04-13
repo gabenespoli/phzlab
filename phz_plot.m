@@ -318,14 +318,9 @@ for p = 1:length(plotOrder)
     if ischar(do_title) || iscell(do_title)
         title(do_title)
         do_title = false;
-    elseif (islogical(do_title) && do_title) || ...
-        (isnumeric(do_title) && do_title ~= 0)
-        do_title = true;
-    else
-        warning('Invalid title. Using default title')
-        do_title = true;
+    elseif do_title
+        title(char(plotOrder(p)))
     end
-    if do_title, title(char(plotOrder(p))), end
     if isempty(ytitleLoc) || ytitleLoc == p, ylabel(ytitle), end
 
     if ismember(PHZ.proc.feature,{'fft','itfft','itpc'}) % FFT / PC plots
