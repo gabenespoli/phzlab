@@ -111,28 +111,29 @@ if any(strcmp(varargin(1:2:end),'verbose'))
 end
 
 for i = 1:2:length(varargin)
+    val = varargin{i};
     switch lower(varargin{i})
         
         % do preprocessing in order of input
-        case 'subset',                  PHZ = phz_subset(PHZ,varargin{i+1},verbose);
-        case {'rect','rectify'},        PHZ = phz_rectify(PHZ,varargin{i+1},verbose);
-        case {'filter','filt'},         PHZ = phz_filter(PHZ,varargin{i+1},'verbose',verbose);
-        case {'smooth','smoothing'},    PHZ = phz_smooth(PHZ,varargin{i+1},verbose);
-        case 'transform',               PHZ = phz_transform(PHZ,varargin{i+1},verbose);
-        case {'blsub','blc'},           PHZ = phz_blsub(PHZ,varargin{i+1},verbose);
-        case {'rej','reject'},          PHZ = phz_reject(PHZ,varargin{i+1},verbose);
-        case {'norm','normtype'},       PHZ = phz_norm(PHZ,varargin{i+1},verbose);
+        case 'subset',                  PHZ = phz_subset(PHZ,val,verbose);
+        case {'rect','rectify'},        PHZ = phz_rectify(PHZ,val,verbose);
+        case {'filter','filt'},         PHZ = phz_filter(PHZ,val,'verbose',verbose);
+        case {'smooth','smoothing'},    PHZ = phz_smooth(PHZ,val,verbose);
+        case 'transform',               PHZ = phz_transform(PHZ,val,verbose);
+        case {'blsub','blc'},           PHZ = phz_blsub(PHZ,val,verbose);
+        case {'rej','reject'},          PHZ = phz_reject(PHZ,val,verbose);
+        case {'norm','normtype'},       PHZ = phz_norm(PHZ,val,verbose);
         
-        case 'region',                  region = varargin{i+1};
-        case {'feature','features'},    feature = varargin{i+1};
-        case {'summary','keepvars'},    keepVars = varargin{i+1};
-        case {'abrsummary','summaryfunction'}, summaryFunction = varargin{i+1};
+        case 'region',                  region = val;
+        case {'feature','features'},    feature = val;
+        case {'summary','keepvars'},    keepVars = val;
+        case {'abrsummary','summaryfunction'}, summaryFunction = val;
             
-        case {'unstack','cast'},        unstackVars = varargin{i+1};
+        case {'unstack','cast'},        unstackVars = val;
             
-        case {'save','filename','file'},filename = addToCell(filename,varargin{i+1});
-        case {'info','infoname'},       infoname = addToCell(infoname,varargin{i+1});
-        case {'force'},                 force = varargin{i+1};
+        case {'save','filename','file'},filename = addToCell(filename,val);
+        case {'info','infoname'},       infoname = addToCell(infoname,val);
+        case {'force'},                 force = val;
             
     end
 end
