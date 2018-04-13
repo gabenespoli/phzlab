@@ -21,10 +21,11 @@
 %               variables). Can also use ' ' (space). Cannot be used in
 %               combination with other KEEPVARS.
 %
-%       'all' = Average all repeated trials; this is shorthand for 
-%               {'participant', 'group', 'condition', 'session', 
-%               'trials'}. Cannot be used in combination with other 
-%               KEEPVARS.
+%       'all' = This is shorthand for {'participant', 'group', 'condition',
+%               'session', 'trials'}, and means to average all repeated
+%               trials (i.e., trials that have the same values for all of
+%               their grouping variables. Cannot be used in combination
+%               with other KEEPVARS.
 %
 % OUTPUT
 %   PHZ.data                      = The data summarized by KEEPVARS.
