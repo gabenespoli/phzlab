@@ -134,7 +134,7 @@ if any(strcmp(varargin(1:2:end),'verbose'))
 end
 
 for i = 1:2:length(varargin)
-    val = varargin{i};
+    val = varargin{i+1};
     switch lower(varargin{i})
         
         % do preprocessing in order of input
