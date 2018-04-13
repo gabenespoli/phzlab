@@ -55,7 +55,8 @@
 %   'simpleYTitle'= [0|1] Enter 1 to suppress inclusion of processing info
 %                   in the y-axis title. Default 0 (include this info).
 % 
-%   'title'       = [1|0] Enter 0 to suppress the plot title. Default 1.
+%   'title'       = [1|0|string|cell] Enter 0 to suppress the plot title,
+%                   or a string or cell for a custom title. Default 1.
 %
 %   'plotall'     = [0|1] Enter 1 to overlay all raw data points on bar
 %                   plots. Default 0.
@@ -194,7 +195,7 @@ for i = 1:2:length(varargin)
         case 'pretty',                          pretty = val;
         case 'dark',                            dark = val;
         case 'simpleytitle',                    simpleytitle = val;
-        case {'do_title','title'},              do_title = val;
+        case {'do_title','title','titletext'},  do_title = val;
         case {'plotall','all'},                 plotall = val;
         case {'filename','save','file'},        filename = val;
         case {'close'},                         do_close = val;
@@ -308,6 +309,16 @@ for p = 1:length(plotOrder)
     end
 
     % label plot, add errorbars
+    if ischar(do_title) || iscell(do_title)
+        title(do_title)
+        do_title = false;
+    elseif (islogical(do_title) && do_title) || ...
+        (isnumeric(do_title) && do_title ~= 0)
+        do_title = true;
+    else
+        warning('Invalid title. Using default title')
+        do_title = true;
+    end
     if do_title, title(char(plotOrder(p))), end
     if isempty(ytitleLoc) || ytitleLoc == p, ylabel(ytitle), end
 
