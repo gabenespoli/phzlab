@@ -102,14 +102,17 @@ PHZ.proc.(procName).summaryFunction = summaryFunction;
 PHZ.proc.(procName).keepVars = keepVars;
 PHZ.proc.(procName).loseVars = loseVars;
 
-if ismember(keepVars{1}, {'none'}) % summary across all trials
+if ismember(keepVars{1}, {'none'})
+    % summary of all trials
     PHZ.proc.(procName).stdError = ste(PHZ.data);
     PHZ.proc.(procName).nParticipant = length(PHZ.participant);
     PHZ.proc.(procName).nTrials = size(PHZ.data, 1);
     preSummaryData{1} = PHZ.data;
-    PHZ.data = doSummary(PHZ.data, summaryFunction);
+    PHZ.data = doSummary(PHZ, summaryFunction);
 
-else % get categories to collapse across
+else 
+    % summary of different categories of trials
+    % get categories to collapse across
     for i = 1:length(keepVars)
         if i == 1
             varInd = PHZ.lib.tags.(keepVars{i});
@@ -120,20 +123,23 @@ else % get categories to collapse across
     varTypes = unique(varInd); % this will be in the proper spec order because they are ordinal categorical arrays
 
     % make containers
+    preSummaryData = cell(length(varTypes),1);
     summaryData = nan(length(varTypes),size(PHZ.data,2));
     PHZ.proc.(procName).stdError = nan(size(summaryData));
     PHZ.proc.(procName).nParticipant = nan(length(varTypes),1);
     PHZ.proc.(procName).nTrials = nan(length(varTypes),1);
 
-    % loop categories and average
+    % perform the summary on each category
     for i = 1:length(varTypes)
-        preSummaryData{i} = PHZ.data(varInd == varTypes(i),:); %#ok<AGROW>
-        PHZ.proc.(procName).nParticipant(i) = length(unique(PHZ.lib.tags.participant(varInd == varTypes(i))));
-        PHZ.proc.(procName).nTrials(i) = size(preSummaryData{i},1);
-        PHZ.proc.(procName).stdError(i,:) = ste(preSummaryData{i});
-        summaryData(i,:) = doSummary(preSummaryData{i}, summaryFunction);
-    end
+        TMP = phz_subset(PHZ, varInd == varTypes(i), false); % verbose = false
+        TMP = phz_discard(TMP, false); % verbose = false
+        preSummaryData{i} = TMP.data;
 
+        PHZ.proc.(procName).nParticipant(i) = length(unique(TMP.lib.tags.participant));
+        PHZ.proc.(procName).nTrials(i)      = size(preSummaryData{i}, 1);
+        PHZ.proc.(procName).stdError(i,:)   = ste(preSummaryData{i});
+        summaryData(i,:) = doSummary(TMP, summaryFunction);
+    end
     PHZ.data = summaryData;
 
     % adjust PHZ.(keepVars) vars
@@ -201,13 +207,14 @@ switch lower(summaryFunction)
     case {'*', 'mean', 'avg', 'average'},   summaryFunction = 'mean';
     case {'+', 'add', 'efr'},               summaryFunction = 'add';
     case {'-', 'sub', 'subtract', 'ffr'},   summaryFunction = 'subtract';
+    case {'itrc'},                          summaryFunction = 'itrc';
     otherwise, error('Invalid summaryFunction.')
 end
 
 % define possible values for input
 possibleKeepVars = {'participant', 'group', 'condition', 'session', 'trials'};
 possibleAloneKeepVars = {'', 'none', ' ', 'all'};
-possibleSummaryFunctions = {'mean', 'add', 'subtract'};
+possibleSummaryFunctions = {'mean', 'add', 'subtract', 'itrc'};
 
 % make sure keepVars is a cell
 if ~iscell(keepVars)
@@ -246,6 +253,7 @@ elseif sum(indSumFunc) ~= 0
     error('Too many summary functions were specified.')
 end
 
+% TODO: itrc needs to be here maybe?
 % if the summary function is + or -, make the keepVar a loseVar instead
 if ismember(summaryFunction, {'add', 'subtract'})
     % keepVar is actually a loseVar
@@ -275,22 +283,28 @@ end
 
 end
 
-function summaryData = doSummary(preData, summaryFunction)
+function summaryData = doSummary(PHZ, summaryFunction)
+% the whole PHZ is passed to this function just for itrc, which
+%   needs the tags information. mean, add, and subtract only act on
+%   PHZ.data and nothing else.
 switch summaryFunction
     case 'mean'
-        summaryData = mean(preData, 1);
+        summaryData = mean(PHZ.data, 1);
 
     case 'add'
-        if size(preData, 1) ~= 2
+        if size(PHZ.data, 1) ~= 2
             error('Cannot add unless there are exactly 2 trials.')
         end
-        summaryData = preData(1,:) + preData(2,:);
+        summaryData = PHZ.data(1,:) + PHZ.data(2,:);
 
     case 'subtract'
-        if size(preData, 1) ~= 2
+        if size(PHZ.data, 1) ~= 2
             error('Cannot subtract unless there are exactly 2 trials.')
         end
-        summaryData = preData(1,:) - preData(2,:);
+        summaryData = PHZ.data(1,:) - PHZ.data(2,:);
+
+    case 'itrc'
+        summaryData = phzFeature_itrc(PHZ);
 
     otherwise
         error('Invalid summary function.')

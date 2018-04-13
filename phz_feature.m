@@ -69,12 +69,8 @@
 %   'fft100:200'  = Using a colon will return the average over the range of
 %                   frequiencies.
 %
-%   'itfft'       = Intertrial FFT. Whereas the 'fft' feature averages
-%                   trials before caluclating the FFT, 'itfft' calculates
-%                   the FFT on each trial before averaging trials together.
-%                   (kind of like an "induced" average).
-%
-%   'itpc'        = Intertrial phase coherence.
+%   'itrc'        = If you want to change the options of the itrc (see help phzFeature_itrc)
+%                   this can only be done by setting the options in PHZ.lib.itrc.
 % 
 %   'src','srclag'= Stimulus-response correlation or lag. Returns the
 %                   r-value or the time in seconds of the maximum
@@ -269,13 +265,18 @@ switch lower(featureStr)
         % magnitude of resultant vector is the measure of phase coherence
         PHZ.data = abs(PHZ.data);
 
-%     case 'itrc', featureTitle = 'Intertrial Phase Consistency';
+    case 'itrc'
         % Method adapted from Tierney & Kraus, 2013, Journal of Neuroscience.
-        
-        % if PHZS has already been summary'd, phzFeature_itrc will have to
-        %   load each file again to calculate it
-        
+        % trials are collapsed
+
+        featureTitle = 'Intertrial Response Consistency';
+        PHZ.units = '';
+
+        % empty keepVars means to itrc across all trials
+        if isempty(keepVars), keepVars = 'none'; end
+
         % calls phz_summary, which calls phzFeature_itrc
+        PHZ = phz_summary(PHZ, keepVars, 'itrc');
 
     case 'src'
         if ~ismember('stim', fieldnames(PHZ.lib))
