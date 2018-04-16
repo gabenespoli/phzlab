@@ -128,6 +128,7 @@ function phz_plot(PHZ,varargin)
 if nargout == 0 && nargin == 0, help phz_plot, return, end
 PHZ = phz_check(PHZ);
 
+%% parse input
 % phzlab defaults
 region = [];
 feature = [];
@@ -210,7 +211,7 @@ for i = 1:2:length(varargin)
     end
 end
 
-% process & prepare data to plot
+%% process & prepare data to plot
 if length(cellstr(keepVars)) > 2, error('Cannot plot more than 2 summary types.'), end
 if ~isempty(feature) && ~strcmp(feature,'time'), PHZ = phz_region(PHZ,region,verbose); end
 if ~isempty(summaryFunction), PHZ = phzABR_summary(PHZ,summaryFunction,verbose); end
@@ -230,8 +231,7 @@ if isempty(yl), yl = nan(length(plotOrder),2); do_yl = true; else, do_yl = false
 if isempty(xl), xl = nan(size(yl));            do_xl = true; else, do_xl = false; end
 ytitle = getytitle(PHZ,feature,legendLoc,do_plotsmooth,featureTitle,simpleytitle);
 
-% loop plots and plot lines/bars
-% ------------------------------
+%% loop plots and plot lines/bars
 figure('units','normalized','outerposition',pos,...
     'name',inputname(1),'numbertitle','off');
 for p = 1:length(plotOrder)
@@ -244,7 +244,7 @@ for p = 1:length(plotOrder)
         ind = 1:size(PHZ.data,1);
     end
 
-    % loop lines/bars
+    %% loop lines/bars
     for i = 1:length(lineOrder)
         y = PHZ.data(ind(i),:);
         yall = preSummaryData{i};
@@ -314,7 +314,7 @@ for p = 1:length(plotOrder)
         end
     end
 
-    % label plot, add errorbars
+    %% label plot, add errorbars
     if ischar(do_title) || iscell(do_title)
         title(do_title)
         do_title = false;
@@ -344,7 +344,7 @@ for p = 1:length(plotOrder)
         errorbar(gca,1:length(lineOrder),PHZ.data(ind),PHZ.proc.summary.stdError(ind),'.k');
     end
 
-    % ---- sigstar (beta)
+    %% ----sigstar (beta)
     if ~isempty(sigstarVars)
         if isstruct(sigstarVars)
             if ismember(plotOrder(p), fieldnames(sigstarVars))
@@ -369,7 +369,7 @@ for p = 1:length(plotOrder)
     hold off
 end
 
-% get min/max axes ranges
+%% adjust axis limits
 if do_yl
     yl = [min(yl(:,1)) max(yl(:,2))];
 
