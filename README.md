@@ -437,6 +437,8 @@ and [Fran Copelli](http://smartlaboratory.org/portfolio/fran-copelli/)),
 for their invaluable thoughts, suggestions, inspiration, and feedback on the
 many versions of PHZLAB that it took to get here.
 
+This toolbox contains an adapted version of [sigstar](https://github.com/raacampbell/sigstar).
+
 <a name="license"></a>
 
 ## 6. License

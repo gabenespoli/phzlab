@@ -243,7 +243,7 @@ function H=makeSignificanceBar(x,y,p,fontsize)
     %makeSignificanceBar produces the bar and defines how many asterisks we get for a 
     %given p-value
 
-    offset = 0.01;
+    offset = 0.005;
     if p<=1E-3
         stars='***'; 
         fontsizeuse = fontsize + 8;
@@ -258,6 +258,7 @@ function H=makeSignificanceBar(x,y,p,fontsize)
         offset=0.025;
         fontsizeuse = fontsize;
     elseif isnan(p) || p>0.1
+        % TODO: option to hide sigstar altogether if n.s.
         stars='n.s.';
         offset=0.025;
         fontsizeuse = fontsize;

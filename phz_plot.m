@@ -59,8 +59,22 @@
 %                   or a string or cell for a custom title. Default 1.
 %
 %   'plotall'     = [0|1] Enter 1 to overlay all raw data points on bar
-%                   plots. Default 0.
+%                   plots. Default 0. **Beta**
 % 
+%   'sigstar'     = [string|cell of strings] For bar plots, add asterisks
+%                   indicating if there is a significant difference between
+%                   pairs of bars. Enter 'paired' or 'unpaired' for the
+%                   different kinds of t-tests. This functionality uses
+%                   the ttest and ttest2 functions from the Statistics and
+%                   Machine Learning Toolbox. Can also be a cell array
+%                   where the first element is 'paired' or 'unpaired', and
+%                   the others are parameter-value pair arguments to the
+%                   underlying ttest/ttest2 functions.
+%
+%                   To manually specify significance stars, see
+%                   phzUtil_sigstar for details. Input would be a cell
+%                   array in this case.
+%
 %   'close'       = [0|1] Enter 1 to close the plot window after drawing
 %                   it. This is useful when making (and saving) many plots 
 %                   with a script.
@@ -151,7 +165,7 @@ plotall = false;
 filename = '';
 do_save = [];
 verbose = true;
-sigstarVars = [];
+sigstarArgs = [];
 
 % user presets
 if mod(length(varargin), 2) % if varargin is odd
@@ -206,7 +220,7 @@ for i = 1:2:length(varargin)
         case {'filename','file'},               filename = val;
         case {'save'},                          do_save = val;
         case {'close'},                         do_close = val;
-        case 'sigstar',                         sigstarVars = val;
+        case 'sigstar',                         sigstarArgs = val;
         otherwise, warning(['Unknown parameter ', varargin{i}])
     end
 end
@@ -344,18 +358,69 @@ for p = 1:length(plotOrder)
         errorbar(gca,1:length(lineOrder),PHZ.data(ind),PHZ.proc.summary.stdError(ind),'.k');
     end
 
-    %% ----sigstar (beta)
-    if ~isempty(sigstarVars)
-        if isstruct(sigstarVars)
-            if ismember(plotOrder(p), fieldnames(sigstarVars))
-                sigstarVarsCurrent = sigstarVars.(char(plotOrder(p)));
+    %% sigstar for bar plots (beta)
+    if ~isempty(sigstarArgs) && size(PHZ.data,2) == 1
+        do_ttest = 0;
+        if ischar(sigstarArgs), sigstarArgs = cellstr(sigstarArgs); end
+        if isstruct(sigstarArgs) % struct is if there are many plots in the same figure
+            if ismember(plotOrder(p), fieldnames(sigstarArgs))
+                sigstarArgsCurrent = sigstarArgs.(char(plotOrder(p)));
             end
+        elseif iscell(sigstarArgs) && ...
+            all(ismember(sigstarArgs{1}, {'ttest','paired'})) % paired
+            do_ttest = 1;
+            sigstarArgsCurrent = sigstarArgs;
+        elseif iscell(sigstarArgs) && ...
+            all(ismember(sigstarArgs{1}, {'ttest2','unpaired'})) % unpaired
+            do_ttest = 2;
+            sigstarArgsCurrent = sigstarArgs;
         else
-            sigstarVarsCurrent = sigstarVars;
+            sigstarArgsCurrent = sigstarArgs;
         end
-        if ~isempty(sigstarVarsCurrent)
+
+        if ~isempty(sigstarArgsCurrent)
+            if do_ttest % calculate the sigstars
+                pval = nan(size(lineOrder));
+                grps = cell(size(lineOrder));
+                for sig1 = 1:length(lineOrder)
+
+                    % wrap around to start of lineOrder
+                    if sig1 == length(lineOrder) 
+                        sig2 = 1;
+                    else
+                        sig2 = sig1 + 1;
+                    end
+                    grps{sig1} = {char(lineOrder(sig1)), char(lineOrder(sig2))};
+
+                    % get extra specified ttest args
+                    if length(sigstarArgsCurrent) > 1
+                        ttestArgs = sigstarArgsCurrent(2:end);
+                    else
+                        ttestArgs = {};
+                    end
+
+                    data1 = preSummaryData{ind(sig1)};
+                    data2 = preSummaryData{ind(sig2)};
+                    if do_ttest == 1
+                        [~,pval(sig1)] = ttest(data1, data2, ttestArgs{:});
+                    elseif do_ttest == 2
+                        [~,pval(sig1)] = ttest2(data1, data2, ttestArgs{:});
+                    else
+                        error('Sigstar input converted to bad value for do_ttest.')
+                    end
+                end
+
+                % collect sigstar args and call sigstar
+                nsort = 0;
+                if length(plotOrder) > 1
+                    sigstarFontsize = fontsize - 8;
+                else
+                    sigstarFontsize = fontsize;
+                end
+                sigstarArgsCurrent = {grps, pval, nsort, sigstarFontsize};
+            end
             try
-                phzUtil_sigstar(sigstarVarsCurrent{:})
+                phzUtil_sigstar(sigstarArgsCurrent{:})
             catch
                 fprintf('  Aborting using sigstar for some reason...\n')
             end
