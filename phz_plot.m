@@ -168,17 +168,30 @@ verbose = true;
 sigstarArgs = [];
 
 % user presets
+% this is basically a wrapper on phz_plot
 if mod(length(varargin), 2) % if varargin is odd
-    if ismember('plots', fieldnames(PHZ.lib)) && ...
-        ismember(varargin{1}, fieldnames(PHZ.lib.plots))
-
-        preset = phzUtil_struct2pairs(PHZ.lib.plots.(varargin{1}));
-        varargin(1) = [];
+    if islogical(varargin{1}) && ~varargin{1}
+        varargin(1) = []; % don't do presets, remove the oddball vararg
+    end
+    if ~ismember('plots', fieldnames(PHZ.lib))
+        error('No presets are specified in PHZ.lib.plots.')
+    end
+    presets = varargin{1};
+    varargin(1) = [];
+    if ischar(presets) % single preset, continue and draw plot
+        if ~ismember(presets, fieldnames(PHZ.lib.plots))
+            fprintf('! No preset called %s.\n', presets)
+            return
+        end
+        preset = phzUtil_struct2pairs(PHZ.lib.plots.(presets));
         varargin = [preset varargin];
-
-    else
-        error(['Either the preset doesn''t exist in PHZ.lib.plots', ...
-              ' or there are an invalid number of arguments.'])
+    elseif iscell(presets) % many presets, loop them
+        loopPresets(PHZ, presets, varargin{:});
+        return
+    elseif islogical(presets) && presets || ...
+            isnumeric(presets) && presets == 1 % loop all presets
+        loopPresets(PHZ, fieldnames(PHZ.lib.plots), varargin{:});
+        return
     end
 end
 
@@ -724,4 +737,12 @@ end
 if ~isempty(line2), ytitle{2} = line2; end % add 2nd line titles if any
 ytitle{end+1} = ' '; % spacer to prevent overlapping with y ticks
 
+end
+
+function loopPresets(PHZ, presets, varargin)
+for i = 1:length(presets)
+    fprintf('\n  Plotting preset %i/%i: %s\n', ...
+        i, length(presets), presets{i})
+    phz_plot(PHZ, presets{i}, varargin{:});
+end
 end
