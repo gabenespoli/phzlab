@@ -260,6 +260,9 @@ switch lower(featureStr)
         PHZ.data(isnan(PHZ.data)) = 0;
 
         % average trials
+        if isempty(keepVars)
+            keepVars = 'none';
+        end
         PHZ = phz_summary(PHZ,keepVars);
 
         % magnitude of resultant vector is the measure of phase coherence
