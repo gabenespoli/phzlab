@@ -156,6 +156,7 @@ for j = 1:length(files)
             TMP.lib = rmfield(TMP.lib, 'filename'); end
         
         PHZ.proc = [];
+        PHZ.etc = [];
         PHZ.proc.combine{j} = TMP.proc;
         PHZ.etc.combine{j} = TMP.etc;
 
