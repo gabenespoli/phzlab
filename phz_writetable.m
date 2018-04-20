@@ -14,8 +14,7 @@
 %               of the preset as the second argument (in this case
 %               'plot1') is the same as inserting those arguments as
 %               parameter-value pairs. Add other arguments after to
-%               override the preset's default. The special preset
-%               'default' applies if no preset is specified.
+%               override the preset's default. 
 % 
 %   'unstack' = [string|cell of strings] Rearranges the table so that 
 %               columns for grouping variables are "unstacked" across 
