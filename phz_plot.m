@@ -7,15 +7,22 @@
 % Input:
 %   PHZ           = [struct] PHZLAB data structure.
 %
-%   preset        = [string] Presets can be specified in PHZ.lib.plots by
-%                   creating a field there (e.g., PHZ.lib.plots.plot1).
-%                   Default settings for this plot can be specified like
-%                   so: PHZ.lib.plots.plot1.smooth = 1. Putting the name
-%                   of the preset as the second argument (in this case
-%                   'plot1') is the same as inserting those arguments as
+%   preset        = [string|cell of strings|logical] Presets can be
+%                   specified in PHZ.lib.plots by creating a field there
+%                   (e.g., PHZ.lib.plots.plot1). Default settings for this
+%                   plot can be specified like so:
+%                   PHZ.lib.plots.plot1.smooth = 1. Putting the name of the
+%                   preset as the second argument (in this case 'plot1') is
+%                   the same as inserting those arguments as
 %                   parameter-value pairs. Add other arguments after to
-%                   override the preset's default. 
-% 
+%                   override the preset's default. Note that this is only 
+%                   the case for non-processing parameters.
+%
+%                   Use a cell array of strings to plot many presets in
+%                   one function call.
+%
+%                   Use logical true to plot all presets.
+%
 %   'smooth'      = [1|0] For line plots, apply a moving point average.
 % 
 %   'dispn'       = [1|0] Display the number of trials or participants
@@ -183,7 +190,7 @@ if mod(length(varargin), 2) % if varargin is odd
             return
         end
         preset = phzUtil_struct2pairs(PHZ.lib.plots.(presets));
-        varargin = [preset varargin];
+        varargin = [varargin preset];
     elseif iscell(presets) % many presets, loop them
         loopPresets(PHZ, presets, varargin{:});
         return
@@ -201,6 +208,12 @@ if any(strcmp(varargin(1:2:end),'verbose'))
     varargin([i,i+1]) = [];
 end
 
+% TODO: 3. look for duplicate processing parameters and use most recent, maybe throw warning
+% > warning or fprintf('If you want to transform twice, use the correct parameter syntax (coming soon).')
+
+% TODO: 4. look for 2's at the end of parameters, and allow them to run twice
+% this means that 
+
 for i = 1:2:length(varargin)
     val = varargin{i+1};
     switch lower(varargin{i})
@@ -212,10 +225,14 @@ for i = 1:2:length(varargin)
         case {'blsub','blc'},                   PHZ = phz_blsub(PHZ,val,verbose);
         case {'rej','reject'},                  PHZ = phz_reject(PHZ,val,verbose);
         case {'norm','normtype'},               PHZ = phz_norm(PHZ,val,verbose);
+            % TODO: 2. run these processing steps right away, similar to running in command window
+            % - make sure that preSummaryData is saved somewhere so we can still get error bars
+            % - don't call region from phz_feature, these need to be separate
         case 'region',                          region = val;
         case 'feature',                         feature = val;
         case {'summary','keepvars'},            keepVars = val;
         case {'abrsummary','summaryfunction'},  summaryFunction = val;
+            % -----
         case {'plotsmooth'},                    do_plotsmooth = val;
         case {'dispn','n'},                     dispn = val;    
         case {'legend','legendloc'},            legendLoc = val;            
@@ -241,6 +258,8 @@ end
 if length(cellstr(keepVars)) > 2, error('Cannot plot more than 2 summary types.'), end
 if ~isempty(feature) && ~strcmp(feature,'time'), PHZ = phz_region(PHZ,region,verbose); end
 if ~isempty(summaryFunction), PHZ = phzABR_summary(PHZ,summaryFunction,verbose); end
+
+% TODO: 1. remove the dependency of calling summary from phz_feature
 [PHZ,featureTitle,preSummaryData] = phz_feature(PHZ,feature,'summary',keepVars,'verbose',verbose);
 % (run phz_summary through phz_feature because fft feature needs to average
 %  over the summaryType by participant before doing the fft)
