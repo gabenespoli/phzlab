@@ -171,12 +171,13 @@ while keepGoing
     ytitle = [PHZ.datatype, ' (', PHZ.units, ')'];
     ytitle2 = '';
     if yScaleAll
-        ylim(getYL(PHZ_plot.data, rejectionThreshold))
+        yl = (getYL(PHZ_plot.data, rejectionThreshold));
         ytitle2 = [ytitle2, ' [scale: all]'];
     else
-        ylim(getYL(PHZ_plot.data(currentTrial,:), []))
+        yl = getYL(PHZ_plot.data(currentTrial,:), []);
         ytitle2 = [ytitle2, ' [scale: current]'];
     end
+    if yl(1) < yl(2), ylim(yl), end
     if smooth
         ytitle2 = [ytitle2, ' [smoothing: ',PHZ_plot.proc.smooth,']'];
     end
