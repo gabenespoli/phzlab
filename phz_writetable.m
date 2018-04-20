@@ -247,6 +247,7 @@ function printOrSaveToFile(filename,d,force)
 if ~isempty(filename)
     for i = 1:length(filename)
         fname = filename{i};
+        if islogical(fname) && ~fname, continue, end
         fname = phzUtil_getUniqueSaveName(fname,force);
         if isempty(fname), continue, end
         [~,~,ext] = fileparts(fname);
