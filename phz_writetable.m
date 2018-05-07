@@ -22,11 +22,16 @@
 %               unstacked. This is useful if you will be using SPSS
 %               with a repeated measures design. See examples.
 % 
-%   'filename'= Filename and path to save resultant table as either a
-%               MATLAB file (.mat) or text file of comma-separated values
-%               (.csv). The file extension determines the type of file.
+%   'filename' = [string] Enter a filename to save the created figure
+%                to disk as a file. The filetype is determined from the
+%                file extension. Supports png, pdf, and eps output. if 
+%                no extension is given, .png is used.
 %
-%   'force'   = See help phzUtil_getUniqueSaveName.
+%   'save'     = [empty|1|0] Leave this option empty ([]) to be implied
+%                with filename; i.e., save if a filename given,
+%                otherwise don't save. Enter 1 or 0 to force 
+%   
+%  'force'   = See help phzUtil_getUniqueSaveName.
 %   
 %   The following functions can be called as parameter/value pairs,
 %   and are executed in the same order as they appear in the
@@ -107,7 +112,7 @@ unstackVars = [];
 filename = {};
 infoname = {};
 force = 0;
-
+do_save = [];
 verbose = true;
 
 % user presets
@@ -153,7 +158,8 @@ for i = 1:2:length(varargin)
             
         case {'unstack','cast'},        unstackVars = val;
             
-        case {'save','filename','file'},filename = addToCell(filename,val);
+        case {'filename','file'},               filename = val;
+        case {'save'},                          do_save = val;
         case {'info','infoname'},       infoname = addToCell(infoname,val);
         case {'force'},                 force = val;
             
@@ -243,21 +249,35 @@ varargout{1} = d;
 disp('  Done exporting PHZ features.')
 end
 
-function printOrSaveToFile(filename,d,force)
-if ~isempty(filename)
-    for i = 1:length(filename)
-        fname = filename{i};
-        if islogical(fname) && ~fname, continue, end
-        fname = phzUtil_getUniqueSaveName(fname,force);
-        if isempty(fname), continue, end
-        [~,~,ext] = fileparts(fname);
-        switch ext
-            case {'.mat'},          save(fname,'d')
-            case {'.csv','.txt'},   writetable(d,fname)
-        end
-        disp(['  Saved file ''',fname,'''.'])
-    end
-end
+if ~isempty(filename), phzUtil_savefig(gcf, filename), end
+ % backwards compatibility: if do_save is a str, make that the filename
+ if ischar(do_save) && isempty(filename)
+     filename = do_save;
+     do_save = true;
+ end
+ 
+ % default do_save bahaviour: only save if filename specified
+ if isempty(do_save)
+     if isempty(filename)
+         do_save = false;
+     else
+         do_save = true;
+     end
+ end
+ 
+ if do_save
+    % if do_save specified as true, but no filename specified, prompt for
+     %   filename
+     if isempty(filename)
+         [name, pathstr] = uiputfile( ...
+            {'*.png';'*.eps';'*.pdf';'*.fig'}, ...
+             'Save as');
+         filename = fullfile(pathstr, name);
+     end
+ 
+     phzUtil_savefig(gcf, filename),
+ end
+
 end
 
 function d = insertOtherInfo(d,infoname)
