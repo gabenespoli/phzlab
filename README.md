@@ -1,3 +1,5 @@
+<a name="phzlab"></a>
+
 # PHZLAB: A MATLAB toolbox for analyzing physiological data.
 
 ![PHZLAB Logo](img/phzlab_logo.png)
