@@ -2,7 +2,9 @@
 
 # PHZLAB: A MATLAB toolbox for analyzing physiological data.
 
-<img src="https://github.com/gabenespoli/phzlab/blob/master/img/phzlab_logo.png" height="250" alt="PHZLAB Logo">
+<div style="text-align:center">
+<img src="https://github.com/gabenespoli/phzlab/blob/master/img/phzlab_logo.png" height="250" alt="PHZLAB Logo" />
+</div>
 
 PHZLAB is a MATLAB Toolbox for analyzing physiological data, both peripheral
 (e.g., EDA, EMG) and neural (i.e., ABR). Really, it is good for any
