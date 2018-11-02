@@ -14,13 +14,11 @@ in mind:
 - be simple enough to act as an introduction to MATLAB
 - be hackable enough so as not to be a hindrance, while still adding value
 
-## Documentation
+See the [wiki](https://github.com/gabenespoli/phzlab/wiki) for a [proper introduction](https://github.com/gabenespoli/phzlab/wiki/Introduction), [quickstart walkthrough](https://github.com/gabenespoli/phzlab/wiki/Quickstart), example pipeline scripts, and other reference guides.
 
-See the [wiki](https://github.com/gabenespoli/phzlab/wiki) for a [quickstart](https://github.com/gabenespoli/phzlab/wiki/Quickstart) guide, example pipeline scripts, and other reference guides.
+## Installation in Three Steps
 
-## Installation
-
-### System Requirements
+### 1. System Requirements
 
 PHZLAB requires MATLAB to run. Since PHZLAB uses the table and categorical
 variable types, it will only run on MATLAB versions R2014a and later. Also for
@@ -34,16 +32,16 @@ dependencies can be found in the help section of the functions themselves.
 
 - `phz_filter` requires the **Signal Processing Toolbox**.
 
-### Download
+### 2. Download
 
 **Manual download.** Use the download link in the upper-right corner of this
 webpage (https://github.com/gabenespoli/phzlab). Unzip the file and put it
-somewhere where you can easily add it to your MATLAB path.
+somewhere where you can easily add it to your MATLAB path (like ~/Documents/MATLAB).
 
 **Install using git.** From a terminal, move to the directory where you want to
-put PHZLAB (likely the default MATLAB folder) and clone the git repository
-there. You may need to install git first (e.g., on a Mac you'll need the XCode
-Command Line Tools, which you can obtain by running `xcode-select install` in a
+put PHZLAB (like ~/Documents/MATLAB) and clone the git repository there. You
+may need to install git first (e.g., on a Mac you'll need the XCode Command
+Line Tools, which you can obtain by running `xcode-select install` in a
 terminal).
 
 ```bash
@@ -58,7 +56,7 @@ cd ~/Documents/MATLAB/phzlab
 git pull
 ```
 
-### Add the folder to your MATLAB path
+### 3. Add to the MATLAB path
 
 Use the MATLAB menu to add the phzlab folder to your path, or type the following in the command window or your scripts:
 
