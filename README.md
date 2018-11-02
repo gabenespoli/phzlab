@@ -14,7 +14,7 @@ in mind:
 - be simple enough to act as an introduction to MATLAB
 - be hackable enough so as not to be a hindrance, while still adding value
 
-See the [wiki](https://github.com/gabenespoli/phzlab/wiki) for a [proper introduction](https://github.com/gabenespoli/phzlab/wiki/Introduction), [quickstart walkthrough](https://github.com/gabenespoli/phzlab/wiki/Quickstart), example pipeline scripts, and other reference guides.
+See the [wiki](https://github.com/gabenespoli/phzlab/wiki) for a [proper introduction](https://github.com/gabenespoli/phzlab/wiki/Introduction), [quickstart guide](https://github.com/gabenespoli/phzlab/wiki/Quickstart), example pipeline scripts, and other reference pages.
 
 ## Installation in Three Steps
 
