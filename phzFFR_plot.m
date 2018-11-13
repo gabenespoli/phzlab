@@ -1,4 +1,4 @@
-%PHZFFR_PLOT  Special plotting function to inspect ABR responses.
+%PHZFFR_PLOT  Special plotting function to inspect FFR responses.
 %   Plots 5 signals and their associated spectra, for a total of 10 plots.
 %   These signals are the stimulus, the regular trials, the inverted
 %   trials, the envelope FFR (adding the two polarities) and the 
@@ -6,11 +6,11 @@
 %   are similar to phz_plot.
 %
 % Usage:
-%   phzABR_plot(PHZ, 'Param', Value, etc.)
-%   phzABR_plot(PHZ, preset, 'Param', Value, etc.)
+%   phzFFR_plot(PHZ, 'Param', Value, etc.)
+%   phzFFR_plot(PHZ, preset, 'Param', Value, etc.)
 %
 % Input:
-%   PHZ           = PHZLAB data structure of ABR data. Should have the
+%   PHZ           = PHZLAB data structure of FFR data. Should have the
 %                   PHZ.lib.stim field with the stimulus waveform.
 %
 %   preset        = [string] Use this preset from PHZ.lib.abrplots.
@@ -84,7 +84,7 @@
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see http://www.gnu.org/licenses/.
 
-function phzABR_plot(PHZ, varargin)
+function phzFFR_plot(PHZ, varargin)
 
 if length(PHZ.trials) ~= 2
     error('Must have exactly 2 trial types (usually regular and inverted)')
@@ -167,7 +167,7 @@ for i = 1:2:length(varargin)
 end
 
 % prepare for all plots
-PHZ = phzABR_equalizeTrials(PHZ);
+PHZ = phzFFR_equalizeTrials(PHZ);
 PHZ = phz_summary(PHZ, 'trials');
 if dark, plotSpec = strrep(plotSpec, 'k', 'w'); end
 

@@ -1,9 +1,9 @@
-%PHZABR_EXPORTBT  Export ABR data in a format that can be imported into
+%PHZFFR_EXPORTBT  Export FFR data in a format that can be imported into
 %   Brainstem Toolbox (http://www.brainvolts.northwestern.edu/form/freeware.php)
 %
 % USAGE
-%   phzABR_exportBT(PHZ)
-%   phzABR_exportBT(PHZ,'Param1','Value1',etc.)
+%   phzFFR_exportBT(PHZ)
+%   phzFFR_exportBT(PHZ,'Param1','Value1',etc.)
 %
 % INPUT
 %   PHZ         = [struct] PHZLAB data structure.
@@ -31,12 +31,12 @@
 %   processing funtions. See the help of each function for more details.
 %   'region'    = Calls phz_region.
 % 
-%   'summary'   = ['add'|'sub'] Calls phzABR_summary.m.
+%   'summary'   = ['add'|'sub'] Calls phzFFR_summary.m.
 %
 
-function PHZ = phzABR_exportBT(PHZ, varargin)
+function PHZ = phzFFR_exportBT(PHZ, varargin)
 
-if nargout == 0 && nargin == 0, help phzABR_exportToBT, return, end
+if nargout == 0 && nargin == 0, help phzFFR_exportToBT, return, end
 PHZ = phz_check(PHZ);
 
 % defaults
@@ -81,7 +81,7 @@ if stimulus
 else
     % data preprocessing
     PHZ = phz_region(PHZ, region, verbose);
-    PHZ = phzABR_summary(PHZ, summaryFunction, verbose);
+    PHZ = phzFFR_summary(PHZ, summaryFunction, verbose);
     if size(PHZ.data, 1) > 1
         PHZ = phz_summary(PHZ, 'none'); % average across all trials
     end

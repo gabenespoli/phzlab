@@ -1,9 +1,9 @@
-%PHZABR_EQUALIZETRIALS  Make the number of each type of trial the same
+%PHZFFR_EQUALIZETRIALS  Make the number of each type of trial the same
 %   by randomly removing trials.
 %
 % USAGE
-%   PHZ = phzABR_equalizeTrials(PHZ)
-%   PHZ = phzABR_equalizeTrials(PHZ, grpVar)
+%   PHZ = phzFFR_equalizeTrials(PHZ)
+%   PHZ = phzFFR_equalizeTrials(PHZ, grpVar)
 %
 % INPUT
 %   grpVar    = [string] One of the grouping variables 'participant',
@@ -40,9 +40,9 @@
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see http://www.gnu.org/licenses/.
 
-function PHZ = phzABR_equalizeTrials(PHZ, grpVar, verbose)
+function PHZ = phzFFR_equalizeTrials(PHZ, grpVar, verbose)
 
-if nargout == 0 && nargin == 0, help phzABR_equalizeTrials, return, end
+if nargout == 0 && nargin == 0, help phzFFR_equalizeTrials, return, end
 if nargin < 2, grpVar = 'trials'; end
 if nargin < 3, verbose = true; end
 if isempty(grpVar), return, end

@@ -1,14 +1,14 @@
-%PHZABR_SUMMARY  Combine polarities in an appropriate way for ABR data.
+%PHZFFR_SUMMARY  Combine polarities in an appropriate way for FFR data.
 %   Polarities must be labeled with the 'trials' grouping variable (i.e.,
 %   PHZ.trials) and must have exactly two unique categories. First the
 %   number of trials in each category is equalized using
-%   phzABR_equalizeTrials, and then phz_summary is used to a) average
+%   phzFFR_equalizeTrials, and then phz_summary is used to a) average
 %   together each polarity (while maintaining the other grouping
 %   variables), and then b) combine the resulting two waveforms using
 %   the specified summary function (i.e., add, subtract, or mean).
 %
 % USAGE
-%   PHZ = phzABR_summary(PHZ, summaryFunction)
+%   PHZ = phzFFR_summary(PHZ, summaryFunction)
 %   
 % INPUT
 %   PHZ               = [struct] PHZLAB data structure.
@@ -23,7 +23,7 @@
 %   there must be exactly two trials for every unique combination of the
 %   values of KEEPVARS. These must be used with at least one other
 %   KEEPVARS. The default for phz_summary is 'mean', but there is no
-%   default for phzABR_summary; this parameter must be specified.
+%   default for phzFFR_summary; this parameter must be specified.
 
 % Copyright (C) 2018 Gabriel A. Nespoli, gabenespoli@gmail.com
 % 
@@ -40,7 +40,7 @@
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see http://www.gnu.org/licenses/.
 
-function PHZ = phzABR_summary(PHZ, summaryFunction, verbose)
+function PHZ = phzFFR_summary(PHZ, summaryFunction, verbose)
 
 % defaults
 if nargin < 3, verbose = true; end
@@ -54,7 +54,7 @@ if length(unique(PHZ.lib.tags.(grpVar))) ~= 2
 end
 
 % equalize number of trials
-PHZ = phzABR_equalizeTrials(PHZ, grpVar, verbose);
+PHZ = phzFFR_equalizeTrials(PHZ, grpVar, verbose);
 
 % summary by everything (i.e., create averages for each of the 2 labels)
 PHZ = phz_summary(PHZ, 'all', verbose);
