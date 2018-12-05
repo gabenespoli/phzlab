@@ -26,7 +26,7 @@
 % 
 %   These are always executed in the order listed here, after the above
 %   processing funtions. See the help of each function for more details.
-%     'equal'     = Calls phzABR_equalizeTrials.
+%     'equal'     = Calls phzFFR_equalizeTrials.
 %     'region'    = Calls phz_region.
 %     'summary'   = Calls phz_summary. Note that this will summarize each
 %                   file individually.
@@ -138,7 +138,7 @@ for j = 1:length(files)
         end
     end
     
-    TMP = phzABR_equalizeTrials(TMP, equalGrpVar, verbose);
+    TMP = phzFFR_equalizeTrials(TMP, equalGrpVar, verbose);
     TMP = phz_region(TMP, region, verbose);
     TMP = phz_summary(TMP, keepVars, verbose);
     

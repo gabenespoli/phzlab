@@ -47,7 +47,7 @@
 %   'feature'   = Calls phz_feature. Input can be a cell of many features
 %                 or a string for a single feature.
 %   'summary'   = Calls phz_summary.
-%   'abrsummary'= Calls phzABR_summary. If specified, this is called 
+%   'ffrsummary'= Calls phzFFR_summary. If specified, this is called 
 %                 before phz_summary.
 % 
 % OUTPUT
@@ -149,7 +149,7 @@ for i = 1:2:length(varargin)
         case 'region',                  region = val;
         case {'feature','features'},    feature = val;
         case {'summary','keepvars'},    keepVars = val;
-        case {'abrsummary','summaryfunction'}, summaryFunction = val;
+        case {'ffrsummary','summaryfunction'}, summaryFunction = val;
             
         case {'unstack','cast'},        unstackVars = val;
             
@@ -164,7 +164,7 @@ end
 if isempty(feature), error('A feature must be specified.'), end
 if ~iscell(feature), feature = {feature}; end
 if ischar(keepVars), keepVars = cellstr(keepVars); end
-if ~isempty(summaryFunction), PHZ = phzABR_summary(PHZ, summaryFunction, verbose); end
+if ~isempty(summaryFunction), PHZ = phzFFR_summary(PHZ, summaryFunction, verbose); end
 
 disp('  Calculating features...')
 for i = 1:length(feature)

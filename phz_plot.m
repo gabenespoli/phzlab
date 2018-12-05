@@ -112,7 +112,7 @@
 %   'feature'   = Calls phz_feature and makes bar plots instead of line
 %                 plots (excepting FFT and ITPC).
 % 
-%   'abrsummary'= Calls phzABR_summary.
+%   'abrsummary'= Calls phzFFR_summary.
 % 
 %   'summary'   = Calls phz_summary. The default summary is 'all', which 
 %                 averages across all trials. A maximum of 2 summary 
@@ -257,7 +257,7 @@ end
 %% process & prepare data to plot
 if length(cellstr(keepVars)) > 2, error('Cannot plot more than 2 summary types.'), end
 if ~isempty(feature) && ~strcmp(feature,'time'), PHZ = phz_region(PHZ,region,verbose); end
-if ~isempty(summaryFunction), PHZ = phzABR_summary(PHZ,summaryFunction,verbose); end
+if ~isempty(summaryFunction), PHZ = phzFFR_summary(PHZ,summaryFunction,verbose); end
 
 % TODO: 1. remove the dependency of calling summary from phz_feature
 [PHZ,featureTitle,preSummaryData] = phz_feature(PHZ,feature,'summary',keepVars,'verbose',verbose);
