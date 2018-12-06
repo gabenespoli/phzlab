@@ -1,4 +1,4 @@
-function phzUtil_savefig(fig, filename)
+function phzUtil_savefig(fig, filename, verbose)
 % phzUtil_savefig: Utility function to save a figure.
 % phzUtil_savefig(filename)
 % phzUtil_savefig(fig, filename)
@@ -11,6 +11,9 @@ function phzUtil_savefig(fig, filename)
 if nargin < 2
     filename = fig;
     fig = gcf;
+end
+if nargin < 3
+    verbose = true;
 end
 
 [~,~,ext] = fileparts(filename);
@@ -41,4 +44,9 @@ switch ext
         print(fig, '-dpdf', filename);
 
 end
+
+if verbose
+    fprintf('  Saved figure %s\n', filename)
+end
+
 end
