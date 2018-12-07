@@ -77,7 +77,9 @@ PHZ.data = PHZ.data(keep, :);
 
 for fields = {'participant','group','condition','session','trials'}
     field = fields{1};
-    PHZ.lib.tags.(field) = PHZ.lib.tags.(field)(keep);
+    if ~strcmp('<collapsed>', PHZ.lib.tags.(field))
+        PHZ.lib.tags.(field) = PHZ.lib.tags.(field)(keep);
+    end
 
     % if we've lost a whole category, remove it from PHZ.lib.spec
     cats = PHZ.(field);
