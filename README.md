@@ -83,3 +83,6 @@ PHZLAB contains an adapted version of
 
 This software is covered by the GNU General Public Licence v3.
 
+## Contributing
+
+If you are interested in contributing to this project please get in touch! You can email me at [gabenespoli@gmail.com](mailto:gabenespoli@gmail.com)
