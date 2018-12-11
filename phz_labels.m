@@ -33,6 +33,11 @@
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see http://www.gnu.org/licenses/.
 
+% TODO: accept a text file as input
+%   - must have same number of lines as trials
+%   - optionally specify a format string to pull one part of each line, 
+%     i.e. if this is a log file we can parse it a little bit
+
 function PHZ = phz_labels(PHZ, labels, verbose)
 
 if nargout == 0 && nargin == 0, help phz_labels, return, end
