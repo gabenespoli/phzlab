@@ -261,9 +261,9 @@ if ismember(summaryFunction, {'add', 'subtract'})
         error('Must use exactly one keepVar with an ''add'' or ''subtract'' summary function.')
     end
     loseVars = keepVars;
-    keepVars = possibleKeepVars(~ismember(keepVars, possibleKeepVars));
+    keepVars = possibleKeepVars(~ismember(possibleKeepVars, keepVars));
 else
-    loseVars = possibleKeepVars(~ismember(keepVars, possibleKeepVars));
+    loseVars = possibleKeepVars(~ismember(possibleKeepVars, keepVars));
 end
 
 % if a keepVar doesn't have multiple categories within, it doesn't need to be summary'd
