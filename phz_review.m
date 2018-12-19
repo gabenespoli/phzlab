@@ -138,7 +138,7 @@ rejectionThreshold = [];
 PHZ_plot = PHZ; % make copy so we can change smoothing
 keepGoing = true;
 pos = [];
-showKeyboardControls = false;
+showKeyboardControls = true;
 
 while keepGoing
 
