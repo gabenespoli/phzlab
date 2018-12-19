@@ -9,7 +9,8 @@
 % 
 %   cutoff        = [numeric] Cutoff frequencies for filtering in Hertz, 
 %                   in the form [hipass lopass notch]. Notch filters are a 
-%                   freq - 1 to freq + 1 band stop filter.
+%                   freq - 1 to freq + 1 band stop filter. Enter 0 to
+%                   prevent filtering.
 % 
 %   'order'       = [numeric] Specifies the filter order. Default 3.
 % 
